@@ -42,10 +42,10 @@ Debug
 BuildLog.htm
 
 # Various files and folders created by CMake
-CMakeFiles
-CMakeScripts
+#CMakeFiles
+#CMakeScripts
 CMakeCache.txt
-*.cmake
+#*.cmake
 *.dir
 ALL_BUILD*
 

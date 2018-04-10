@@ -1,0 +1,17 @@
+/Users/lmonster/Work/Sigil/Code/Sigil/CMakeFiles/rebuild_cache.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/CMakeFiles/edit_cache.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/internal/gumbo/CMakeFiles/rebuild_cache.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/internal/gumbo/CMakeFiles/edit_cache.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/internal/gumbo/CMakeFiles/sigilgumbo.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/3rdparty/CMakeFiles/rebuild_cache.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/3rdparty/CMakeFiles/edit_cache.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/3rdparty/CMakeFiles/pcre.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/3rdparty/CMakeFiles/hunspell.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/3rdparty/CMakeFiles/minizip.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/3rdparty/CMakeFiles/zlib.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/src/CMakeFiles/rebuild_cache.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/src/CMakeFiles/edit_cache.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/src/CMakeFiles/makedmg.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/src/CMakeFiles/addframeworks.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/src/CMakeFiles/Sigil.dir
+/Users/lmonster/Work/Sigil/Code/Sigil/src/CMakeFiles/Sigil_autogen.dir
