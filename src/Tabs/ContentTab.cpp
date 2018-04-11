@@ -30,6 +30,7 @@
 ContentTab::ContentTab(Resource *resource, QWidget *parent)
     :
     QWidget(parent),
+    canAutoSave(true),
     m_Resource(resource),
     m_Layout(new QVBoxLayout(this))
 {

@@ -787,8 +787,10 @@ bool MainWindow::Save()
         if (!SUPPORTED_SAVE_TYPE.contains(extension)) {
             return SaveAs();
         }
-
-        return SaveFile(m_CurrentFilePath);
+        m_TabManager->GetCurrentContentTab()->canAutoSave = false;
+        bool save_result = SaveFile(m_CurrentFileName);
+        m_TabManager->GetCurrentContentTab()->canAutoSave = true;
+        return save_result;
     }
 }
 

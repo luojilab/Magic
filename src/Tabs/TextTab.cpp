@@ -245,7 +245,9 @@ void TextTab::SaveTabContent()
 void TextTab::SaveTabContent(QWidget *editor)
 {
     Q_UNUSED(editor);
-    SaveTabContent();
+    if (canAutoSave) {
+        SaveTabContent();
+    }
 }
 
 

@@ -162,6 +162,8 @@ public:
     virtual bool ViewStatesEnabled() {
         return false;
     }
+    
+    bool canAutoSave;
 
     /**
      * Checked state of the BookView action.
