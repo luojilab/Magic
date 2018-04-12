@@ -31,6 +31,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QDateTime>
+#include <qmessagebox.h>
 
 #include "BookManipulation/CleanSource.h"
 #include "BookManipulation/XhtmlDoc.h"
@@ -1222,15 +1223,20 @@ QString OPFResource::ValidatePackageVersion(const QString& source)
     QString orig_version = GetEpubVersion();
     QRegularExpression pkgversion_search(PKG_VERSION, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatch mo = pkgversion_search.match(newsource);
-    if (mo.hasMatch()) {
-        QString version = mo.captured(1);
-        if (version != orig_version) {
+    QString new_version = mo.captured(1);
+    if (new_version != orig_version) {
+        QMessageBox box;
+        box.setText("The version of EPub has been changed!");
+        box.setInformativeText("Confirm to change the version of the EPub file?");
+        box.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        box.setDefaultButton(QMessageBox::Cancel);
+        int bt_click = box.exec();
+        if (bt_click == QMessageBox::Ok) {
+            GetLock().lockForWrite();
+            SetEpubVersion(new_version);
+            GetLock().unlock();
+        } else {
             newsource.replace(mo.capturedStart(1), mo.capturedLength(1), orig_version);
-            if (!m_WarnedAboutVersion && !version.startsWith('1')) {
-                Utility::DisplayStdWarningDialog("Changing package version inside Sigil is not supported", 
-                                                 "Use an appropriate output plugin to make the initial conversion");
-                m_WarnedAboutVersion = true;
-            }
         }
     }
     return newsource;
