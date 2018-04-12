@@ -158,8 +158,7 @@ QString OPFResource::GetText() const
 void OPFResource::SetText(const QString &text)
 {
     QWriteLocker locker(&GetLock());
-    QString source = ValidatePackageVersion(text);
-    TextResource::SetText(source);
+    TextResource::SetText(ValidatePackageVersion(text));
 }
 
 
@@ -1216,7 +1215,6 @@ void OPFResource::UpdateText(const OPFParser &p)
     TextResource::SetText(p.convert_to_xml());
 }
 
-
 QString OPFResource::ValidatePackageVersion(const QString& source)
 {
     QString newsource = source;
@@ -1239,6 +1237,18 @@ QString OPFResource::ValidatePackageVersion(const QString& source)
             newsource.replace(mo.capturedStart(1), mo.capturedLength(1), orig_version);
         }
     }
+    
+//    if (mo.hasMatch()) {
+//        QString version = mo.captured(1);
+//        if (version != orig_version) {
+//            newsource.replace(mo.capturedStart(1), mo.capturedLength(1), orig_version);
+//            if (!m_WarnedAboutVersion && !version.startsWith('1')) {
+//                Utility::DisplayStdWarningDialog("Changing package version inside Sigil is not supported",
+//                                                 "Use an appropriate output plugin to make the initial conversion");
+//                m_WarnedAboutVersion = true;
+//            }
+//        }
+//    }
     return newsource;
 }
 
