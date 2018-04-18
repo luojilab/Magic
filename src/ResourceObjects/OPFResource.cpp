@@ -1224,7 +1224,7 @@ QString OPFResource::ValidatePackageVersion(const QString& source)
     QRegularExpression pkgversion_search(PKG_VERSION, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatch mo = pkgversion_search.match(newsource);
     QString new_version = mo.captured(1);
-    if (new_version != orig_version) {
+    if (new_version != orig_version && new_version < orig_version) {
         QMessageBox box;
         box.setText("The version of EPub has been changed!");
         box.setInformativeText("Confirm to change the version of the EPub file?");
@@ -1238,6 +1238,8 @@ QString OPFResource::ValidatePackageVersion(const QString& source)
         } else {
             newsource.replace(mo.capturedStart(1), mo.capturedLength(1), orig_version);
         }
+    } else {
+        newsource.replace(mo.capturedStart(1), mo.capturedLength(1), orig_version);
     }
     return newsource;
 }
