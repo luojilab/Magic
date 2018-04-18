@@ -1039,6 +1039,7 @@ void BookBrowser::RemoveSelection(QList<Resource *> tab_resources)
     RemoveResources(tab_resources, resources);
 }
 
+#include <qglobal.h>
 void BookBrowser::RemoveResources(QList<Resource *> tab_resources, QList<Resource *> resources)
 {
     if (resources.isEmpty()) {
@@ -1150,22 +1151,64 @@ void BookBrowser::RemoveResources(QList<Resource *> tab_resources, QList<Resourc
     }
     
     // Update OPF if delete nav.xhtml file
-    if (selected_resources.contains(nav_resource)) {
-        QString handleString = m_Book->GetOPF()->GetText();
-        const QString pattern("<\\s*item[^>]*properties\\s*=\\s*[\"\'][^>]*[\"\'][^>]*/\\s*>");
-        QRegularExpression reg(pattern,QRegularExpression::CaseInsensitiveOption);
-        QRegularExpressionMatch match = reg.match(handleString);
-        if (match.hasMatch()) {
-            const QString replaceString("<item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\" properties=\"nav\"/>");
-            m_Book->GetOPF()->SetText(handleString.replace(match.capturedStart(), match.capturedLength(), replaceString));
-            // Clean nav resource
-            m_Book->GetOPF()->SetNavResource(0);
+    const QString kProperties("properties");
+    const QString kHref("href");
+    const QString kNavValue("nav");
+    QString toc_file_name;
+    OPFParser p;
+    p.parse(m_Book->GetOPF()->GetText());
+    QChar seperator;
+#ifdef Q_OS_WIN
+    seperator = '\';
+#else
+    seperator = '/';
+#endif
+    foreach(ManifestEntry item, p.m_manifest) {
+        if (item.m_atts.contains(kProperties) && item.m_atts[kProperties] == kNavValue) {
+            int s_idx = item.m_href.lastIndexOf(seperator);
+            toc_file_name = s_idx < 0 ? item.m_href : item.m_href.right(item.m_href.length() - s_idx - 1);
         }
+    }
+    // If select file have nav_resource
+    // OR the nav.xhtml is set to be nav file
+    // in the content.opf file's manifest
+    // then update the content.opf manifest
+    if (selected_resources.contains(nav_resource) ||
+        [&](QString name, QList<Resource *>res_list) -> bool {
+            bool delete_nav_file = false;
+            foreach(Resource *res, res_list) {
+                delete_nav_file = res->Filename() == toc_file_name;
+                if (delete_nav_file) break;
+            }
+            return delete_nav_file;}(toc_file_name,selected_resources)
+        ) {
+        int removedIdx = -1;
+        ManifestEntry* ncx = NULL;
+        foreach(ManifestEntry item, p.m_manifest) {
+            if (item.m_atts.contains(kProperties) && item.m_atts[kProperties] == kNavValue) {
+                removedIdx++;
+            }
+            if (item.m_atts.contains(kHref) && item.m_href == "toc.ncx") {
+                ncx = &item;
+            }
+        }
+        if (removedIdx >= 0 && removedIdx < p.m_manifest.count()) {
+            p.m_manifest.removeAt(removedIdx);
+        }
+        if (ncx) {
+            // Have ncx file in manifest
+            ncx->m_atts[kProperties] = kNavValue;
+        } else {
+            // Don't have ncx in manifest
+            p.m_manifest.insert(0, ManifestEntry("ncx", "toc.ncx", "application/x-dtbncx+xml", QStringList(kProperties), QStringList(kNavValue)));
+        }
+        // Clean nav resource
+        m_Book->GetOPF()->SetNavResource(0);
+        m_Book->GetOPF()->SetText(p.convert_to_xml());
     }
 
     QApplication::restoreOverrideCursor();
 }
-
 
 Resource *BookBrowser::ResourceToSelectAfterRemove(QList<Resource *> selected_resources)
 {

@@ -1224,7 +1224,12 @@ QString OPFResource::ValidatePackageVersion(const QString& source)
     QRegularExpression pkgversion_search(PKG_VERSION, QRegularExpression::CaseInsensitiveOption);
     QRegularExpressionMatch mo = pkgversion_search.match(newsource);
     QString new_version = mo.captured(1);
+#ifdef DEBUG
+    if (new_version != orig_version) {
+#else
     if (new_version != orig_version && new_version < orig_version) {
+#endif
+
         QMessageBox box;
         box.setText("The version of EPub has been changed!");
         box.setInformativeText("Confirm to change the version of the EPub file?");
