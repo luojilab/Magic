@@ -1159,7 +1159,7 @@ void BookBrowser::RemoveResources(QList<Resource *> tab_resources, QList<Resourc
     p.parse(m_Book->GetOPF()->GetText());
     QChar seperator;
 #ifdef Q_OS_WIN
-    seperator = '\';
+    seperator = '\\';
 #else
     seperator = '/';
 #endif
