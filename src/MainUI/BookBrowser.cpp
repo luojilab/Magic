@@ -50,6 +50,7 @@
 #include "ResourceObjects/NavProcessor.h"
 #include "sigil_constants.h"
 #include "sigil_exception.h"
+#include "BookManipulation/CleanSource.h"
 
 static const QString SETTINGS_GROUP = "bookbrowser";
 static const QString OPF_NCX_EDIT_WARNING_KEY = SETTINGS_GROUP + "-opfncx-warning";
@@ -1047,7 +1048,10 @@ void BookBrowser::RemoveResources(QList<Resource *> tab_resources, QList<Resourc
     Resource *next_resource = NULL;
 
     Resource * nav_resource =  m_Book->GetConstOPF()->GetNavResource();
-    if (nav_resource && resources.contains(nav_resource)) {
+    // Now that wen can change the version
+    // so the situation of package version is 2.0
+    // but the toc file is nav.xhtml
+    if (nav_resource && resources.contains(nav_resource) && m_Book->GetOPF()->GetPackageVersion() == "3.0") {
         Utility::DisplayStdErrorDialog(
             tr("The Nav document can not be removed.")
         );
@@ -1142,6 +1146,20 @@ void BookBrowser::RemoveResources(QList<Resource *> tab_resources, QList<Resourc
     } else {
         if (next_resource) {
             UpdateSelection(next_resource);
+        }
+    }
+    
+    // Update OPF if delete nav.xhtml file
+    if (selected_resources.contains(nav_resource)) {
+        QString handleString = m_Book->GetOPF()->GetText();
+        const QString pattern("<\\s*item[^>]*properties\\s*=\\s*[\"\'][^>]*[\"\'][^>]*/\\s*>");
+        QRegularExpression reg(pattern,QRegularExpression::CaseInsensitiveOption);
+        QRegularExpressionMatch match = reg.match(handleString);
+        if (match.hasMatch()) {
+            const QString replaceString("<item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\" properties=\"nav\"/>");
+            m_Book->GetOPF()->SetText(handleString.replace(match.capturedStart(), match.capturedLength(), replaceString));
+            // Clean nav resource
+            m_Book->GetOPF()->SetNavResource(0);
         }
     }
 
