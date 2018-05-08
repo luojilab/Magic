@@ -493,6 +493,8 @@ set( QRC_FILES
     Resource_Files/icon/icon.qrc  
     )
 
+file (GLOB LAYOUT_ENGINE_FILES LayoutEngine/*.h LayoutEngine/*.m )	
+
 file( GLOB TS_FILES Resource_Files/ts/sigil_*.ts )
 
 file( GLOB DIC_FILES Resource_Files/dictionaries/* )
@@ -544,7 +546,7 @@ if ( NOT DEFINED INSTALL_BUNDLED_DICTS )
     set ( INSTALL_BUNDLED_DICTS 1 )
 endif()
 
-set( RAW_SOURCES ${MAIN_FILES} ${TAB_FILES} ${SOURCEUPDATE_FILES} ${BOOK_MANIPULATION_FILES} ${RESOURCE_OBJECT_FILES} ${DIALOG_FILES} ${EXPORTER_FILES} ${IMPORTER_FILES} ${MISC_FILES} ${MISC_EDITORS_FILES} ${SPCRE_FILES} ${VIEW_EDITOR_FILES} ${MAINUI_FILES} )
+set( RAW_SOURCES ${MAIN_FILES} ${TAB_FILES} ${SOURCEUPDATE_FILES} ${BOOK_MANIPULATION_FILES} ${RESOURCE_OBJECT_FILES} ${DIALOG_FILES} ${EXPORTER_FILES} ${IMPORTER_FILES} ${MISC_FILES} ${MISC_EDITORS_FILES} ${SPCRE_FILES} ${VIEW_EDITOR_FILES} ${MAINUI_FILES} ${LAYOUT_ENGINE_FILES} )
 
 #############################################################################
 
@@ -665,6 +667,7 @@ include_directories( BEFORE
 #############################################################################
 
 # We make bundles for Mac OS X
+set ( LAYOUT_ENGINE_LIBRATY "C:/Works/looker_core/build/bin/Debug/" )
 if ( APPLE )
     add_executable( ${PROJECT_NAME} MACOSX_BUNDLE ${ALL_SOURCES} )
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
@@ -676,7 +679,8 @@ endif()
 
 # No need to explicity link Qt5::WinMain or to use the qt5_use_modules macro since CMAKE 2.8.11. We require CMAKE 3.0.0
 target_link_libraries( ${PROJECT_NAME} ${HUNSPELL_LIBRARIES} ${PCRE_LIBRARIES} ${GUMBO_LIBRARIES} ${MINIZIP_LIBRARIES} ${PYTHON_LIBRARIES}
-    Qt5::Widgets  Qt5::Xml  Qt5::XmlPatterns  Qt5::PrintSupport  Qt5::Svg  Qt5::WebKit  Qt5::WebKitWidgets  Qt5::Network  Qt5::Concurrent )
+    Qt5::Widgets  Qt5::Xml  Qt5::XmlPatterns  Qt5::PrintSupport  Qt5::Svg  Qt5::WebKit  Qt5::WebKitWidgets  Qt5::Network  Qt5::Concurrent 
+	${LAYOUT_ENGINE_LIBRATY} )
 
 #############################################################################
 

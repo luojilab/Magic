@@ -4229,9 +4229,17 @@ void MainWindow::PlatformSpecificTweaks()
     sizeMenuIcons();
 }
 
+void MainWindow::layout() {
+	QMessageBox::information(this, "Title", "Text", QMessageBox::Ok);
+}
 
 void MainWindow::ExtendUI()
 {
+	/*QAction *layoutAc = new QAction("Layout", this);
+	ui.menuFile->addAction(layoutAc);
+	connect(layoutAc, SIGNAL(toggled(bool)), this, SLOT(layout(bool)));
+	QMessageBox::information(this, "Title", "Text", QMessageBox::Ok);*/
+
     m_FindReplace->ShowHide();
     // We want a nice frame around the tab manager
     QFrame *frame = new QFrame(this);
@@ -4797,6 +4805,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionSaveACopy,     SIGNAL(triggered()), this, SLOT(SaveACopy()));
     connect(ui.actionClose,         SIGNAL(triggered()), this, SLOT(close()));
     connect(ui.actionExit,          SIGNAL(triggered()), this, SLOT(Exit()));
+	connect(ui.actionLayout,		SIGNAL(triggered()), this, SLOT(layout()));
     // Edit
     connect(ui.actionInsertFile,     SIGNAL(triggered()), this, SLOT(InsertFileDialog()));
     connect(ui.actionInsertSpecialCharacter, SIGNAL(triggered()), this, SLOT(InsertSpecialCharacter()));
