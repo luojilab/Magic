@@ -186,6 +186,7 @@ EmbeddedPython::EmbeddedPython()
 
     QString pysyspath = pyhomepath + PYTHON_MAIN_PATH;
     foreach (const QString &src_path, PYTHON_SYS_PATHS) {
+		std::string ss = src_path.toStdString();
         pysyspath = pysyspath + PATH_LIST_DELIM + pyhomepath + PYTHON_MAIN_PATH + src_path;
     }
     wchar_t *mpath = new wchar_t[pysyspath.size()+1];
@@ -269,6 +270,21 @@ bool EmbeddedPython::addToPythonSysPath(const QString &mpath)
 
     // PySys_GetObject borrows a reference */
     sysPath = PySys_GetObject((char*)"path");
+
+	int size = PyList_Size(sysPath);
+	for (int i = 0; i < size; i++) {
+		PyObject* item = PyList_GetItem(sysPath, i);
+		char *ss = PyUnicode_AsUTF8(item);
+		if (ss != nullptr) {
+			std::string s = std::string();
+			printf("%s\n", s);
+		}
+		else
+		{
+			printf("Empty ss");
+		}
+	}
+
     if (sysPath != NULL) {
         aPath = PyUnicode_FromString(mpath.toUtf8().constData());
         if (aPath != NULL) {
@@ -307,7 +323,6 @@ QVariant EmbeddedPython::runInPython(const QString &mname,
         *rv = -1;
         goto cleanup;
     }
-
     module = PyImport_Import(moduleName);
     if (module == NULL) {
         *rv = -2;
