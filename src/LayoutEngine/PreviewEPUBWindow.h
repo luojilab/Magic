@@ -35,7 +35,4 @@ public slots:
 
 signals:
 	void canDrawSignal();
-
-protected:
-	void closeEvent(QCloseEvent *);
 };

@@ -4232,15 +4232,12 @@ void MainWindow::PlatformSpecificTweaks()
     sizeMenuIcons();
 }
 
-void MainWindow::previewiPhone5() {
-	this->layout(m_preViewWindowsMap[iPhone5]);
-}
-
-void MainWindow::layout(PreviewEPUBWindow *previewer) {
-	if ( previewer && this->Save() ) {
-		if ( !previewer->isVisible() ) {
-			previewer->updateEngine("c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
-			previewer->show();
+void MainWindow::layout(PreviewPhoneType type) {
+	if (this->previewer && this->Save() ) {
+		this->previewer->updateEngine("c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
+		this->previewer->setFixedSize(m_previewPhoneSizeMap[type]);
+		if ( !this->previewer->isVisible() ) {
+			this->previewer->show();
 		}
 	} else {
 		QMessageBox::information(this, "", u8"请先保存文件！然后才能预览", QMessageBox::Ok);
@@ -4345,7 +4342,7 @@ void MainWindow::ExtendUI()
     qApp->setPalette(palette);
 
 	// add preview epub window
-	std::map<PreviewPhoneType, QSize>::iterator it = m_previewPhoneSizeMap.begin();
+	/*std::map<PreviewPhoneType, QSize>::iterator it = m_previewPhoneSizeMap.begin();
 	while ( it != m_previewPhoneSizeMap.end() )
 	{
 		PreviewEPUBWindow *previewer = new PreviewEPUBWindow(this, "c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
@@ -4354,7 +4351,11 @@ void MainWindow::ExtendUI()
 		this->addDockWidget(Qt::RightDockWidgetArea, previewer);
 		previewer->hide();
 		it++;
-	}
+	}*/
+	this->previewer = new PreviewEPUBWindow(this, "c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
+	this->previewer->setFixedSize(QSize(750, 1334));
+	addDockWidget(Qt::RightDockWidgetArea,this->previewer);
+	this->previewer->hide();
     // Setup userdefined keyboard shortcuts for actions.
     KeyboardShortcutManager *sm = KeyboardShortcutManager::instance();
     // Note: shortcut action Ids should not be translated.
@@ -4876,10 +4877,11 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionCreateIndex,   SIGNAL(triggered()), this, SLOT(CreateIndex()));
     connect(ui.actionDeleteUnusedMedia,    SIGNAL(triggered()), this, SLOT(DeleteUnusedMedia()));
     connect(ui.actionDeleteUnusedStyles,    SIGNAL(triggered()), this, SLOT(DeleteUnusedStyles()));
-	//connect(ui.actionIPhone5, SIGNAL(triggered()), this, SLOT(previewiPhone5));
-	/*connect(ui.actionIPhone6, SIGNAL(triggered()), this, SLOT(previewiPhone6));
-	connect(ui.actionIPhone6P, SIGNAL(triggered()), this, SLOT(previewiPhone6P));
-	connect(ui.actionIPhoneX, SIGNAL(triggered()), this, SLOT(previewiPhoneX));*/
+	connect(ui.actionIPhone5, SIGNAL(triggered()), this, SLOT(previewForIphone5()));
+	connect(ui.actionIPhone6, SIGNAL(triggered()), this, SLOT(previewForIphone6()));
+	connect(ui.actionIPhone6P, SIGNAL(triggered()), this, SLOT(previewForIphone6P()));
+	connect(ui.actionIPhoneX, SIGNAL(triggered()), this, SLOT(previewForIphoneX()));
+	connect(ui.actionXiaoMi, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
     // Change case
     connect(ui.actionCasingLowercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
     connect(ui.actionCasingUppercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));

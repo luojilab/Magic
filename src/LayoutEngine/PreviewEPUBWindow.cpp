@@ -49,13 +49,11 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
 		if (bundlePath.length() && epubPath.length()) {
 			if (this->m_bookModel != NULL) {
 				this->engine->closeEpub(this->m_bookModel);
-				this->m_bookModel = NULL;
 			}
 			this->epubPath = epubPath;
 			this->engine->openEpub(this, this->epubPath, "/", "\n");
 		} else {
 			this->engine->closeEpub(this->m_bookModel);
-			this->m_bookModel = NULL;
 		}
 	}
 }
@@ -136,13 +134,5 @@ QStringList PreviewEPUBWindow::engineNeedNoteData(const QString & charpterId)
 
 void PreviewEPUBWindow::enginePaintHighlightRect(const QRect & rect, const QColor & color)
 {
-}
-
-// close book when the preview view is closed
-void PreviewEPUBWindow::closeEvent(QCloseEvent *event) {
-	if (this->engine->EngineIsReady()) {
-		this->engine->closeEpub(this->m_bookModel);
-		this->m_bookModel = nullptr;
-	}
 }
 

@@ -2370,11 +2370,6 @@
     <string>XiaoMi</string>
    </property>
   </action>
-  <action name="actionHuaWei">
-   <property name="text">
-    <string>HuaWei</string>
-   </property>
-  </action>
  </widget>
  <resources>
   <include location="../Resource_Files/main/main.qrc"/>

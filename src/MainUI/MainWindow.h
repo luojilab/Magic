@@ -267,6 +267,12 @@ protected:
 
 private slots:
 
+void previewForIphone5() { layout(iPhone5); };
+void previewForIphone6() { layout(iPhone6); };
+void previewForIphone6P() { layout(iPhone6P); };
+void previewForIphoneX() { layout(iPhoneX); };
+void previewForXiaoMi() { layout(XiaoMi); };
+
 	void AddCover();
 
     /**
@@ -656,8 +662,16 @@ private slots:
     void unloadPluginsMenu();
 
 private:
+	typedef enum {
+		iPhone5,
+		iPhone6,
+		iPhone6P,
+		iPhoneX,
+		XiaoMi,
+		Unknown
+	}PreviewPhoneType;
 
-	void layout(PreviewEPUBWindow *);
+	void layout(PreviewPhoneType);
     void updateToolTipsOnPluginIcons();
     void UpdateClipButton(int clip_number, QAction *ui_action);
     void InsertFiles(const QStringList &selected_images);
@@ -1030,20 +1044,15 @@ private:
      */
 	Ui::MainWindow ui;
 
-	typedef enum {
-		iPhone5,
-		iPhone6,
-		iPhone6P,
-		iPhoneX,
-		Unknown
-	}PreviewPhoneType;
+	PreviewEPUBWindow* previewer;
 
 	std::map<PreviewPhoneType,PreviewEPUBWindow *>m_preViewWindowsMap;
 	std::map<PreviewPhoneType, QSize> m_previewPhoneSizeMap = {
-		{ PreviewPhoneType::iPhone5, QSize(320,568)},
-		{ PreviewPhoneType::iPhone6 ,QSize(375,567)},
-		{ PreviewPhoneType::iPhone6P ,QSize(540,960)},
-		{ PreviewPhoneType::iPhoneX ,QSize(375,812)}
+		{ PreviewPhoneType::iPhone5, QSize(640,1136)},
+		{ PreviewPhoneType::iPhone6 ,QSize(750,1134)},
+		{ PreviewPhoneType::iPhone6P ,QSize(qint16(1080 * 0.7),qint16(1920 * 0.7))},
+		{ PreviewPhoneType::iPhoneX ,QSize(562,1218)},
+		{ PreviewPhoneType::XiaoMi ,QSize(qint16(1080*0.7),qint16(1920*0.7))}
 	};
 };
 
