@@ -136,6 +136,8 @@ static const QStringList SUPPORTED_SAVE_TYPE = QStringList() << "epub";
 
 static const QString DEFAULT_FILENAME = "untitled.epub";
 
+static const int supportPreviewPhoneTypeCount = 4;
+
 QStringList MainWindow::s_RecentFiles = QStringList();
 
 MainWindow::MainWindow(const QString &openfilepath, bool is_internal, QWidget *parent, Qt::WindowFlags flags)
@@ -186,7 +188,8 @@ MainWindow::MainWindow(const QString &openfilepath, bool is_internal, QWidget *p
     m_menuPluginsEdit(NULL),
     m_menuPluginsValidation(NULL),
     m_pluginList(QStringList()),
-    m_SaveCSS(false)
+    m_SaveCSS(false),
+	m_preViewWindowsMap(std::map<PreviewPhoneType,PreviewEPUBWindow *>())
 {
     ui.setupUi(this);
 
@@ -4229,17 +4232,23 @@ void MainWindow::PlatformSpecificTweaks()
     sizeMenuIcons();
 }
 
-void MainWindow::layout() {
-	QMessageBox::information(this, "Title", "Text", QMessageBox::Ok);
+void MainWindow::previewiPhone5() {
+	this->layout(m_preViewWindowsMap[iPhone5]);
+}
+
+void MainWindow::layout(PreviewEPUBWindow *previewer) {
+	if ( previewer && this->Save() ) {
+		if ( !previewer->isVisible() ) {
+			previewer->updateEngine("c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
+			previewer->show();
+		}
+	} else {
+		QMessageBox::information(this, "", u8"请先保存文件！然后才能预览", QMessageBox::Ok);
+	}
 }
 
 void MainWindow::ExtendUI()
 {
-	/*QAction *layoutAc = new QAction("Layout", this);
-	ui.menuFile->addAction(layoutAc);
-	connect(layoutAc, SIGNAL(toggled(bool)), this, SLOT(layout(bool)));
-	QMessageBox::information(this, "Title", "Text", QMessageBox::Ok);*/
-
     m_FindReplace->ShowHide();
     // We want a nice frame around the tab manager
     QFrame *frame = new QFrame(this);
@@ -4334,6 +4343,18 @@ void MainWindow::ExtendUI()
     palette.setColor(QPalette::Inactive, QPalette::Highlight, Qt::darkGreen);
     palette.setColor(QPalette::Inactive, QPalette::HighlightedText, Qt::white);
     qApp->setPalette(palette);
+
+	// add preview epub window
+	std::map<PreviewPhoneType, QSize>::iterator it = m_previewPhoneSizeMap.begin();
+	while ( it != m_previewPhoneSizeMap.end() )
+	{
+		PreviewEPUBWindow *previewer = new PreviewEPUBWindow(this, "c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
+		previewer->setFixedSize(it->second);
+		m_preViewWindowsMap[it->first] = previewer;
+		this->addDockWidget(Qt::RightDockWidgetArea, previewer);
+		previewer->hide();
+		it++;
+	}
     // Setup userdefined keyboard shortcuts for actions.
     KeyboardShortcutManager *sm = KeyboardShortcutManager::instance();
     // Note: shortcut action Ids should not be translated.
@@ -4805,7 +4826,6 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionSaveACopy,     SIGNAL(triggered()), this, SLOT(SaveACopy()));
     connect(ui.actionClose,         SIGNAL(triggered()), this, SLOT(close()));
     connect(ui.actionExit,          SIGNAL(triggered()), this, SLOT(Exit()));
-	connect(ui.actionLayout,		SIGNAL(triggered()), this, SLOT(layout()));
     // Edit
     connect(ui.actionInsertFile,     SIGNAL(triggered()), this, SLOT(InsertFileDialog()));
     connect(ui.actionInsertSpecialCharacter, SIGNAL(triggered()), this, SLOT(InsertSpecialCharacter()));
@@ -4856,6 +4876,10 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionCreateIndex,   SIGNAL(triggered()), this, SLOT(CreateIndex()));
     connect(ui.actionDeleteUnusedMedia,    SIGNAL(triggered()), this, SLOT(DeleteUnusedMedia()));
     connect(ui.actionDeleteUnusedStyles,    SIGNAL(triggered()), this, SLOT(DeleteUnusedStyles()));
+	//connect(ui.actionIPhone5, SIGNAL(triggered()), this, SLOT(previewiPhone5));
+	/*connect(ui.actionIPhone6, SIGNAL(triggered()), this, SLOT(previewiPhone6));
+	connect(ui.actionIPhone6P, SIGNAL(triggered()), this, SLOT(previewiPhone6P));
+	connect(ui.actionIPhoneX, SIGNAL(triggered()), this, SLOT(previewiPhoneX));*/
     // Change case
     connect(ui.actionCasingLowercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
     connect(ui.actionCasingUppercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
@@ -5152,4 +5176,3 @@ void MainWindow::BreakTabConnections(ContentTab *tab)
     disconnect(tab,                                0, m_BookBrowser, 0);
     disconnect(tab,                                0, m_ClipboardHistorySelector, 0);
 }
-

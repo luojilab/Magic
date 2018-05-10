@@ -1,15 +1,21 @@
 #include <QWidget>
 #include "LayoutEngin.h"
+#include "BookModel.h"
+#include <QDockWidget.h>
 
-class SMainWindow : public QWidget, public LayoutEngineDelegate {
+class PreviewEPUBWindow : public QDockWidget, public LayoutEngineDelegate {
 public:
 	QImage * pic;
 private:
+	std::string epubPath;
 	LayoutEngine * engine;
 	BookModel* m_bookModel;
 public:
-	SMainWindow();
-	void SMainWindow::paintEvent(QPaintEvent *);
+	PreviewEPUBWindow(QWidget *parent,const std::string& bundlePath, const std::string& epubPath);
+	void PreviewEPUBWindow::paintEvent(QPaintEvent *);
+	void updateEngine(const std::string& bundlePath = "" ,const std::string& epubPath = "");
+
+public:
 	virtual void engineInitFinish();
 	virtual void engineOpenBook(BookModel* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
 	void mousePressEvent(QMouseEvent * event);
@@ -29,4 +35,7 @@ public slots:
 
 signals:
 	void canDrawSignal();
+
+protected:
+	void closeEvent(QCloseEvent *);
 };

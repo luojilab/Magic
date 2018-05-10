@@ -1,14 +1,8 @@
 #include <QWidget>
 #include <QtCore>
-#include "HighlightInfo.h"
-#include "NativeImage.h"
-
-namespace future_core {
-	class BookModel;
-};
+#include "BookModel.h"
 
 using namespace future_core;
-
 typedef enum {
 	OPEN_EPUB_SUCCESS = 0,          //成功打开EPUB
 	EPUB_FILENAME_ERROR,            //EPUB文件名错误
@@ -122,7 +116,7 @@ public:
 	virtual void engineUpdateVisibleViewPage(EngineHighlightInfo* info) = 0;
 	virtual void engineShowSelectionMenu(const qint32& x, const qint32& y, const qint32& x2, const qint32& y2) = 0;
 	virtual void engineOpenUrl(QString urlString) = 0;
-	virtual void engineClickImage(WebCore::NativeImagePtr image, const qint32& originX, const qint32& originY, const qint32& width, const qint32& height) = 0;
+	virtual void engineClickImage(QImage* image, const qint32& originX, const qint32& originY, const qint32& width, const qint32& height) = 0;
 	virtual QList<BookUnderlineData *> engineNeedUnderlineData(const QString& charpterId) = 0;
 	virtual QStringList engineNeedNoteData(const QString& charpterId) = 0;
 	virtual void enginePaintHighlightRect(const QRect& rect, const QColor& color) = 0;
@@ -144,8 +138,8 @@ public:
 	void InitLayoutEngine(const std::string& bundlePath);
 	void setPageSize(BookModel *bookModel, const qint32& width, const qint32& height, const float& scale);
 	void openEpub(QWidget *view, const std::string& filePath, const QString& tokenStd, const QString& uidStd);
-	/*void closeEpub(BookModel *bookModel);
-	void getTotalPageCount(BookModel *bookModel);
+	void closeEpub(BookModel *bookModel);
+	/*void getTotalPageCount(BookModel *bookModel);
 	int getCurrentPageIndex(BookModel *bookModel);
 	QString getSummaryByPageOffset(BookModel *bookModel, qint32 pageOffset);
 	QString getCurrentPageChapterName(BookModel *bookModel);

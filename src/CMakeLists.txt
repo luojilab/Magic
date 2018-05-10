@@ -493,7 +493,7 @@ set( QRC_FILES
     Resource_Files/icon/icon.qrc  
     )
 
-file (GLOB LAYOUT_ENGINE_FILES LayoutEngine/*.h LayoutEngine/*.m )	
+file (GLOB LAYOUT_ENGINE_FILES LayoutEngine/*.h LayoutEngine/*.cpp )	
 
 file( GLOB TS_FILES Resource_Files/ts/sigil_*.ts )
 
@@ -666,8 +666,17 @@ include_directories( BEFORE
 
 #############################################################################
 
+
+# Layout Engine settings
+
+set ( LAYOUT_ENGINE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/LayoutEngine )
+if ( WIN32 )
+	file(GLOB ICU_LIB_FILES LayoutEngine/icu/qt/lib64/*.lib )
+endif()
+include_directories( BEFORE ${LAYOUT_ENGINE_HEADERS} )
+set ( LAYOUT_ENGINE_LIBRATY "C:/Works/looker_core/build/lib/Release/core.lib" "C:/Works/looker_core/build/lib/Release/LayoutEngine.lib" "C:/Works/looker_core/build/lib/Release/platform.lib")
+set ( ICU_LIBRARY ${ICU_LIB_FILES} )
 # We make bundles for Mac OS X
-set ( LAYOUT_ENGINE_LIBRATY "C:/Works/looker_core/build/bin/Debug/" )
 if ( APPLE )
     add_executable( ${PROJECT_NAME} MACOSX_BUNDLE ${ALL_SOURCES} )
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
@@ -680,7 +689,7 @@ endif()
 # No need to explicity link Qt5::WinMain or to use the qt5_use_modules macro since CMAKE 2.8.11. We require CMAKE 3.0.0
 target_link_libraries( ${PROJECT_NAME} ${HUNSPELL_LIBRARIES} ${PCRE_LIBRARIES} ${GUMBO_LIBRARIES} ${MINIZIP_LIBRARIES} ${PYTHON_LIBRARIES}
     Qt5::Widgets  Qt5::Xml  Qt5::XmlPatterns  Qt5::PrintSupport  Qt5::Svg  Qt5::WebKit  Qt5::WebKitWidgets  Qt5::Network  Qt5::Concurrent 
-	${LAYOUT_ENGINE_LIBRATY} )
+	${LAYOUT_ENGINE_LIBRATY} ${ICU_LIBRARY} )
 
 #############################################################################
 

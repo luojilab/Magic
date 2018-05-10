@@ -50,9 +50,9 @@ CMakeCache.txt
 ALL_BUILD*
 
 # Various Qt files
-#ui_*
-#moc_*
-#qrc_*
+ui_*
+moc_*
+qrc_*
 
 # Misc files
 *.svn

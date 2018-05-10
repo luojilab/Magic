@@ -27,6 +27,7 @@
 
 #include <QtCore/QSharedPointer>
 #include <QtWidgets/QMainWindow>
+#include <vector>
 
 #include "ui_main.h"
 #include "BookManipulation/Book.h"
@@ -46,6 +47,7 @@
 #include "MiscEditors/IndexEditorModel.h"
 #include "MiscEditors/SearchEditorModel.h"
 #include "Tabs/ContentTab.h"
+#include "PreviewEPUBWindow.h"
 
 const int MAX_RECENT_FILES = 5;
 const int STATUSBAR_MSG_DISPLAY_TIME = 7000;
@@ -67,8 +69,6 @@ class ClipsWindow;
 class SelectCharacter;
 class ViewImage;
 class FlowTab;
-
-
 /**
  * @mainpage
  * The conversion of all source comments to Doxygen format
@@ -266,10 +266,8 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
-	
-	void layout();
 
-    void AddCover();
+	void AddCover();
 
     /**
      * Implements New action functionality.
@@ -659,6 +657,7 @@ private slots:
 
 private:
 
+	void layout(PreviewEPUBWindow *);
     void updateToolTipsOnPluginIcons();
     void UpdateClipButton(int clip_number, QAction *ui_action);
     void InsertFiles(const QStringList &selected_images);
@@ -1029,7 +1028,23 @@ private:
     /**
      * Holds all the widgets Qt Designer created for us.
      */
-    Ui::MainWindow ui;
+	Ui::MainWindow ui;
+
+	typedef enum {
+		iPhone5,
+		iPhone6,
+		iPhone6P,
+		iPhoneX,
+		Unknown
+	}PreviewPhoneType;
+
+	std::map<PreviewPhoneType,PreviewEPUBWindow *>m_preViewWindowsMap;
+	std::map<PreviewPhoneType, QSize> m_previewPhoneSizeMap = {
+		{ PreviewPhoneType::iPhone5, QSize(320,568)},
+		{ PreviewPhoneType::iPhone6 ,QSize(375,567)},
+		{ PreviewPhoneType::iPhone6P ,QSize(540,960)},
+		{ PreviewPhoneType::iPhoneX ,QSize(375,812)}
+	};
 };
 
 #endif // SIGIL_H
