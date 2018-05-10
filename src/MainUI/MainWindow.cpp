@@ -4238,9 +4238,9 @@ void MainWindow::PlatformSpecificTweaks()
 
 void MainWindow::layout(PreviewPhoneType type) {
 	if (this->previewer && this->Save() ) {
-		this->previewer->updateEngine("c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
-		this->previewer->setFixedSize(m_previewPhoneSizeMap[type]);
 		if ( !this->previewer->isVisible() ) {
+			this->previewer->updateEngine("c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
+			this->previewer->setFixedSize(m_previewPhoneSizeMap[type]);
 			this->previewer->show();
 		}
 	} else {

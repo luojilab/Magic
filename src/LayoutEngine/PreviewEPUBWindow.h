@@ -30,7 +30,7 @@ public:
 	virtual QStringList engineNeedNoteData(const QString& charpterId);
 	virtual void enginePaintHighlightRect(const QRect& rect, const QColor& color);
 
-public slots:
+private slots:
 	void canDraw();
 
 signals:
