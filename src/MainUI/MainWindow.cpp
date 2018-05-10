@@ -4100,6 +4100,10 @@ void MainWindow::UpdateUiWithCurrentFile(const QString &fullfilepath)
             mainWin->UpdateRecentFileActions();
         }
     }
+	if (this->previewer->isVisible() && 
+		!m_CurrentFilePath.isEmpty() ) {
+		this->previewer->updateEngine("c:/", m_CurrentFilePath.toStdString());
+	}
 }
 
 
