@@ -35,4 +35,7 @@ private slots:
 
 signals:
 	void canDrawSignal();
+
+protected:
+	void keyPressEvent(QKeyEvent *);
 };

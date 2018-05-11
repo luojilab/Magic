@@ -14,6 +14,7 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	this->engine->delegate = dynamic_cast<LayoutEngineDelegate *>(this);
 	this->engine->SetViewTopMargin(0);
 	this->engine->SetViewBottomMargin(0);
+	this->setFocusPolicy(Qt::ClickFocus);
 }
 
 void PreviewEPUBWindow::canDraw() {
@@ -37,6 +38,38 @@ void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
 		} else {
 			printf("painter isn't actived");
 		}
+	}
+}
+
+void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
+	switch (event->key())
+	{
+	case Qt::Key_Right: {
+		this->m_bookModel->GotoNextPage();
+		break;
+	}
+	case Qt::Key_Left: {
+		this->m_bookModel->GotoPreviousPage();
+		break;
+	}
+	case Qt::Key_PageUp: {
+		this->m_bookModel->GotoPreviousChapter();
+		break;
+	}
+	case Qt::Key_PageDown: {
+		this->m_bookModel->GotoNextChapter();
+		break;
+	}
+	default:
+		return;
+	}
+	if (this->isVisible()) {
+		this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
+		while (this->pic == nullptr)
+		{
+			this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
+		}
+		this->update();
 	}
 }
 

@@ -5138,47 +5138,47 @@ void MainWindow::MakeTabConnections(ContentTab *tab)
 
 void MainWindow::BreakTabConnections(ContentTab *tab)
 {
-    if (tab == NULL) {
-        return;
-    }
+	if (tab == NULL) {
+		return;
+	}
 
-    disconnect(ui.actionUndo,                      0, tab, 0);
-    disconnect(ui.actionRedo,                      0, tab, 0);
-    disconnect(ui.actionCut,                       0, tab, 0);
-    disconnect(ui.actionCopy,                      0, tab, 0);
-    disconnect(ui.actionPaste,                     0, tab, 0);
-    disconnect(ui.actionDeleteLine,                0, tab, 0);
-    disconnect(ui.actionBold,                      0, tab, 0);
-    disconnect(ui.actionItalic,                    0, tab, 0);
-    disconnect(ui.actionUnderline,                 0, tab, 0);
-    disconnect(ui.actionStrikethrough,             0, tab, 0);
-    disconnect(ui.actionSubscript,                 0, tab, 0);
-    disconnect(ui.actionSuperscript,               0, tab, 0);
-    disconnect(ui.actionAlignLeft,                 0, tab, 0);
-    disconnect(ui.actionAlignCenter,               0, tab, 0);
-    disconnect(ui.actionAlignRight,                0, tab, 0);
-    disconnect(ui.actionAlignJustify,              0, tab, 0);
-    disconnect(ui.actionInsertBulletedList,        0, tab, 0);
-    disconnect(ui.actionInsertNumberedList,        0, tab, 0);
-    disconnect(ui.actionDecreaseIndent,            0, tab, 0);
-    disconnect(ui.actionIncreaseIndent,            0, tab, 0);
-    disconnect(ui.actionTextDirectionLTR,          0, tab, 0);
-    disconnect(ui.actionTextDirectionRTL,          0, tab, 0);
-    disconnect(ui.actionTextDirectionDefault,      0, tab, 0);
-    disconnect(ui.actionShowTag,                   0, tab, 0);
-    disconnect(ui.actionRemoveFormatting,          0, tab, 0);
-    disconnect(ui.actionSplitSection,              0, tab, 0);
-    disconnect(ui.actionInsertSGFSectionMarker,    0, tab, 0);
-    disconnect(ui.actionInsertClosingTag,          0, tab, 0);
-    disconnect(ui.actionGoToLinkOrStyle,           0, tab, 0);
-    disconnect(ui.actionAddMisspelledWord,         0, tab, 0);
-    disconnect(ui.actionIgnoreMisspelledWord,      0, tab, 0);
-    disconnect(ui.actionPrintPreview,              0, tab, 0);
-    disconnect(ui.actionPrint,                     0, tab, 0);
-    disconnect(ui.actionAddToIndex,                0, tab, 0);
-    disconnect(ui.actionMarkForIndex,              0, tab, 0);
-    disconnect(tab,                                0, this, 0);
-    disconnect(tab,                                0, m_Book.data(), 0);
-    disconnect(tab,                                0, m_BookBrowser, 0);
-    disconnect(tab,                                0, m_ClipboardHistorySelector, 0);
+	disconnect(ui.actionUndo, 0, tab, 0);
+	disconnect(ui.actionRedo, 0, tab, 0);
+	disconnect(ui.actionCut, 0, tab, 0);
+	disconnect(ui.actionCopy, 0, tab, 0);
+	disconnect(ui.actionPaste, 0, tab, 0);
+	disconnect(ui.actionDeleteLine, 0, tab, 0);
+	disconnect(ui.actionBold, 0, tab, 0);
+	disconnect(ui.actionItalic, 0, tab, 0);
+	disconnect(ui.actionUnderline, 0, tab, 0);
+	disconnect(ui.actionStrikethrough, 0, tab, 0);
+	disconnect(ui.actionSubscript, 0, tab, 0);
+	disconnect(ui.actionSuperscript, 0, tab, 0);
+	disconnect(ui.actionAlignLeft, 0, tab, 0);
+	disconnect(ui.actionAlignCenter, 0, tab, 0);
+	disconnect(ui.actionAlignRight, 0, tab, 0);
+	disconnect(ui.actionAlignJustify, 0, tab, 0);
+	disconnect(ui.actionInsertBulletedList, 0, tab, 0);
+	disconnect(ui.actionInsertNumberedList, 0, tab, 0);
+	disconnect(ui.actionDecreaseIndent, 0, tab, 0);
+	disconnect(ui.actionIncreaseIndent, 0, tab, 0);
+	disconnect(ui.actionTextDirectionLTR, 0, tab, 0);
+	disconnect(ui.actionTextDirectionRTL, 0, tab, 0);
+	disconnect(ui.actionTextDirectionDefault, 0, tab, 0);
+	disconnect(ui.actionShowTag, 0, tab, 0);
+	disconnect(ui.actionRemoveFormatting, 0, tab, 0);
+	disconnect(ui.actionSplitSection, 0, tab, 0);
+	disconnect(ui.actionInsertSGFSectionMarker, 0, tab, 0);
+	disconnect(ui.actionInsertClosingTag, 0, tab, 0);
+	disconnect(ui.actionGoToLinkOrStyle, 0, tab, 0);
+	disconnect(ui.actionAddMisspelledWord, 0, tab, 0);
+	disconnect(ui.actionIgnoreMisspelledWord, 0, tab, 0);
+	disconnect(ui.actionPrintPreview, 0, tab, 0);
+	disconnect(ui.actionPrint, 0, tab, 0);
+	disconnect(ui.actionAddToIndex, 0, tab, 0);
+	disconnect(ui.actionMarkForIndex, 0, tab, 0);
+	disconnect(tab, 0, this, 0);
+	disconnect(tab, 0, m_Book.data(), 0);
+	disconnect(tab, 0, m_BookBrowser, 0);
+	disconnect(tab, 0, m_ClipboardHistorySelector, 0);
 }

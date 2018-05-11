@@ -6,6 +6,8 @@ namespace future_core {
 		void GotoFirstPage();
 		void GotoNextPage();
 		void GotoPreviousPage();
+		void GotoNextChapter();
+		void GotoPreviousChapter();
 	};
 }
 
