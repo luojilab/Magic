@@ -672,6 +672,7 @@ include_directories( BEFORE
 set ( LAYOUT_ENGINE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/LayoutEngine )
 if ( WIN32 )
 	file(GLOB ICU_LIB_FILES LayoutEngine/icu/qt/lib64/*.lib )
+	file(GLOB ICU_DLL_FILES LayoutEngine/icu/qt/bin64/icu*.dll)
 endif()
 include_directories( BEFORE ${LAYOUT_ENGINE_HEADERS} )
 set ( LAYOUT_ENGINE_LIBRATY "C:/Works/looker_core/build/lib/Release/core.lib" "C:/Works/looker_core/build/lib/Release/LayoutEngine.lib" "C:/Works/looker_core/build/lib/Release/platform.lib")
@@ -820,7 +821,11 @@ elseif (MSVC)
     
     # Copy ISS file to temp folder location
     add_custom_command( TARGET ${TARGET_FOR_COPY} PRE_BUILD 
-                        COMMAND cmake -E copy ${ISS_CONFIGURED_LOCATION} ${ISS_TEMP_LOCATION} )     
+                        COMMAND cmake -E copy ${ISS_CONFIGURED_LOCATION} ${ISS_TEMP_LOCATION} )
+	foreach( dll ${ICU_DLL_FILES} )
+		add_custom_command( TARGET ${TARGET_FOR_COPY} POST_BUILD COMMAND
+		cmake -E copy ${dll} ${MAIN_PACKAGE_DIR} )
+	endforeach()
 
     # windeployqt
     add_custom_command( TARGET ${TARGET_FOR_COPY} POST_BUILD COMMAND
