@@ -30,6 +30,10 @@ public:
 	virtual QStringList engineNeedNoteData(const QString& charpterId);
 	virtual void enginePaintHighlightRect(const QRect& rect, const QColor& color);
 
+	void engineOpenHTML(BookChapter * html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
+
+	void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic);
+
 private slots:
 	void canDraw();
 

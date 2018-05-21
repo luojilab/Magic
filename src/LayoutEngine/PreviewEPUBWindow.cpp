@@ -169,3 +169,5 @@ void PreviewEPUBWindow::enginePaintHighlightRect(const QRect & rect, const QColo
 {
 }
 
+void PreviewEPUBWindow::engineOpenHTML(BookChapter *html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) {}
+void PreviewEPUBWindow::htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic) {}

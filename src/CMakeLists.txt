@@ -675,7 +675,7 @@ if ( WIN32 )
 	file(GLOB ICU_DLL_FILES LayoutEngine/icu/qt/bin64/icu*.dll)
 endif()
 include_directories( BEFORE ${LAYOUT_ENGINE_HEADERS} )
-set ( LAYOUT_ENGINE_LIBRATY "C:/Works/looker_core/build/lib/Release/core.lib" "C:/Works/looker_core/build/lib/Release/LayoutEngine.lib" "C:/Works/looker_core/build/lib/Release/platform.lib")
+set ( LAYOUT_ENGINE_LIBRATY "C:/Work/looker_core/build/lib/Debug/cored.lib" "C:/Work/looker_core/build/lib/Debug/LayoutEngined.lib" "C:/Work/looker_core/build/lib/Debug/platformd.lib")
 set ( ICU_LIBRARY ${ICU_LIB_FILES} )
 # We make bundles for Mac OS X
 if ( APPLE )

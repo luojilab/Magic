@@ -48,6 +48,7 @@
 #include "MiscEditors/SearchEditorModel.h"
 #include "Tabs/ContentTab.h"
 #include "PreviewEPUBWindow.h"
+#include "PreviewHTMLWindow.h"
 
 const int MAX_RECENT_FILES = 5;
 const int STATUSBAR_MSG_DISPLAY_TIME = 7000;
@@ -247,6 +248,7 @@ public slots:
 
 signals:
     void SettingsChanged();
+	void FileSaved(bool);
 
 protected:
     void showEvent(QShowEvent *event);
@@ -265,13 +267,31 @@ protected:
      */
     void closeEvent(QCloseEvent *event);
 
+	private:typedef enum {
+		iPhone5,
+		iPhone6,
+		iPhone6P,
+		iPhoneX,
+		XiaoMi,
+		Unknown
+	}PreviewPhoneType;
+
 private slots:
 
-void previewForIphone5() { layout(iPhone5); };
+void previewForIphone5() { layout(iPhone5);};
 void previewForIphone6() { layout(iPhone6); };
 void previewForIphone6P() { layout(iPhone6P); };
 void previewForIphoneX() { layout(iPhoneX); };
 void previewForXiaoMi() { layout(XiaoMi); };
+
+void previewIntimeForIphone5() { previewForCurrentHTML(iPhone5); };
+void previewIntimeForIphone6() { previewForCurrentHTML(iPhone6); };
+void previewIntimeForIphone6P() { previewForCurrentHTML(iPhone6P); };
+void previewIntimeForIphoneX() { previewForCurrentHTML(iPhoneX); };
+void previewIntimeForXiaoMi() { previewForCurrentHTML(XiaoMi); };
+
+void changeIntimePreviewContent(ContentTab* , ContentTab*);
+void fileSavedSuccessAction();
 
 	void AddCover();
 
@@ -662,14 +682,6 @@ void previewForXiaoMi() { layout(XiaoMi); };
     void unloadPluginsMenu();
 
 private:
-	typedef enum {
-		iPhone5,
-		iPhone6,
-		iPhone6P,
-		iPhoneX,
-		XiaoMi,
-		Unknown
-	}PreviewPhoneType;
 
 	void layout(PreviewPhoneType);
     void updateToolTipsOnPluginIcons();
@@ -1044,16 +1056,26 @@ private:
      */
 	Ui::MainWindow ui;
 
+private:
+	/*
+	 * preview for epub
+	 * and 
+	 * preview for single html
+	 */
 	PreviewEPUBWindow* previewer;
+	PreviewHTMLWindow* m_previewerToHTML;
 
 	std::map<PreviewPhoneType,PreviewEPUBWindow *>m_preViewWindowsMap;
 	std::map<PreviewPhoneType, QSize> m_previewPhoneSizeMap = {
-		{ PreviewPhoneType::iPhone5, QSize(640,1136)},
-		{ PreviewPhoneType::iPhone6 ,QSize(750,1134)},
-		{ PreviewPhoneType::iPhone6P ,QSize(qint16(1080 * 0.7),qint16(1920 * 0.7))},
+		{ PreviewPhoneType::iPhone5, QSize(640 * 0.5 ,1136 * 0.5)},
+		{ PreviewPhoneType::iPhone6 ,QSize(750 * 0.5 ,1134 * 0.5)},
+		{ PreviewPhoneType::iPhone6P ,QSize(qint16(1080 * 0.5),qint16(1920 * 0.5))},
 		{ PreviewPhoneType::iPhoneX ,QSize(562,1218)},
 		{ PreviewPhoneType::XiaoMi ,QSize(qint16(1080*0.7),qint16(1920*0.7))}
 	};
+
+	void previewForCurrentHTML(PreviewPhoneType);
+	void updateIntimePreviewContent();
 };
 
 #endif // SIGIL_H

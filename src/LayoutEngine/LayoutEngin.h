@@ -1,8 +1,18 @@
+#ifndef LAYOUT_ENGINE_H
+#define LAYOUT_ENGINE_H
+
 #include <QWidget>
 #include <QtCore>
-#include "BookModel.h"
+#include "BookChapter.h"
+#include <memory>
+
+namespace future_core {
+	class BookModel;
+	struct HighlightInfo;
+};
 
 using namespace future_core;
+
 typedef enum {
 	OPEN_EPUB_SUCCESS = 0,          //成功打开EPUB
 	EPUB_FILENAME_ERROR,            //EPUB文件名错误
@@ -24,7 +34,7 @@ struct BookContents
 	quint32 level;
 	QString text;
 	QString ContentHRef;
-	BookContents():order(0),level(0) {}
+	BookContents() :order(0), level(0) {}
 };
 
 struct BookUnderlineData
@@ -32,7 +42,7 @@ struct BookUnderlineData
 	quint32 m_startOffset;
 	quint32 m_endOffset;
 	QColor m_lineColor;
-	BookUnderlineData(): m_startOffset(0),m_endOffset(0) {}
+	BookUnderlineData() : m_startOffset(0), m_endOffset(0) {}
 };
 
 //Engine offset
@@ -57,7 +67,7 @@ struct BookNotationOffsetData
 	qint32 m_htmlStartOffset;
 	qint32 m_htmlEndOffset;
 
-	BookNotationOffsetData():
+	BookNotationOffsetData() :
 		m_createTimeStamp(0),
 		m_updateTimeStamp(0),
 		m_startFileOffset(0),
@@ -81,7 +91,7 @@ struct SearchResultData
 	qint32 m_strBeginOffset;      //高亮选中搜索文字start
 	qint32 m_strEndOffset;        //高亮选中搜索文字end
 
-	SearchResultData() :m_chapterIndex(0),m_htmlBeginOffset(0),m_htmlEndOffset(0),m_strBeginOffset(0),m_strEndOffset(0) {}
+	SearchResultData() :m_chapterIndex(0), m_htmlBeginOffset(0), m_htmlEndOffset(0), m_strBeginOffset(0), m_strEndOffset(0) {}
 };
 
 struct EngineHighlightInfo {
@@ -102,10 +112,10 @@ struct EngineHighlightInfo {
 	qint32	m_htmlEndOffset;
 	QString m_selectedStr;
 	bool	m_selectionIsForward;
-	// EngineHighlightInfo operator<<(future_core::HighlightInfo& info);
+	EngineHighlightInfo operator<<(future_core::HighlightInfo& info);
 };
 
-class __declspec(dllexport) LayoutEngineDelegate
+class LayoutEngineDelegate
 {
 public:
 	virtual void engineInitFinish() = 0;
@@ -120,9 +130,12 @@ public:
 	virtual QList<BookUnderlineData *> engineNeedUnderlineData(const QString& charpterId) = 0;
 	virtual QStringList engineNeedNoteData(const QString& charpterId) = 0;
 	virtual void enginePaintHighlightRect(const QRect& rect, const QColor& color) = 0;
+	// only open html file
+	virtual void engineOpenHTML(BookChapter *html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) = 0;
+	virtual void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic) = 0;
 };
 
-class __declspec(dllexport) LayoutEngine
+class LayoutEngine
 {
 public:
 	typedef void(*PageStartEndOffsetByPageOffsetCallback)(bool, QString, qint32, qint32, QString);
@@ -139,6 +152,10 @@ public:
 	void setPageSize(BookModel *bookModel, const qint32& width, const qint32& height, const float& scale);
 	void openEpub(QWidget *view, const std::string& filePath, const QString& tokenStd, const QString& uidStd);
 	void closeEpub(BookModel *bookModel);
+	// HTML utils
+	void openHtml(QWidget *view,const std::string htmlPath, std::string uniqueKey);
+	void paintHtml(BookChapter *html, unsigned int pageIndex);
+	void closeHtml(BookChapter* html);
 	/*void getTotalPageCount(BookModel *bookModel);
 	int getCurrentPageIndex(BookModel *bookModel);
 	QString getSummaryByPageOffset(BookModel *bookModel, qint32 pageOffset);
@@ -158,6 +175,7 @@ public:
 	void gotoPreviousChapter(BookModel *bookModel);
 	void gotoPreviousChapter(BookModel *bookModel);*/
 
+	void setFontScale(BookModel *bookModel, float scaleFactor);
 	QImage* paintDisplayImageByOffset(BookModel *bookModel, qint32 offset);
 
 	/*void setSuperFontSrc(BookModel *bookModel, const QString& fontLocalSrc);
@@ -187,4 +205,12 @@ private:
 	void bookHookInit(BookModel *bookModel);
 	void enginInitFinish();
 	QList<BookContents *>getContentList(BookModel *bookModel);
+	std::map<std::string, QImage*>m_imageCache = std::map<std::string, QImage*>();
+	std::string m_htmlUniqueKey { "" };
+
+private:
+	void goPaintingHTML(BookChapter* html, unsigned int pageIndex);
 };
+
+
+#endif // LAYOUT_ENGINE_H

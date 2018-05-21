@@ -50,7 +50,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -336,6 +336,17 @@
      <addaction name="separator"/>
      <addaction name="actionXiaoMi"/>
     </widget>
+    <widget class="QMenu" name="menu">
+     <property name="title">
+      <string>实时预览</string>
+     </property>
+     <addaction name="actionIPhone5_inTime"/>
+     <addaction name="actionIPhone6_inTime"/>
+     <addaction name="actionIPhone6P_inTime"/>
+     <addaction name="actionIPhoneX_inTime"/>
+     <addaction name="separator"/>
+     <addaction name="actionXiaoMi_inTime"/>
+    </widget>
     <addaction name="actionAddCover"/>
     <addaction name="actionMetaEditor"/>
     <addaction name="menuTOC"/>
@@ -355,6 +366,7 @@
     <addaction name="actionDeleteUnusedStyles"/>
     <addaction name="separator"/>
     <addaction name="menuPreview"/>
+    <addaction name="menu"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
     <property name="title">
@@ -2368,6 +2380,31 @@
   <action name="actionXiaoMi">
    <property name="text">
     <string>XiaoMi</string>
+   </property>
+  </action>
+  <action name="actionIPhone5_inTime">
+   <property name="text">
+    <string>iPhone5实时预览</string>
+   </property>
+  </action>
+  <action name="actionIPhone6_inTime">
+   <property name="text">
+    <string>iPhone6实时预览</string>
+   </property>
+  </action>
+  <action name="actionIPhone6P_inTime">
+   <property name="text">
+    <string>iPhone6P实时预览</string>
+   </property>
+  </action>
+  <action name="actionIPhoneX_inTime">
+   <property name="text">
+    <string>iPhoneX实时预览</string>
+   </property>
+  </action>
+  <action name="actionXiaoMi_inTime">
+   <property name="text">
+    <string>XiaoMi实时预览</string>
    </property>
   </action>
  </widget>

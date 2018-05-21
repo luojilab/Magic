@@ -189,7 +189,8 @@ MainWindow::MainWindow(const QString &openfilepath, bool is_internal, QWidget *p
     m_menuPluginsValidation(NULL),
     m_pluginList(QStringList()),
     m_SaveCSS(false),
-	m_preViewWindowsMap(std::map<PreviewPhoneType,PreviewEPUBWindow *>())
+	m_preViewWindowsMap(std::map<PreviewPhoneType,PreviewEPUBWindow *>()),
+	m_previewerToHTML(NULL)
 {
     ui.setupUi(this);
 
@@ -3922,6 +3923,8 @@ bool MainWindow::SaveFile(const QString &fullfilepath, bool update_current_filen
         return false;
     }
 
+	emit FileSaved(true);
+
     return true;
 }
 
@@ -4886,6 +4889,11 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(ui.actionIPhone6P, SIGNAL(triggered()), this, SLOT(previewForIphone6P()));
 	connect(ui.actionIPhoneX, SIGNAL(triggered()), this, SLOT(previewForIphoneX()));
 	connect(ui.actionXiaoMi, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
+	connect(ui.actionIPhone5_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone5()));
+	connect(ui.actionIPhone6_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone6()));
+	connect(ui.actionIPhone6P_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone6P()));
+	connect(ui.actionIPhoneX_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphoneX()));
+	connect(ui.actionXiaoMi_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForXiaoMi()));
     // Change case
     connect(ui.actionCasingLowercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
     connect(ui.actionCasingUppercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
@@ -4952,6 +4960,8 @@ void MainWindow::ConnectSignalsToSlots()
             this,                    SLOT(UpdateBrowserSelectionToTab()));
     connect(m_TabManager,          SIGNAL(TabChanged(ContentTab *, ContentTab *)),
             this,                    SLOT(UpdatePreview()));
+	connect(m_TabManager,		   SIGNAL(TabChanged(ContentTab *, ContentTab *)),
+			this,					SLOT(changeIntimePreviewContent(ContentTab *, ContentTab *)));
     connect(m_BookBrowser,          SIGNAL(UpdateBrowserSelection()),
             this,                    SLOT(UpdateBrowserSelectionToTab()));
     connect(m_BookBrowser, SIGNAL(RenumberTOCContentsRequest()),
@@ -5026,6 +5036,9 @@ void MainWindow::ConnectSignalsToSlots()
     // Plugins
     PluginDB *pdb = PluginDB::instance();
     connect(pdb, SIGNAL(plugins_changed()), this, SLOT(loadPluginsMenu()));
+
+	// File Saved
+	connect(this, SIGNAL(FileSaved(bool)), this, SLOT(fileSavedSuccessAction()));
 }
 
 void MainWindow::MakeTabConnections(ContentTab *tab)
@@ -5126,6 +5139,7 @@ void MainWindow::MakeTabConnections(ContentTab *tab)
         connect(ui.actionPrintPreview,             SIGNAL(triggered()),  tab,   SLOT(PrintPreview()));
         connect(ui.actionPrint,                    SIGNAL(triggered()),  tab,   SLOT(Print()));
         connect(tab,   SIGNAL(ContentChanged()),             m_Book.data(), SLOT(SetModified()));
+		connect(tab, SIGNAL(ContentChanged()), this, SLOT(fileSavedSuccessAction()));
         connect(tab,   SIGNAL(UpdateCursorPosition(int, int)), this,          SLOT(UpdateCursorPositionLabel(int, int)));
         connect(tab,   SIGNAL(ZoomFactorChanged(float)),   this,          SLOT(UpdateZoomLabel(float)));
         connect(tab,   SIGNAL(ZoomFactorChanged(float)),   this,          SLOT(UpdateZoomSlider(float)));
@@ -5181,4 +5195,75 @@ void MainWindow::BreakTabConnections(ContentTab *tab)
 	disconnect(tab, 0, m_Book.data(), 0);
 	disconnect(tab, 0, m_BookBrowser, 0);
 	disconnect(tab, 0, m_ClipboardHistorySelector, 0);
+}
+
+void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
+{
+	if ( m_previewerToHTML && m_previewerToHTML->isVisible() ) {
+		return;
+	}
+	if (type == Unknown) {
+		QMessageBox::information(this, "", "未知的展示类型", QMessageBox::Ok);
+		return;
+	}
+	ContentTab *tab = m_TabManager->GetCurrentContentTab();
+	QString QfullPath = "";
+	if (!tab) {
+		QMessageBox::information(this, "", "没有打开一个html文件", QMessageBox::Ok);
+		return;
+	}
+	Resource* res = tab->GetLoadedResource();
+	if ( !res || res->Type() != Resource::HTMLResourceType ) {
+		QMessageBox::information(this, "", "不支持实时预览的资源文件", QMessageBox::Ok);
+		return;
+	}
+	QfullPath = res->GetFullPath();
+	if (QfullPath.isEmpty()) {
+		QMessageBox::information(this, "", "资源文件路径为空，请先保存", QMessageBox::Ok);
+		return;
+	}
+	QSize size = m_previewPhoneSizeMap[type];
+	if (!m_previewerToHTML) {
+		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString(), size);
+		m_previewerToHTML->setFixedSize(QSize(centralWidget()->size().height() * 0.56, centralWidget()->size().height()));
+		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
+	}
+	else {
+		m_previewerToHTML->setFixedSize(size.width(), size.height());
+		m_previewerToHTML->reloadHTML(QfullPath.toStdString());
+	}
+	m_previewerToHTML->show();
+}
+
+void MainWindow::changeIntimePreviewContent(ContentTab*old_tab, ContentTab* new_tab) {
+	if (!new_tab) {
+		return;
+	}
+	QString QfullPath = "";
+	Resource* res = new_tab->GetLoadedResource();
+	if (!res || res->Type() != Resource::HTMLResourceType) {
+		return;
+	}
+	QfullPath = res->GetFullPath();
+	if (QfullPath.isEmpty()) {
+		return;
+	}
+	if (!m_previewerToHTML || !m_previewerToHTML->isVisible()) {
+		return;
+	}
+	m_previewerToHTML->reloadHTML(QfullPath.toStdString());
+}
+
+void MainWindow::updateIntimePreviewContent() {
+	m_previewerToHTML->updateCurrentPage();
+}
+
+void MainWindow::fileSavedSuccessAction() {
+	if ( !m_previewerToHTML ) {
+		return;
+	}
+	if ( !m_previewerToHTML->isVisible() ) {
+		return;
+	}
+	m_previewerToHTML->updateCurrentPage();
 }
