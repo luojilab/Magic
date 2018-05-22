@@ -97,6 +97,7 @@ void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
 // mouse click event
 void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event) {
 	if (isRendering()) return;
+	if (!m_htmlModel) return;
 	if (event->button() == Qt::LeftButton) {
 		if (m_htmlPageIndex + 1 >= getHtmlModel()->GetPageCount()) return;
 		++m_htmlPageIndex;

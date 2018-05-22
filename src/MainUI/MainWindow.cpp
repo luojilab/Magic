@@ -5050,12 +5050,12 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(this, SIGNAL(FileSaved(bool)), this, SLOT(fileSavedSuccessAction()));
 
 	// timer
-	if (!m_previerToHtmlTimer) {
+	/*if (!m_previerToHtmlTimer) {
 		m_previerToHtmlTimer = new QTimer(this);
 		connect(m_previerToHtmlTimer, SIGNAL(timeout()), this, SLOT(checkoutTabChangedStatusAndContentChangedStatus()));
 		m_previerToHtmlTimer->setSingleShot(false);
 		m_previerToHtmlTimer->start(500);
-	}
+	}*/
 	m_contentChangedTimer->setInterval(500);
 	m_contentChangedTimer->setSingleShot(true);
 	connect(m_contentChangedTimer, SIGNAL(timeout()), this, SLOT(contentTxetChangedAction()));
@@ -5267,6 +5267,7 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 
 void MainWindow::changeIntimePreviewContent() {
 	m_tabChanged = true;
+	tabChangedAction();
 }
 
 void MainWindow::tabChangedAction() {
