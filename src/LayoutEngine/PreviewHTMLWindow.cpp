@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <QReadWriteLock>
 #include <QFile>
+#include <QDir>
 #include <QSettings>
 
 PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPath, const QSize& maxSize)
@@ -13,17 +14,31 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
 	m_maxSize(maxSize)
 {
 	m_engine->delegate = this;
-	m_engine->InitLayoutEngine("");
 	m_engine->SetViewTopMargin(0);
 	m_engine->SetViewBottomMargin(0);
-	QFile f(m_htmlPath.c_str());
-	m_innerHtmlPath = tempFilePath(m_htmlPath);
-	bool s = f.copy(m_innerHtmlPath.c_str());
+	m_innerHtmlPath = tempFilePath(htmlPath);
+	QFile f(htmlPath.c_str());
+	if (f.exists()) {
+		f.copy(m_innerHtmlPath.c_str());
+	}
+	// Must initial engine at last!
+	// in case the width and height value get wrong
+	m_engine->InitLayoutEngine("");
+}
+
+PreviewHTMLWindow::~PreviewHTMLWindow()
+{
+	cleanResource();
+	delete m_engine;
+	delete &m_htmlPath;
+	delete &m_innerHtmlPath;
 }
 
 void PreviewHTMLWindow::engineInitFinish() {
+	int w = width();
+	int h = height();
 	m_engine->setPageSize(NULL, width(), height(), 1);
-	m_engine->openHtml(this, m_htmlPath, "html_id_key");
+	m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
 }
 
 // engine epub delegate function
@@ -46,17 +61,18 @@ void PreviewHTMLWindow::enginePaintHighlightRect(const QRect& rect, const QColor
 // html open success 
 void PreviewHTMLWindow::engineOpenHTML(BookChapter *html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) {
 	if (error == OPEN_EPUB_SUCCESS) {
-		m_htmlModel = html;
-		m_engine->paintHtml(m_htmlModel, m_htmlPageIndex);
+		if (getHtmlModel() != NULL) {
+			cleanResource();
+		}
+		setHtmlModel(html);
+		m_engine->paintHtml(getHtmlModel(), m_htmlPageIndex);
 	}
 }
 // html pic render finish
 void PreviewHTMLWindow::htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic) {
 	safeSetRenderStatus(false);
 	if (pic != nullptr) {
-		int count__ = pic.use_count();
 		m_pic = pic;
-		int count = m_pic.use_count();
 		m_old_htmlPageIndex = m_htmlPageIndex;
 		update();
 	} else {
@@ -71,7 +87,6 @@ void PreviewHTMLWindow::htmlImageRenderFinish(BookChapter *html, std::shared_ptr
 // paint event
 void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
 	if ( m_pic != nullptr && !(*m_pic).isNull() ) {
-		int count = m_pic.use_count();
 		QPainter p(this);
 		if (p.isActive()) {
 			int w = width();
@@ -85,42 +100,68 @@ void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
 void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event) {
 	if (isRendering()) return;
 	if (event->button() == Qt::LeftButton) {
-		if (m_htmlPageIndex + 1 >= m_htmlModel->GetPageCount()) return;
+		if (m_htmlPageIndex + 1 >= getHtmlModel()->GetPageCount()) return;
 		++m_htmlPageIndex;
 	}
 	else if (event->button() == Qt::RightButton) {
 		if (m_htmlPageIndex == 0) return;
 		--m_htmlPageIndex;
 	}
-	m_engine->paintHtml(m_htmlModel, m_htmlPageIndex);
+	m_engine->paintHtml(getHtmlModel(), m_htmlPageIndex);
+}
+// close event
+void PreviewHTMLWindow::closeEvent(QCloseEvent *) {
+	cleanResource();
+	delete m_htmlModel;
+	m_pic.reset();
 }
 
 void PreviewHTMLWindow::reloadHTML(std::string htmlPath)
 {
-	cleanResource();
-	QFile f(htmlPath.c_str());
-	m_htmlPath = htmlPath;
-	m_innerHtmlPath = tempFilePath(m_htmlPath);
-	if ( !QFile(tempFilePath(htmlPath).c_str()).exists() ) {
+	if (getHtmlModel()) {
+		cleanResource();
+		m_htmlPath = htmlPath;
+		QFile f(htmlPath.c_str());
+		m_htmlPath = htmlPath;
+		m_innerHtmlPath = tempFilePath(m_htmlPath);
+		if ( !QFile(tempFilePath(htmlPath).c_str()).exists() ) {
 		f.copy(tempFilePath(m_htmlPath).c_str());
+		}
+		m_htmlPageIndex = 0;
+		m_engine->openHtml(this, m_htmlPath, "html_id_key");
 	}
-	m_engine->openHtml(this, m_htmlPath, "html_id_key");
 }
 
-void PreviewHTMLWindow::updateCurrentPage()
+void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts)
 {
-	cleanResource();
-	/*QFile f(m_innerHtmlPath.c_str());
-	if (f.open(QIODevice::ReadWrite | QIODevice::Text)) {
-		f.write(content.toUtf8());
-	}*/
-	m_engine->openHtml(this, m_htmlPath, "html_id_key");
+	//if (getHtmlModel()) {
+		cleanResource();
+		QFile f(m_innerHtmlPath.c_str());
+		if (f.open(QIODevice::ReadWrite | QIODevice::Text)) {
+		f.write(contentTexts.toUtf8());
+		f.close();
+		}
+		m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
+	//}
 }
 
 void PreviewHTMLWindow::setMaxSize(int w, int h)
 {
 	m_maxSize.setHeight(h);
 	m_maxSize.setWidth(w);
+}
+
+void PreviewHTMLWindow::cleanTempFile()
+{
+	QDir dir(QFileInfo(m_htmlPath.c_str()).absolutePath());
+	QFileInfoList file_list = dir.entryInfoList(QDir::Files | QDir::NoSymLinks);
+	for each (QFileInfo f_info in file_list)
+	{
+		if (f_info.fileName().startsWith("__Temp__")) 
+		{
+			QFile(f_info.filePath()).remove();
+		}
+	}
 }
 
 void PreviewHTMLWindow::safeSetRenderStatus(bool status)
@@ -138,12 +179,31 @@ inline bool PreviewHTMLWindow::safeGetRenderStatus()
 	return status;
 }
 
+inline void PreviewHTMLWindow::setHtmlModel(BookChapter *html)
+{
+	m_ModelLocker.lockForWrite();
+	m_htmlModel = html;
+	m_ModelLocker.unlock();
+}
+
+inline BookChapter * PreviewHTMLWindow::getHtmlModel()
+{
+	BookChapter *model;
+	m_ModelLocker.lockForRead();
+	model = m_htmlModel;
+	m_ModelLocker.unlock();
+	return model;
+}
+
 void PreviewHTMLWindow::cleanResource()
 {
-	int count = m_pic.use_count();
-	m_pic.reset();
-	m_engine->closeHtml(m_htmlModel);
-	m_htmlModel = NULL;
+	if (m_pic) {
+		m_pic.reset();
+	}
+	if (getHtmlModel()) {
+		m_engine->closeHtml(getHtmlModel());
+		setHtmlModel(NULL);
+	}
 }
 
 std::string PreviewHTMLWindow::tempFilePath(const std::string & ofilePath)
@@ -158,6 +218,5 @@ std::string PreviewHTMLWindow::tempFilePath(const std::string & ofilePath)
 	if (fileName.empty()) {
 		return "";
 	}
-
 	return dir + fileName;
 }

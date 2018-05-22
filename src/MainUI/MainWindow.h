@@ -290,8 +290,11 @@ void previewIntimeForIphone6P() { previewForCurrentHTML(iPhone6P); };
 void previewIntimeForIphoneX() { previewForCurrentHTML(iPhoneX); };
 void previewIntimeForXiaoMi() { previewForCurrentHTML(XiaoMi); };
 
-void changeIntimePreviewContent(ContentTab* , ContentTab*);
+void changeIntimePreviewContent();
+void updateIntimePreviewContent();
 void fileSavedSuccessAction();
+void checkoutTabChangedStatusAndContentChangedStatus();
+void contentTxetChangedAction();
 
 	void AddCover();
 
@@ -1065,6 +1068,11 @@ private:
 	PreviewEPUBWindow* previewer;
 	PreviewHTMLWindow* m_previewerToHTML;
 
+	bool m_tabChanged{ false };
+	bool m_contentChanged{ false };
+	QTimer *m_previerToHtmlTimer;
+	QTimer *m_contentChangedTimer;
+
 	std::map<PreviewPhoneType,PreviewEPUBWindow *>m_preViewWindowsMap;
 	std::map<PreviewPhoneType, QSize> m_previewPhoneSizeMap = {
 		{ PreviewPhoneType::iPhone5, QSize(640 * 0.5 ,1136 * 0.5)},
@@ -1075,7 +1083,8 @@ private:
 	};
 
 	void previewForCurrentHTML(PreviewPhoneType);
-	void updateIntimePreviewContent();
+	void fileWillSavedAction();
+	void tabChangedAction();
 };
 
 #endif // SIGIL_H

@@ -9,9 +9,11 @@ class PreviewHTMLWindow : public QDockWidget, public LayoutEngineDelegate
 {
 public:
 	PreviewHTMLWindow(QWidget* parent, const std::string htmlPath, const QSize& maxSize);
+	~PreviewHTMLWindow();
 	void reloadHTML(std::string htmlPath);
-	void updateCurrentPage();
+	void updateCurrentPage(const QString& contentTexts);
 	void setMaxSize(int, int);
+	void cleanTempFile();
 
 protected:
 	virtual void engineInitFinish();
@@ -33,6 +35,8 @@ protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *);
 
+	void closeEvent(QCloseEvent *);
+
 private:
 	LayoutEngine *m_engine{ NULL };
 	BookChapter* m_htmlModel{ NULL };
@@ -43,13 +47,15 @@ private:
 	std::shared_ptr<QImage> m_pic;
 	bool m_isRendering{ false };
 	QReadWriteLock m_locker;
-	QReadWriteLock m_picLocker;
+	QReadWriteLock m_ModelLocker;
 	QSize m_maxSize;
 
 private:
 	inline void safeSetRenderStatus(bool);
 	inline bool safeGetRenderStatus();
 	inline bool isRendering() { return safeGetRenderStatus(); };
+	inline void setHtmlModel(BookChapter *);
+	inline BookChapter* getHtmlModel();
 	void cleanResource();
 	std::string tempFilePath(const std::string& fileName);
 };

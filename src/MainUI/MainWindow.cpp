@@ -44,6 +44,7 @@
 #include <QStringList>
 #include <QFont>
 #include <QFontMetrics>
+#include <QTimer>
 
 #include "BookManipulation/CleanSource.h"
 #include "BookManipulation/Index.h"
@@ -190,7 +191,9 @@ MainWindow::MainWindow(const QString &openfilepath, bool is_internal, QWidget *p
     m_pluginList(QStringList()),
     m_SaveCSS(false),
 	m_preViewWindowsMap(std::map<PreviewPhoneType,PreviewEPUBWindow *>()),
-	m_previewerToHTML(NULL)
+	m_previewerToHTML(NULL),
+	m_previerToHtmlTimer(NULL),
+	m_contentChangedTimer(new QTimer(this))
 {
     ui.setupUi(this);
 
@@ -674,8 +677,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
 
         if ((m_PreviewWindow)  && m_PreviewWindow->isVisible()) {
-            m_PreviewWindow->hide();
+            m_PreviewWindow->close();
         }
+		if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+			m_previewerToHTML->close();
+		}
         event->accept();
     } else {
         event->ignore();
@@ -783,6 +789,7 @@ void MainWindow::OpenRecentFile()
 
 bool MainWindow::Save()
 {
+	fileWillSavedAction();
     if (m_CurrentFilePath.isEmpty()) {
         return SaveAs();
     } else {
@@ -4961,7 +4968,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(m_TabManager,          SIGNAL(TabChanged(ContentTab *, ContentTab *)),
             this,                    SLOT(UpdatePreview()));
 	connect(m_TabManager,		   SIGNAL(TabChanged(ContentTab *, ContentTab *)),
-			this,					SLOT(changeIntimePreviewContent(ContentTab *, ContentTab *)));
+			this,					SLOT(changeIntimePreviewContent()));
     connect(m_BookBrowser,          SIGNAL(UpdateBrowserSelection()),
             this,                    SLOT(UpdateBrowserSelectionToTab()));
     connect(m_BookBrowser, SIGNAL(RenumberTOCContentsRequest()),
@@ -5039,6 +5046,24 @@ void MainWindow::ConnectSignalsToSlots()
 
 	// File Saved
 	connect(this, SIGNAL(FileSaved(bool)), this, SLOT(fileSavedSuccessAction()));
+
+	// timer
+	if (!m_previerToHtmlTimer) {
+		m_previerToHtmlTimer = new QTimer(this);
+		connect(m_previerToHtmlTimer, SIGNAL(timeout()), this, SLOT(checkoutTabChangedStatusAndContentChangedStatus()));
+		m_previerToHtmlTimer->setSingleShot(false);
+		m_previerToHtmlTimer->start(500);
+	}
+	m_contentChangedTimer->setInterval(500);
+	m_contentChangedTimer->setSingleShot(true);
+	connect(m_contentChangedTimer, SIGNAL(timeout()), this, SLOT(contentTxetChangedAction()));
+	m_contentChangedTimer->start();
+}
+
+void MainWindow::fileSavedSuccessAction() {
+	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+		m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString());
+	}
 }
 
 void MainWindow::MakeTabConnections(ContentTab *tab)
@@ -5139,7 +5164,7 @@ void MainWindow::MakeTabConnections(ContentTab *tab)
         connect(ui.actionPrintPreview,             SIGNAL(triggered()),  tab,   SLOT(PrintPreview()));
         connect(ui.actionPrint,                    SIGNAL(triggered()),  tab,   SLOT(Print()));
         connect(tab,   SIGNAL(ContentChanged()),             m_Book.data(), SLOT(SetModified()));
-		connect(tab, SIGNAL(ContentChanged()), this, SLOT(fileSavedSuccessAction()));
+		connect(tab, SIGNAL(ContentChanged()), this, SLOT(updateIntimePreviewContent()));
         connect(tab,   SIGNAL(UpdateCursorPosition(int, int)), this,          SLOT(UpdateCursorPositionLabel(int, int)));
         connect(tab,   SIGNAL(ZoomFactorChanged(float)),   this,          SLOT(UpdateZoomLabel(float)));
         connect(tab,   SIGNAL(ZoomFactorChanged(float)),   this,          SLOT(UpdateZoomSlider(float)));
@@ -5229,14 +5254,19 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
 	}
 	else {
-		m_previewerToHTML->setFixedSize(size.width(), size.height());
+		m_previewerToHTML->setFixedSize(QSize(centralWidget()->size().height() * 0.56, centralWidget()->size().height()));
 		m_previewerToHTML->reloadHTML(QfullPath.toStdString());
 	}
 	m_previewerToHTML->show();
 }
 
-void MainWindow::changeIntimePreviewContent(ContentTab*old_tab, ContentTab* new_tab) {
-	if (!new_tab) {
+void MainWindow::changeIntimePreviewContent() {
+	m_tabChanged = true;
+}
+
+void MainWindow::tabChangedAction() {
+	ContentTab *new_tab;
+	if (!(new_tab = m_TabManager->GetCurrentContentTab())) {
 		return;
 	}
 	QString QfullPath = "";
@@ -5254,16 +5284,33 @@ void MainWindow::changeIntimePreviewContent(ContentTab*old_tab, ContentTab* new_
 	m_previewerToHTML->reloadHTML(QfullPath.toStdString());
 }
 
-void MainWindow::updateIntimePreviewContent() {
-	m_previewerToHTML->updateCurrentPage();
+void MainWindow::updateIntimePreviewContent() { 
+	m_contentChangedTimer->stop();
+	m_contentChanged = true;
+	m_contentChangedTimer->start();
 }
 
-void MainWindow::fileSavedSuccessAction() {
+void MainWindow::contentTxetChangedAction() {
+	if (m_contentChanged) {
+		HTMLResource* res = dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource());
+		m_previewerToHTML->updateCurrentPage(res->GetText());
+		m_contentChanged = false;
+	}
+}
+
+void MainWindow::fileWillSavedAction() {
 	if ( !m_previewerToHTML ) {
 		return;
 	}
-	if ( !m_previewerToHTML->isVisible() ) {
+	if ( m_previewerToHTML->isVisible() ) {
 		return;
 	}
-	m_previewerToHTML->updateCurrentPage();
+	m_previewerToHTML->cleanTempFile();
+}
+
+void MainWindow::checkoutTabChangedStatusAndContentChangedStatus() {
+	if (m_tabChanged && m_previewerToHTML && m_previewerToHTML->isVisible()) {
+		tabChangedAction();
+		m_tabChanged = false;
+	}
 }
