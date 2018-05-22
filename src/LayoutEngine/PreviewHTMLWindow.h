@@ -8,11 +8,10 @@
 class PreviewHTMLWindow : public QDockWidget, public LayoutEngineDelegate
 {
 public:
-	PreviewHTMLWindow(QWidget* parent, const std::string htmlPath, const QSize& maxSize);
+	PreviewHTMLWindow(QWidget* parent, const std::string htmlPath);
 	~PreviewHTMLWindow();
-	void reloadHTML(std::string htmlPath);
+	void reloadHTML(std::string htmlPath, bool reload);
 	void updateCurrentPage(const QString& contentTexts);
-	void setMaxSize(int, int);
 	void cleanTempFile();
 
 protected:
@@ -48,7 +47,6 @@ private:
 	bool m_isRendering{ false };
 	QReadWriteLock m_locker;
 	QReadWriteLock m_ModelLocker;
-	QSize m_maxSize;
 
 private:
 	inline void safeSetRenderStatus(bool);

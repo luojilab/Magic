@@ -4250,7 +4250,9 @@ void MainWindow::layout(PreviewPhoneType type) {
 	if (this->previewer && this->Save() ) {
 		if ( !this->previewer->isVisible() ) {
 			this->previewer->updateEngine("c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
-			this->previewer->setFixedSize(m_previewPhoneSizeMap[type]);
+			QSize phone_size = m_previewPhoneSizeMap[type];
+			int height = centralWidget()->size().height();
+			this->previewer->setFixedSize(QSize(float(phone_size.width())/phone_size.height()*height, height));
 			this->previewer->show();
 		}
 	} else {
@@ -5062,7 +5064,7 @@ void MainWindow::ConnectSignalsToSlots()
 
 void MainWindow::fileSavedSuccessAction() {
 	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
-		m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString());
+		m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true);
 	}
 }
 
@@ -5248,14 +5250,17 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		return;
 	}
 	QSize size = m_previewPhoneSizeMap[type];
+	int height = centralWidget()->size().height();
+	float delta = size.width() / float(size.height());
+	float width = height * delta;
 	if (!m_previewerToHTML) {
-		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString(), size);
-		m_previewerToHTML->setFixedSize(QSize(centralWidget()->size().height() * 0.56, centralWidget()->size().height()));
+		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString());
+		m_previewerToHTML->setFixedSize(QSize(width, height));
 		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
 	}
 	else {
-		m_previewerToHTML->setFixedSize(QSize(centralWidget()->size().height() * 0.56, centralWidget()->size().height()));
-		m_previewerToHTML->reloadHTML(QfullPath.toStdString());
+		m_previewerToHTML->setFixedSize(QSize(width, height));
+		m_previewerToHTML->reloadHTML(QfullPath.toStdString(),true);
 	}
 	m_previewerToHTML->show();
 }
@@ -5281,7 +5286,7 @@ void MainWindow::tabChangedAction() {
 	if (!m_previewerToHTML || !m_previewerToHTML->isVisible()) {
 		return;
 	}
-	m_previewerToHTML->reloadHTML(QfullPath.toStdString());
+	m_previewerToHTML->reloadHTML(QfullPath.toStdString(),true);
 }
 
 void MainWindow::updateIntimePreviewContent() { 

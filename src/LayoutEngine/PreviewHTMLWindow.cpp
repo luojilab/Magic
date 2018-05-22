@@ -6,12 +6,11 @@
 #include <QDir>
 #include <QSettings>
 
-PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPath, const QSize& maxSize)
+PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPath)
 	:QDockWidget(parent),
 	m_htmlPath(htmlPath),
 	m_engine(new LayoutEngine), 
-	m_htmlPageIndex(0),
-	m_maxSize(maxSize)
+	m_htmlPageIndex(0)
 {
 	m_engine->delegate = this;
 	m_engine->SetViewTopMargin(0);
@@ -89,9 +88,8 @@ void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
 	if ( m_pic != nullptr && !(*m_pic).isNull() ) {
 		QPainter p(this);
 		if (p.isActive()) {
-			int w = width();
 			p.eraseRect(QRect(0, 0, width(), height()));
-			p.drawImage(QRect(0, 0, width(), height()), (*m_pic).scaled(size()));
+			p.drawImage(QRect(0, 0, width(), height()), *m_pic);
 			p.end();
 		}
 	}
@@ -116,9 +114,9 @@ void PreviewHTMLWindow::closeEvent(QCloseEvent *) {
 	m_pic.reset();
 }
 
-void PreviewHTMLWindow::reloadHTML(std::string htmlPath)
+void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload)
 {
-	if (getHtmlModel()) {
+	if (getHtmlModel() || reload) {
 		cleanResource();
 		m_htmlPath = htmlPath;
 		QFile f(htmlPath.c_str());
@@ -128,6 +126,7 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath)
 		f.copy(tempFilePath(m_htmlPath).c_str());
 		}
 		m_htmlPageIndex = 0;
+		m_engine->setPageSize(NULL, width(), height(), 1);
 		m_engine->openHtml(this, m_htmlPath, "html_id_key");
 	}
 }
@@ -143,12 +142,6 @@ void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts)
 		}
 		m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
 	//}
-}
-
-void PreviewHTMLWindow::setMaxSize(int w, int h)
-{
-	m_maxSize.setHeight(h);
-	m_maxSize.setWidth(w);
 }
 
 void PreviewHTMLWindow::cleanTempFile()
