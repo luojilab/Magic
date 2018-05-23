@@ -273,6 +273,7 @@ protected:
 		iPhone6P,
 		iPhoneX,
 		XiaoMi,
+		iPad,
 		Unknown
 	}PreviewPhoneType;
 
@@ -282,12 +283,14 @@ void previewForIphone5() { layout(iPhone5);};
 void previewForIphone6() { layout(iPhone6); };
 void previewForIphone6P() { layout(iPhone6P); };
 void previewForIphoneX() { layout(iPhoneX); };
+void previewForIpad() { layout(iPad); };
 void previewForXiaoMi() { layout(XiaoMi); };
 
 void previewIntimeForIphone5() { previewForCurrentHTML(iPhone5); };
 void previewIntimeForIphone6() { previewForCurrentHTML(iPhone6); };
 void previewIntimeForIphone6P() { previewForCurrentHTML(iPhone6P); };
 void previewIntimeForIphoneX() { previewForCurrentHTML(iPhoneX); };
+void previewIntimeForIpad() { previewForCurrentHTML(iPad); };
 void previewIntimeForXiaoMi() { previewForCurrentHTML(XiaoMi); };
 
 void changeIntimePreviewContent();
@@ -1079,7 +1082,8 @@ private:
 		{ PreviewPhoneType::iPhone6 ,QSize(750 * 0.5 ,1134 * 0.5)},
 		{ PreviewPhoneType::iPhone6P ,QSize(qint16(1080 * 0.5),qint16(1920 * 0.5))},
 		{ PreviewPhoneType::iPhoneX ,QSize(562,1218)},
-		{ PreviewPhoneType::XiaoMi ,QSize(qint16(1080*0.7),qint16(1920*0.7))}
+		{ PreviewPhoneType::XiaoMi ,QSize(qint16(1080 * 0.7),qint16(1920 * 0.7))},
+		{ PreviewPhoneType::iPad,QSize(2048,1536)}
 	};
 
 	void previewForCurrentHTML(PreviewPhoneType);

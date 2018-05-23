@@ -333,6 +333,7 @@
      <addaction name="actionIPhone6"/>
      <addaction name="actionIPhone6P"/>
      <addaction name="actionIPhoneX"/>
+     <addaction name="actionIPad"/>
      <addaction name="separator"/>
      <addaction name="actionXiaoMi"/>
     </widget>
@@ -346,6 +347,7 @@
      <addaction name="actionIPhoneX_inTime"/>
      <addaction name="separator"/>
      <addaction name="actionXiaoMi_inTime"/>
+     <addaction name="actionIPad_inTime"/>
     </widget>
     <addaction name="actionAddCover"/>
     <addaction name="actionMetaEditor"/>
@@ -2405,6 +2407,16 @@
   <action name="actionXiaoMi_inTime">
    <property name="text">
     <string>XiaoMi实时预览</string>
+   </property>
+  </action>
+  <action name="actionIPad">
+   <property name="text">
+    <string>iPad（2048*1536）</string>
+   </property>
+  </action>
+  <action name="actionIPad_inTime">
+   <property name="text">
+    <string>iPad实时预览</string>
    </property>
   </action>
  </widget>
