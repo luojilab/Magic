@@ -5297,7 +5297,7 @@ void MainWindow::updateIntimePreviewContent() {
 }
 
 void MainWindow::contentTxetChangedAction() {
-	if (m_contentChanged) {
+	if (m_contentChanged && m_previewerToHTML && m_previewerToHTML->isVisible()) {
 		HTMLResource* res = dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource());
 		m_previewerToHTML->updateCurrentPage(res->GetText());
 		m_contentChanged = false;

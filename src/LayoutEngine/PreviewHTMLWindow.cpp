@@ -137,7 +137,7 @@ void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts)
 	//if (getHtmlModel()) {
 		cleanResource();
 		QFile f(m_innerHtmlPath.c_str());
-		if (f.open(QIODevice::ReadWrite | QIODevice::Text)) {
+		if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
 		f.write(contentTexts.toUtf8());
 		f.close();
 		}
