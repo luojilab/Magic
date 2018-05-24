@@ -396,6 +396,7 @@ signals:
 
     void MarkSelectionRequest();
     void ClearMarkedTextRequest();
+	void updatePreviewerForHtmlOffset(unsigned int);
 
 public slots:
 
@@ -535,6 +536,8 @@ private slots:
     void ReformatHTMLToValidAction();
     void ReformatHTMLToValidAllAction();
 
+	void calculateHtmlByteOffset();
+
 private:
     bool IsMarkedText();
 
@@ -605,6 +608,8 @@ private:
     bool AddSpellCheckContextMenu(QMenu *menu);
 
     void AddViewImageContextMenu(QMenu *menu);
+
+	void AddGotoHtmlOffsetContextMenu(QMenu *menu);
 
     bool CreateMenuEntries(QMenu *parent_menu, QAction *topAction, QStandardItem *item);
 

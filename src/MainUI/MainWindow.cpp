@@ -4973,6 +4973,8 @@ void MainWindow::ConnectSignalsToSlots()
             this,                    SLOT(UpdatePreview()));
 	connect(m_TabManager,		   SIGNAL(TabChanged(ContentTab *, ContentTab *)),
 			this,					SLOT(changeIntimePreviewContent()));
+	connect(m_TabManager,			SIGNAL(updateForHtmlOffsetNotification(unsigned int)), 
+			this,					SLOT(updateHtmlOffsetForInstancePreview(unsigned int)));
     connect(m_BookBrowser,          SIGNAL(UpdateBrowserSelection()),
             this,                    SLOT(UpdateBrowserSelectionToTab()));
     connect(m_BookBrowser, SIGNAL(RenumberTOCContentsRequest()),
@@ -5052,12 +5054,6 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(this, SIGNAL(FileSaved(bool)), this, SLOT(fileSavedSuccessAction()));
 
 	// timer
-	/*if (!m_previerToHtmlTimer) {
-		m_previerToHtmlTimer = new QTimer(this);
-		connect(m_previerToHtmlTimer, SIGNAL(timeout()), this, SLOT(checkoutTabChangedStatusAndContentChangedStatus()));
-		m_previerToHtmlTimer->setSingleShot(false);
-		m_previerToHtmlTimer->start(500);
-	}*/
 	m_contentChangedTimer->setInterval(500);
 	m_contentChangedTimer->setSingleShot(true);
 	connect(m_contentChangedTimer, SIGNAL(timeout()), this, SLOT(contentTxetChangedAction()));
@@ -5258,6 +5254,8 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 	if (!m_previewerToHTML) {
 		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString());
 		m_previewerToHTML->setFixedSize(QSize(width, height));
+		m_previewerToHTML->setContextMenuPolicy(Qt::PreventContextMenu);
+		m_previewerToHTML->setFeatures(QDockWidget::AllDockWidgetFeatures);
 		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
 	}
 	else {
@@ -5265,6 +5263,7 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		m_previewerToHTML->reloadHTML(QfullPath.toStdString(),true);
 	}
 	m_previewerToHTML->show();
+	m_previewerToHTML->setFocus();
 }
 
 void MainWindow::changeIntimePreviewContent() {
@@ -5321,4 +5320,12 @@ void MainWindow::checkoutTabChangedStatusAndContentChangedStatus() {
 		tabChangedAction();
 		m_tabChanged = false;
 	}
+}
+
+void MainWindow::updateHtmlOffsetForInstancePreview(unsigned int offset)
+{
+	if (!m_previewerToHTML || !m_previewerToHTML->isVisible()) {
+		return;
+	}
+	m_previewerToHTML->updateForOffset(offset);
 }

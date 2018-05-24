@@ -5,6 +5,8 @@
 #include <QFile>
 #include <QDir>
 #include <QSettings>
+#include <QMenu>
+#include <QAction>
 
 PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPath)
 	:QDockWidget(parent),
@@ -33,13 +35,6 @@ PreviewHTMLWindow::~PreviewHTMLWindow()
 	delete &m_innerHtmlPath;
 }
 
-void PreviewHTMLWindow::engineInitFinish() {
-	int w = width();
-	int h = height();
-	m_engine->setPageSize(NULL, width(), height(), 1);
-	m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
-}
-
 // engine epub delegate function
 void PreviewHTMLWindow::engineOpenBook(BookModel* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) {}
 void PreviewHTMLWindow::engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset) {}
@@ -53,6 +48,12 @@ QList<BookUnderlineData *> PreviewHTMLWindow::engineNeedUnderlineData(const QStr
 QStringList PreviewHTMLWindow::engineNeedNoteData(const QString& charpterId) { return QStringList(); }
 void PreviewHTMLWindow::enginePaintHighlightRect(const QRect& rect, const QColor& color) {}
 
+void PreviewHTMLWindow::engineInitFinish() {
+	int w = width();
+	int h = height();
+	m_engine->setPageSize(NULL, width(), height(), 1);
+	m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
+}
 /*
  * engine html delegate function 
  */
@@ -96,23 +97,44 @@ void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
 }
 // mouse click event
 void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event) {
-	if (isRendering()) return;
 	if (!m_htmlModel) return;
 	if (event->button() == Qt::LeftButton) {
-		if (m_htmlPageIndex + 1 >= getHtmlModel()->GetPageCount()) return;
-		++m_htmlPageIndex;
+		this->setFocus();
+	} else if (event->button() == Qt::RightButton) {
+		QMenu *menu = new QMenu(this);
+		QAction *ac = new QAction(tr("Go to HTML"), menu);
+		menu->addAction(ac);
+		connect(ac, SIGNAL(triggered()), this, SLOT(gobackToHTMLOffset()));
+		menu->exec(event->globalPos());
+		delete menu;
 	}
-	else if (event->button() == Qt::RightButton) {
-		if (m_htmlPageIndex == 0) return;
-		--m_htmlPageIndex;
-	}
-	m_engine->paintHtml(getHtmlModel(), m_htmlPageIndex);
 }
 // close event
 void PreviewHTMLWindow::closeEvent(QCloseEvent *) {
 	cleanResource();
 	delete m_htmlModel;
 	m_pic.reset();
+}
+
+void PreviewHTMLWindow::keyPressEvent(QKeyEvent *event) {
+	if (isRendering()) return;
+	if (!m_htmlModel) return;
+	if (event->key() == Qt::Key_Left) {
+		if (m_htmlPageIndex == 0) return;
+		--m_htmlPageIndex;
+	} else if (event->key() == Qt::Key_Right) {
+		if (m_htmlPageIndex + 1 >= getHtmlModel()->GetPageCount()) return;
+		++m_htmlPageIndex;
+	}
+	this->refreshView();
+}
+
+void PreviewHTMLWindow::contextMenuEvent(QContextMenuEvent *event) {
+	QMenu *menu = new QMenu(this);
+	QAction *ac = new QAction(tr("a action"),menu);
+	menu->addAction(ac);
+	menu->exec(event->globalPos());
+	delete menu;
 }
 
 void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload)
@@ -143,6 +165,14 @@ void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts)
 		}
 		m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
 	//}
+}
+
+void PreviewHTMLWindow::updateForOffset(unsigned int htmlOffset)
+{
+	if (!m_htmlModel) return;
+	int idx = m_htmlModel->GetPageIndex(htmlOffset);
+	m_htmlPageIndex = idx >= 0 ? idx : m_htmlPageIndex;
+	refreshView();
 }
 
 void PreviewHTMLWindow::cleanTempFile()
@@ -200,6 +230,14 @@ void PreviewHTMLWindow::cleanResource()
 	}
 }
 
+void PreviewHTMLWindow::refreshView() const
+{
+	if (!m_engine && !m_htmlModel) {
+		return;
+	}
+	m_engine->paintHtml(m_htmlModel, m_htmlPageIndex);
+}
+
 std::string PreviewHTMLWindow::tempFilePath(const std::string & ofilePath)
 {
 	if (ofilePath.empty()) {
@@ -213,4 +251,12 @@ std::string PreviewHTMLWindow::tempFilePath(const std::string & ofilePath)
 		return "";
 	}
 	return dir + fileName;
+}
+
+void PreviewHTMLWindow::gobackToHTMLOffset() {
+	if (!m_htmlModel) return;
+	std::string text = "";
+	int offset = m_htmlModel->GetBeginHtmlOffset(m_htmlPageIndex, text);
+	// emit signal
+
 }

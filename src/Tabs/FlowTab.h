@@ -350,6 +350,8 @@ private slots:
     // Store our caret location as required.
     void ResourceTextChanging();
 
+	void updatePreviewerForHtmlOffset(unsigned int);
+
 private:
     void CreateBookViewIfRequired(bool is_delayed_load = true);
     void CreateCodeViewIfRequired(bool is_delayed_load = true);

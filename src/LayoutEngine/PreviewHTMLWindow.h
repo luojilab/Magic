@@ -7,11 +7,14 @@
 
 class PreviewHTMLWindow : public QDockWidget, public LayoutEngineDelegate
 {
+	Q_OBJECT
+
 public:
 	PreviewHTMLWindow(QWidget* parent, const std::string htmlPath);
 	~PreviewHTMLWindow();
 	void reloadHTML(std::string htmlPath, bool reload);
 	void updateCurrentPage(const QString& contentTexts);
+	void updateForOffset(unsigned int);
 	void cleanTempFile();
 
 protected:
@@ -36,6 +39,13 @@ protected:
 
 	void closeEvent(QCloseEvent *);
 
+	void contextMenuEvent(QContextMenuEvent *);
+	void keyPressEvent(QKeyEvent *);
+
+
+private slots:
+	void gobackToHTMLOffset();
+
 private:
 	LayoutEngine *m_engine{ NULL };
 	BookChapter* m_htmlModel{ NULL };
@@ -55,5 +65,6 @@ private:
 	inline void setHtmlModel(BookChapter *);
 	inline BookChapter* getHtmlModel();
 	void cleanResource();
+	void refreshView() const;
 	std::string tempFilePath(const std::string& fileName);
 };

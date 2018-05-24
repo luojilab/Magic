@@ -185,6 +185,8 @@ signals:
 
     void ShowStatusMessageRequest(const QString &message, int duration = 5000);
 
+	void updateForHtmlOffsetNotification(unsigned int);
+
 protected:
     virtual void tabInserted(int index);
 
@@ -219,6 +221,8 @@ private slots:
     void UpdateTabName(ContentTab *renamed_tab);
 
     void SetFocusInTab();
+
+	void updateHtmlOffset(unsigned int);
 
 private:
 

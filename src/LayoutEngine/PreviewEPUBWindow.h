@@ -1,9 +1,14 @@
+#ifndef __PreviewEPUBWindow__H
+#define __PreviewEPUBWindow__H
 #include <QWidget>
 #include "LayoutEngin.h"
 #include "BookModel.h"
 #include <QDockWidget.h>
 
 class PreviewEPUBWindow : public QDockWidget, public LayoutEngineDelegate {
+
+	Q_OBJECT
+
 public:
 	QImage * pic;
 private:
@@ -11,9 +16,9 @@ private:
 	LayoutEngine * engine;
 	BookModel* m_bookModel;
 public:
-	PreviewEPUBWindow(QWidget *parent,const std::string& bundlePath, const std::string& epubPath);
+	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath);
 	void PreviewEPUBWindow::paintEvent(QPaintEvent *);
-	void updateEngine(const std::string& bundlePath = "" ,const std::string& epubPath = "");
+	void updateEngine(const std::string& bundlePath = "", const std::string& epubPath = "");
 
 public:
 	virtual void engineInitFinish();
@@ -34,7 +39,7 @@ public:
 
 	void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic);
 
-private slots:
+	private slots:
 	void canDraw();
 
 signals:
@@ -43,3 +48,4 @@ signals:
 protected:
 	void keyPressEvent(QKeyEvent *);
 };
+#endif // !__PreviewEPUBWindow_H

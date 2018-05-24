@@ -438,6 +438,11 @@ void FlowTab::ResourceTextChanging()
     }
 }
 
+void FlowTab::updatePreviewerForHtmlOffset(unsigned int offset)
+{
+	emit updateHtmlOffset(offset);
+}
+
 void FlowTab::ReloadTabIfPending()
 {
     if (!isVisible()) {
@@ -1601,4 +1606,5 @@ void FlowTab::ConnectCodeViewSignalsToSlots()
     connect(m_wCodeView, SIGNAL(DocumentSet()), this, SLOT(EmitUpdatePreviewImmediately()));
     connect(m_wCodeView, SIGNAL(MarkSelectionRequest()), this, SIGNAL(MarkSelectionRequest()));
     connect(m_wCodeView, SIGNAL(ClearMarkedTextRequest()), this, SIGNAL(ClearMarkedTextRequest()));
+	connect(m_wCodeView, SIGNAL(updatePreviewerForHtmlOffset(unsigned int)), this, SLOT(updatePreviewerForHtmlOffset(unsigned int)));
 }

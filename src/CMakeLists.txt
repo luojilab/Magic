@@ -493,7 +493,9 @@ set( QRC_FILES
     Resource_Files/icon/icon.qrc  
     )
 
-file (GLOB LAYOUT_ENGINE_FILES LayoutEngine/*.h LayoutEngine/*.cpp )	
+file (GLOB LAYOUT_ENGINE_FILES LayoutEngine/*.h LayoutEngine/*.cpp )
+
+file (GLOB LAYOUT_HEADER_FILES LayoutEngine/PreviewHTMLWindow.h)	
 
 file( GLOB TS_FILES Resource_Files/ts/sigil_*.ts )
 
@@ -502,6 +504,8 @@ file( GLOB DIC_FILES Resource_Files/dictionaries/* )
 file( GLOB PLUGIN_FILES_PYTHON Resource_Files/plugin_launchers/python/* )
 
 file( GLOB EXAMPLE_FILES Resource_Files/examples/* )
+
+qt_wrap_cpp( ${PROJECT_NAME} MOC_CPP ${LAYOUT_HEADER_FILES} )
 
 set( LINUX_DESKTOP_FILE
     Resource_Files/freedesktop/sigil.desktop

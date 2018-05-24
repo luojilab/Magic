@@ -1105,6 +1105,8 @@ void CodeViewEditor::contextMenuEvent(QContextMenuEvent *event)
         AddViewImageContextMenu(menu);
     }
 
+	AddGotoHtmlOffsetContextMenu(menu);
+
     menu->exec(event->globalPos());
     delete menu;
 }
@@ -1367,6 +1369,20 @@ void CodeViewEditor::AddViewImageContextMenu(QMenu *menu)
     }
 }
 
+void CodeViewEditor::AddGotoHtmlOffsetContextMenu(QMenu * menu)
+{
+	if (!menu) {
+		return;
+	}
+	QAction *topAction = NULL;
+	if (!menu->actions().isEmpty()) {
+		topAction = menu->actions().at(0);
+	}
+	QAction* gotoAction = new QAction(QObject::tr("GoTo Html Offsite"), menu);
+	menu->addAction(gotoAction);
+	connect(gotoAction, SIGNAL(triggered()), this, SLOT(calculateHtmlByteOffset()));
+}
+
 void CodeViewEditor::AddMarkSelectionMenu(QMenu *menu)
 {
     QAction *topAction = 0;
@@ -1506,11 +1522,17 @@ void CodeViewEditor::OpenImageAction()
     }
 
     emit LinkClicked(QUrl(url_name));
-}
+} 
 
 void CodeViewEditor::GoToLinkOrStyleAction()
 {
-    GoToLinkOrStyle();
+    //GoToLinkOrStyle();
+	QTextCursor c = textCursor();
+	QString string = c.document()->toPlainText();
+	QString subString = string.left(c.position());
+	int length = subString.length();
+	int bytesLength = subString.toUtf8().length();
+	printf("");
 }
 
 void CodeViewEditor::GoToLinkOrStyle()
@@ -1619,6 +1641,20 @@ void CodeViewEditor::ReformatHTMLToValidAction()
 void CodeViewEditor::ReformatHTMLToValidAllAction()
 {
     ReformatHTML(true, true);
+}
+
+void CodeViewEditor::calculateHtmlByteOffset()
+{
+	QString htmlText = textCursor().document()->toPlainText();
+	if (htmlText.isEmpty()) {
+		return;
+	}
+	int cursorPos = textCursor().position();
+	if (cursorPos >= htmlText.length()) {
+		return;
+	}
+	int s = htmlText.left(cursorPos).toUtf8().length();
+	emit updatePreviewerForHtmlOffset(htmlText.left(cursorPos).toUtf8().length());
 }
 
 QString CodeViewEditor::GetTagText()

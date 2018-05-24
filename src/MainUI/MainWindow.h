@@ -298,6 +298,7 @@ void updateIntimePreviewContent();
 void fileSavedSuccessAction();
 void checkoutTabChangedStatusAndContentChangedStatus();
 void contentTxetChangedAction();
+void updateHtmlOffsetForInstancePreview(unsigned int);
 
 	void AddCover();
 

@@ -421,6 +421,7 @@ signals:
 
     void MarkSelectionRequest();
     void ClearMarkedTextRequest();
+	void updateHtmlOffset(unsigned int);
 
 protected slots:
 

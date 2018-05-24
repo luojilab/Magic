@@ -350,6 +350,11 @@ void TabManager::SetFocusInTab()
     }
 }
 
+void TabManager::updateHtmlOffset(unsigned int offset)
+{
+	emit updateForHtmlOffsetNotification(offset);
+}
+
 
 WellFormedContent *TabManager::GetWellFormedContent(int index)
 {
@@ -547,6 +552,7 @@ bool TabManager::AddNewContentTab(ContentTab *new_tab, bool precede_current_tab)
 
     connect(new_tab, SIGNAL(DeleteMe(ContentTab *)), this, SLOT(DeleteTab(ContentTab *)));
     connect(new_tab, SIGNAL(TabRenamed(ContentTab *)), this, SLOT(UpdateTabName(ContentTab *)));
+	connect(new_tab, SIGNAL(updateHtmlOffset(unsigned int)), this, SLOT(updateHtmlOffset(unsigned int)));
     return true;
 }
 
