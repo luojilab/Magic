@@ -299,6 +299,7 @@ void fileSavedSuccessAction();
 void checkoutTabChangedStatusAndContentChangedStatus();
 void contentTxetChangedAction();
 void updateHtmlOffsetForInstancePreview(unsigned int);
+void gobackToHtmlOffset(unsigned int);
 
 	void AddCover();
 

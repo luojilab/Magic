@@ -43,6 +43,9 @@ protected:
 	void keyPressEvent(QKeyEvent *);
 
 
+signals:
+	void mapbackToHtml(unsigned int);
+
 private slots:
 	void gobackToHTMLOffset();
 

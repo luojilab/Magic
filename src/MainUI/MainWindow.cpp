@@ -5257,6 +5257,7 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		m_previewerToHTML->setContextMenuPolicy(Qt::PreventContextMenu);
 		m_previewerToHTML->setFeatures(QDockWidget::AllDockWidgetFeatures);
 		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
+		connect(m_previewerToHTML, SIGNAL(mapbackToHtml(unsigned int)), this, SLOT(gobackToHtmlOffset(unsigned int)));
 	}
 	else {
 		m_previewerToHTML->setFixedSize(QSize(width, height));
@@ -5328,4 +5329,23 @@ void MainWindow::updateHtmlOffsetForInstancePreview(unsigned int offset)
 		return;
 	}
 	m_previewerToHTML->updateForOffset(offset);
+}
+
+
+void MainWindow::gobackToHtmlOffset(unsigned int offset) {
+	FlowTab*tab = GetCurrentFlowTab();
+	if (!tab) { return; }
+	if (tab->GetViewState() == ViewState_BookView) {
+		CodeView();
+	}
+	CodeViewEditor* codeView = dynamic_cast<CodeViewEditor *>(tab->GetSearchableContent());
+	codeView->setFocus();
+	QByteArray fullBytes = codeView->document()->toPlainText().toUtf8();
+	if (fullBytes.length() < offset) { return; }
+	QString leftString = QString(fullBytes.left(offset));
+	int length = leftString.length();
+	QTextCursor cursor = codeView->textCursor();
+	cursor.setPosition(length == 0 ? 0 : length - 1);
+	codeView->setTextCursor(cursor);
+	codeView->ensureCursorVisible();
 }

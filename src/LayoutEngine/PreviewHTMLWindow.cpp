@@ -257,6 +257,7 @@ void PreviewHTMLWindow::gobackToHTMLOffset() {
 	if (!m_htmlModel) return;
 	std::string text = "";
 	int offset = m_htmlModel->GetBeginHtmlOffset(m_htmlPageIndex, text);
+	if (offset < 0) return;
 	// emit signal
-
+	emit mapbackToHtml(offset);
 }
