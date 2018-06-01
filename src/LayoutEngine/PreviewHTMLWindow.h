@@ -5,21 +5,22 @@
 #include <QDockWidget>
 #include <memory>
 
-class PreviewHTMLWindow : public QDockWidget, public LayoutEngineDelegate
+class PreviewHTMLWindow : public QWidget, public LayoutEngineDelegate
 {
 	Q_OBJECT
 
 public:
-	PreviewHTMLWindow(QWidget* parent, const std::string htmlPath);
+	PreviewHTMLWindow(QWidget* parent, const std::string htmlPath, const QSize& standardSize);
 	~PreviewHTMLWindow();
-	void reloadHTML(std::string htmlPath, bool reload);
+	void reloadHTML(std::string htmlPath, bool reload, const QSize& standardSize);
 	void updateCurrentPage(const QString& contentTexts);
 	void updateForOffset(unsigned int);
 	void cleanTempFile();
+	inline QStringList supportedColorNames() { return m_supportedColorNames; };
 
 protected:
 	virtual void engineInitFinish();
-	virtual void engineOpenBook(BookModel* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
+	virtual void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
 	virtual void engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset);
 	virtual void engineUpdateTotalCount(const qint32& totolPageCount);
 	virtual void enginUpdateAllViewPage();
@@ -40,13 +41,18 @@ protected:
 	void closeEvent(QCloseEvent *);
 
 	void contextMenuEvent(QContextMenuEvent *);
+	QSize sizeHint();
+	QSize minimumSizeHint();
 	void keyPressEvent(QKeyEvent *);
 
 
 signals:
 	void mapbackToHtml(unsigned int);
 
+public slots:
+	void bgColorChange(int idx);
 private slots:
+	void closed();
 	void gobackToHTMLOffset();
 
 private:
@@ -60,6 +66,7 @@ private:
 	bool m_isRendering{ false };
 	QReadWriteLock m_locker;
 	QReadWriteLock m_ModelLocker;
+	QSize m_standardSize;
 
 private:
 	inline void safeSetRenderStatus(bool);
@@ -70,4 +77,14 @@ private:
 	void cleanResource();
 	void refreshView() const;
 	std::string tempFilePath(const std::string& fileName);
+	std::map<int, std::string> m_supportBGColor {
+		{0,"rgb(178,190,195)"},
+		{1,"red;"},
+		{2,"blue;"},
+		{3,"rgb(255,255,0);"}
+	};
+	const int m_supportedBGColorCnt = m_supportBGColor.size();
+	QStringList m_supportedColorNames {
+		u8"复原",u8"红色",u8"蓝色",u8"黄色"
+	};
 };

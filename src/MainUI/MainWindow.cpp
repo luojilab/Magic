@@ -100,6 +100,10 @@
 #include "Tabs/OPFTab.h"
 #include "Tabs/TabManager.h"
 
+#include "AspectRatioView.h"
+#include "CustomDockWidget.h"
+#include "ButtonCollectionView.h"
+
 static const int TEXT_ELIDE_WIDTH   = 300;
 static const QString SETTINGS_GROUP = "mainwindow";
 const float ZOOM_STEP               = 0.1f;
@@ -228,6 +232,12 @@ MainWindow::~MainWindow()
         m_ViewImage->close();
         m_ViewImage = NULL;
     }
+	removeDockWidget(m_previewEPUBDock);
+	removeDockWidget(m_previewHTMLDock);
+	removeDockWidget(m_bookContentsDock);
+	delete m_previewEPUBDock;
+	delete m_previewHTMLDock;
+	delete m_bookContentsDock;
 }
 
 
@@ -4110,7 +4120,8 @@ void MainWindow::UpdateUiWithCurrentFile(const QString &fullfilepath)
             mainWin->UpdateRecentFileActions();
         }
     }
-	if (this->previewer->isVisible() && 
+	if (this->previewer &&
+		this->previewer->isVisible() && 
 		!m_CurrentFilePath.isEmpty() ) {
 		this->previewer->updateEngine("c:/", m_CurrentFilePath.toStdString());
 	}
@@ -4247,17 +4258,41 @@ void MainWindow::PlatformSpecificTweaks()
 }
 
 void MainWindow::layout(PreviewPhoneType type) {
-	if (this->previewer && this->Save() ) {
-		if ( !this->previewer->isVisible() ) {
-			this->previewer->updateEngine("c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
-			QSize phone_size = m_previewPhoneSizeMap[type];
-			int height = centralWidget()->size().height();
-			this->previewer->setFixedSize(QSize(float(phone_size.width())/phone_size.height()*height, height));
-			this->previewer->show();
-		}
-	} else {
-		QMessageBox::information(this, "", u8"请先保存文件！然后才能预览", QMessageBox::Ok);
+	if (m_previewEPUBDock && m_previewEPUBDock->isVisible()) {
+		return;
 	}
+	if ( !this->Save() ) {
+		QMessageBox::information(this, "", u8"请先保存文件！然后才能预览", QMessageBox::Ok);
+		return;
+	}
+	QSize d_size = m_previewPhoneSizeMap[type];
+	int w_fix = m_previewPhoneSimulatorFix[type][0];
+	int h_fix = m_previewPhoneSimulatorFix[type][1];
+	float width = (d_size.width() + w_fix) / 0.87;
+	float height = (d_size.height() + h_fix) / 0.87;
+	if ( !this->previewer ) {
+		this->previewer = new PreviewEPUBWindow(nullptr, "", std::string(m_CurrentFilePath.toUtf8().data()), QSize(width, height));
+		m_previewEPUBDock = new CustomDockWidget();
+		AspectRatioView *asptView = new AspectRatioView(this->previewer, width/height);
+		m_previewEPUBDock->setWidget(asptView);
+		addDockWidget(Qt::RightDockWidgetArea, m_previewEPUBDock);
+		//contents view
+		m_bookContentsDock = new CustomDockWidget();
+		m_bookContentView = new QTreeView();
+		m_bookContentView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+		m_bookContentsDock->setWidget(m_bookContentView);
+		addDockWidget(Qt::TopDockWidgetArea, m_bookContentsDock);
+		//connect
+		connect(previewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
+		connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this->previewer, SLOT(closed()));
+		connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this, SLOT(closeBookContentDock()));
+		connect(m_bookContentView, SIGNAL(doubleClicked(const QModelIndex)), previewer, SLOT(gotoChapterByIndex(const QModelIndex)));
+	}
+	this->previewer->updateEngine("", m_CurrentFilePath.toStdString(), QSize(width, height));
+	m_previewEPUBDock->widget()->setMinimumSize(width / 2, height / 2);
+	m_previewEPUBDock->show();
+	m_bookContentsDock->show();
+	this->previewer->setFocus();
 }
 
 void MainWindow::ExtendUI()
@@ -4357,21 +4392,6 @@ void MainWindow::ExtendUI()
     palette.setColor(QPalette::Inactive, QPalette::HighlightedText, Qt::white);
     qApp->setPalette(palette);
 
-	// add preview epub window
-	/*std::map<PreviewPhoneType, QSize>::iterator it = m_previewPhoneSizeMap.begin();
-	while ( it != m_previewPhoneSizeMap.end() )
-	{
-		PreviewEPUBWindow *previewer = new PreviewEPUBWindow(this, "c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
-		previewer->setFixedSize(it->second);
-		m_preViewWindowsMap[it->first] = previewer;
-		this->addDockWidget(Qt::RightDockWidgetArea, previewer);
-		previewer->hide();
-		it++;
-	}*/
-	this->previewer = new PreviewEPUBWindow(this, "c:/Users/1m0nster/Desktop", m_CurrentFilePath.toStdString());
-	this->previewer->setFixedSize(QSize(750, 1334));
-	addDockWidget(Qt::RightDockWidgetArea,this->previewer);
-	this->previewer->hide();
     // Setup userdefined keyboard shortcuts for actions.
     KeyboardShortcutManager *sm = KeyboardShortcutManager::instance();
     // Note: shortcut action Ids should not be translated.
@@ -5062,7 +5082,7 @@ void MainWindow::ConnectSignalsToSlots()
 
 void MainWindow::fileSavedSuccessAction() {
 	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
-		m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true);
+		m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true, QSize(0,0));
 	}
 }
 
@@ -5247,23 +5267,36 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		QMessageBox::information(this, "", "资源文件路径为空，请先保存", QMessageBox::Ok);
 		return;
 	}
-	QSize size = m_previewPhoneSizeMap[type];
-	int height = centralWidget()->size().height();
-	float delta = size.width() / float(size.height());
-	float width = height * delta;
+	QSize d_size = m_previewPhoneSizeMap[type];
+	int w_fix = m_previewPhoneSimulatorFix[type][0];
+	int h_fix = m_previewPhoneSimulatorFix[type][1];
+	float width = (d_size.width()) / 0.85;
+	float height = (d_size.height()) / 0.85;
 	if (!m_previewerToHTML) {
-		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString());
-		m_previewerToHTML->setFixedSize(QSize(width, height));
+		// previewer to html
+		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString(), QSize(width, height));
 		m_previewerToHTML->setContextMenuPolicy(Qt::PreventContextMenu);
-		m_previewerToHTML->setFeatures(QDockWidget::AllDockWidgetFeatures);
-		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
+		AspectRatioView *asptView = new AspectRatioView(m_previewerToHTML, width / height);
+		asptView->setMinimumSize(width / 2, height / 2);
+		asptView->setMinContentSize(QSize(width / 2, height / 2));
+		// tools
+		ButtonCollectionView *toolView = new ButtonCollectionView(m_previewerToHTML->supportedColorNames());
+		asptView->addTopWidget(toolView);	
+		// docker
+		m_previewHTMLDock = new CustomDockWidget();
+		m_previewHTMLDock->setWidget(asptView);
+		addDockWidget(Qt::RightDockWidgetArea, m_previewHTMLDock);
+
+		m_previewHTMLDock->setStyleSheet("background-color:rgb(223,230,233);");
+		connect(m_previewHTMLDock, SIGNAL(DockCloseSig()), m_previewerToHTML, SLOT(closed()));
 		connect(m_previewerToHTML, SIGNAL(mapbackToHtml(unsigned int)), this, SLOT(gobackToHtmlOffset(unsigned int)));
+		connect(toolView, SIGNAL(buttonClick(int)), m_previewerToHTML, SLOT(bgColorChange(int)));
+	} else {
+		dynamic_cast<AspectRatioView *>(m_previewHTMLDock->widget())->setMaximumSize(width, height);
+		dynamic_cast<AspectRatioView *>(m_previewHTMLDock->widget())->setMinimumSize(width / 2, height / 2);
+		m_previewerToHTML->reloadHTML(QfullPath.toStdString(), true, QSize(width, height));
 	}
-	else {
-		m_previewerToHTML->setFixedSize(QSize(width, height));
-		m_previewerToHTML->reloadHTML(QfullPath.toStdString(),true);
-	}
-	m_previewerToHTML->show();
+	m_previewHTMLDock->show();
 	m_previewerToHTML->setFocus();
 }
 
@@ -5289,7 +5322,7 @@ void MainWindow::tabChangedAction() {
 	if (!m_previewerToHTML || !m_previewerToHTML->isVisible()) {
 		return;
 	}
-	m_previewerToHTML->reloadHTML(QfullPath.toStdString(),true);
+	m_previewerToHTML->reloadHTML(QfullPath.toStdString(),true, QSize(0,0));
 }
 
 void MainWindow::updateIntimePreviewContent() { 
@@ -5348,4 +5381,30 @@ void MainWindow::gobackToHtmlOffset(unsigned int offset) {
 	cursor.setPosition(length == 0 ? 0 : length - 1);
 	codeView->setTextCursor(cursor);
 	codeView->ensureCursorVisible();
+}
+
+void MainWindow::updateBookContentView() {
+	QStandardItemModel* model = previewer->getBookContentList();
+	if (!model) { return; }
+	m_bookContentView->setModel(model);
+}
+
+void MainWindow::showBookContentList() {
+	if (!this->previewer || !m_bookContentsDock) {
+		return;
+	}
+	m_bookContentsDock->show();
+}
+
+void MainWindow::closeBookContentDock() {
+	m_bookContentsDock->close();
+	m_bookContentView->setModel(NULL);
+	/*removeDockWidget(m_bookContentsDock);
+	removeDockWidget(m_previewEPUBDock);
+	delete m_bookContentsDock;
+	delete m_previewEPUBDock;
+	m_bookContentsDock = NULL;
+	m_previewEPUBDock = NULL;
+	m_bookContentView = NULL;
+	previewer = NULL;*/
 }

@@ -7,7 +7,7 @@
 #include <memory>
 
 namespace future_core {
-	class BookModel;
+	class BookReader;
 	struct HighlightInfo;
 };
 
@@ -119,7 +119,7 @@ class LayoutEngineDelegate
 {
 public:
 	virtual void engineInitFinish() = 0;
-	virtual void engineOpenBook(BookModel* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) = 0;
+	virtual void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) = 0;
 	virtual void engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset) = 0;
 	virtual void engineUpdateTotalCount(const qint32& totolPageCount) = 0;
 	virtual void enginUpdateAllViewPage() = 0;
@@ -146,65 +146,66 @@ public:
 	static void ReleaseLayoutEngine();
 	static void SetViewTopMargin(qint32 topMargin);
 	static void SetViewBottomMargin(qint32 bottomMargin);
+	QList<BookContents *>getContentList(BookReader *bookModel);
 
 public:
 	void InitLayoutEngine(const std::string& bundlePath);
-	void setPageSize(BookModel *bookModel, const qint32& width, const qint32& height, const float& scale);
+	void setPageSize(BookReader *bookModel, const qint32& width, const qint32& height, const float& scale);
 	void openEpub(QWidget *view, const std::string& filePath, const QString& tokenStd, const QString& uidStd);
-	void closeEpub(BookModel *bookModel);
+	void gotoChapterByFileName(BookReader *bookModel, const QString& fileName);
+	void updateAllView(BookReader *bookModel);
+	void closeEpub(BookReader *bookModel);
 	// HTML utils
 	void openHtml(QWidget *view,const std::string htmlPath, std::string uniqueKey);
 	void paintHtml(BookChapter *html, unsigned int pageIndex);
 	void closeHtml(BookChapter* html);
-	/*void getTotalPageCount(BookModel *bookModel);
-	int getCurrentPageIndex(BookModel *bookModel);
-	QString getSummaryByPageOffset(BookModel *bookModel, qint32 pageOffset);
-	QString getCurrentPageChapterName(BookModel *bookModel);
-	QString getPreviousPageChapterName(BookModel *bookModel);
-	QString getNextPageChapterName(BookModel *bookModel);
-	QString getChapterNameByPageOffset(BookModel *bookModel, qint32 pageOffset);
-	void gotoFirstPage(BookModel *bookModel);
-	void gotoPreviousPage(BookModel *bookModel);
-	void gotoNextPage(BookModel *bookModel);
-	void gotoByPageIndex(BookModel *bookModel,qint32 pageIndex);
-	void gotoByChapterOffset(BookModel *bookModel, const QString& charpterId, qint32 htmlOffset);
-	void gotoBySearchResult(BookModel *bookModel, const QString& charpterId, qint32 htmlStartOffset, qint32 htmlEndOffset);
-	void getCurrentPageOffset(BookModel *bookModel);
-	void getPageStartEndOffsetByPageOffset(BookModel *bookModel, qint32 pageOffset, PageStartEndOffsetByPageOffsetCallback callback);
-	void gotoChapterByFileName(BookModel *bookModel, const QString& fileName);
-	void gotoPreviousChapter(BookModel *bookModel);
-	void gotoPreviousChapter(BookModel *bookModel);*/
+	/*void getTotalPageCount(BookReader *bookModel);
+	int getCurrentPageIndex(BookReader *bookModel);
+	QString getSummaryByPageOffset(BookReader *bookModel, qint32 pageOffset);
+	QString getCurrentPageChapterName(BookReader *bookModel);
+	QString getPreviousPageChapterName(BookReader *bookModel);
+	QString getNextPageChapterName(BookReader *bookModel);
+	QString getChapterNameByPageOffset(BookReader *bookModel, qint32 pageOffset);
+	void gotoFirstPage(BookReader *bookModel);
+	void gotoPreviousPage(BookReader *bookModel);
+	void gotoNextPage(BookReader *bookModel);
+	void gotoByPageIndex(BookReader *bookModel,qint32 pageIndex);
+	void gotoByChapterOffset(BookReader *bookModel, const QString& charpterId, qint32 htmlOffset);
+	void gotoBySearchResult(BookReader *bookModel, const QString& charpterId, qint32 htmlStartOffset, qint32 htmlEndOffset);
+	void getCurrentPageOffset(BookReader *bookModel);
+	void getPageStartEndOffsetByPageOffset(BookReader *bookModel, qint32 pageOffset, PageStartEndOffsetByPageOffsetCallback callback);
+	void gotoPreviousChapter(BookReader *bookModel);
+	void gotoPreviousChapter(BookReader *bookModel);*/
 
-	void setFontScale(BookModel *bookModel, float scaleFactor);
-	QImage* paintDisplayImageByOffset(BookModel *bookModel, qint32 offset);
+	void setFontScale(BookReader *bookModel, float scaleFactor);
+	QImage* paintDisplayImageByOffset(BookReader *bookModel, qint32 offset);
 
-	/*void setSuperFontSrc(BookModel *bookModel, const QString& fontLocalSrc);
-	void setSuperFontSize(BookModel* bookModel, float fontSize);
-	void setFontScale(BookModel *bookModel, float scaleFactor);
-	float getFontScaleFactor(BookModel *bookModel);
+	/*void setSuperFontSrc(BookReader *bookModel, const QString& fontLocalSrc);
+	void setSuperFontSize(BookReader* bookModel, float fontSize);
+	void setFontScale(BookReader *bookModel, float scaleFactor);
+	float getFontScaleFactor(BookReader *bookModel);
 
-	void mouseSingleClickAction(BookModel *bookModel, qint32 originX, qint32 originY);
-	void longPressAction(BookModel *bookModel, qint32 originX, qint32 originY);
-	void longPressReleaseAction(BookModel *bookModel, qint32 originX, qint32 originY);
-	void startReviseSelection(BookModel *bookModel, qint32 originX, qint32 originY);
-	void moveSelection(BookModel *bookModel, qint32 originX, qint32 originY);
-	void touchUpAction(BookModel *bookModel, qint32 originX, qint32 originY);
-	void deleteSelection(BookModel *bookModel);
-	void copySelectionToText(BookModel *bookModel,CopySelectionToTextCallback callback);
+	void mouseSingleClickAction(BookReader *bookModel, qint32 originX, qint32 originY);
+	void longPressAction(BookReader *bookModel, qint32 originX, qint32 originY);
+	void longPressReleaseAction(BookReader *bookModel, qint32 originX, qint32 originY);
+	void startReviseSelection(BookReader *bookModel, qint32 originX, qint32 originY);
+	void moveSelection(BookReader *bookModel, qint32 originX, qint32 originY);
+	void touchUpAction(BookReader *bookModel, qint32 originX, qint32 originY);
+	void deleteSelection(BookReader *bookModel);
+	void copySelectionToText(BookReader *bookModel,CopySelectionToTextCallback callback);
 
-	void showHighlight(BookModel *bookModel, const QString& charpterUUID, unsigned int startOffset, unsigned int enfOffset);
-	bool isFirstPage(BookModel *bookModel);
-	bool isLastPage(BookModel *bookModel);
-	bool isFirstCharpter(BookModel *bookModel);
-	bool isLastCharpter(BookModel *bookModel);
-	bool isChapterFirstPage(BookModel *bookModel);
-	bool isChapterLastPage(BookModel *bookModel);*/
+	void showHighlight(BookReader *bookModel, const QString& charpterUUID, unsigned int startOffset, unsigned int enfOffset);
+	bool isFirstPage(BookReader *bookModel);
+	bool isLastPage(BookReader *bookModel);
+	bool isFirstCharpter(BookReader *bookModel);
+	bool isLastCharpter(BookReader *bookModel);
+	bool isChapterFirstPage(BookReader *bookModel);
+	bool isChapterLastPage(BookReader *bookModel);*/
 
 private:
 	void openEpubFailCallback(LAYOUT_ENGINE_OPEN_EPUB_STATUS e);
-	void bookHookInit(BookModel *bookModel);
+	void bookHookInit(BookReader *bookModel);
 	void enginInitFinish();
-	QList<BookContents *>getContentList(BookModel *bookModel);
 	std::map<std::string, QImage*>m_imageCache = std::map<std::string, QImage*>();
 	std::string m_htmlUniqueKey { "" };
 

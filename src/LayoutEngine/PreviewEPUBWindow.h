@@ -2,10 +2,13 @@
 #define __PreviewEPUBWindow__H
 #include <QWidget>
 #include "LayoutEngin.h"
-#include "BookModel.h"
+#include "BookReader.h"
 #include <QDockWidget.h>
 
-class PreviewEPUBWindow : public QDockWidget, public LayoutEngineDelegate {
+class QStandardItemModel;
+class QStandardItem;
+
+class PreviewEPUBWindow : public QWidget, public LayoutEngineDelegate {
 
 	Q_OBJECT
 
@@ -14,15 +17,20 @@ public:
 private:
 	std::string epubPath;
 	LayoutEngine * engine;
-	BookModel* m_bookModel;
+	BookReader* m_bookModel;
+	QSize m_defaultSize;
+	QStandardItemModel *m_bookContents;
+	std::vector<QStandardItem *>m_bookItems;
 public:
-	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath);
+	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize);
+	~PreviewEPUBWindow();
 	void PreviewEPUBWindow::paintEvent(QPaintEvent *);
-	void updateEngine(const std::string& bundlePath = "", const std::string& epubPath = "");
+	void updateEngine(const std::string& bundlePath = "", const std::string& epubPath = "", const QSize& defaultSize = QSize(0, 0));
+	QStandardItemModel *getBookContentList() { return m_bookContents; };
 
 public:
 	virtual void engineInitFinish();
-	virtual void engineOpenBook(BookModel* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
+	virtual void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
 	void mousePressEvent(QMouseEvent * event);
 	virtual void engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset);
 	virtual void engineUpdateTotalCount(const qint32& totolPageCount);
@@ -39,11 +47,19 @@ public:
 
 	void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic);
 
-	private slots:
+public slots:
+	void gotoChapterByIndex(const QModelIndex);
+
+private:
+	void generateContentsModel();
+
+private slots:
 	void canDraw();
+	void closed();
 
 signals:
 	void canDrawSignal();
+	void bookContentReady();
 
 protected:
 	void keyPressEvent(QKeyEvent *);

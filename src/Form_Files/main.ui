@@ -50,7 +50,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -327,7 +327,7 @@
     </widget>
     <widget class="QMenu" name="menuPreview">
      <property name="title">
-      <string>Preview</string>
+      <string>全书预览</string>
      </property>
      <addaction name="actionIPhone5"/>
      <addaction name="actionIPhone6"/>
@@ -369,6 +369,7 @@
     <addaction name="separator"/>
     <addaction name="menuPreview"/>
     <addaction name="menu"/>
+    <addaction name="actionContents_List"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
     <property name="title">
@@ -2417,6 +2418,11 @@
   <action name="actionIPad_inTime">
    <property name="text">
     <string>iPad实时预览</string>
+   </property>
+  </action>
+  <action name="actionContents_List">
+   <property name="text">
+    <string>全书目录</string>
    </property>
   </action>
  </widget>

@@ -493,9 +493,9 @@ set( QRC_FILES
     Resource_Files/icon/icon.qrc  
     )
 
-file (GLOB LAYOUT_ENGINE_FILES LayoutEngine/*.h LayoutEngine/*.cpp )
+file (GLOB LAYOUT_ENGINE_FILES LayoutEngine/*.h LayoutEngine/*.cpp)
 
-file (GLOB LAYOUT_HEADER_FILES LayoutEngine/PreviewHTMLWindow.h)	
+file (GLOB LAYOUT_HEADER_FILES LayoutEngine/PreviewHTMLWindow.h  LayoutEngine/PreviewEPUBWindow.h LayoutEngine/CustomDockWidget.h LayoutEngine/ButtonCollectionView.h )	
 
 file( GLOB TS_FILES Resource_Files/ts/sigil_*.ts )
 
@@ -679,7 +679,7 @@ if ( WIN32 )
 	file(GLOB ICU_DLL_FILES LayoutEngine/icu/qt/bin64/icu*.dll)
 endif()
 include_directories( BEFORE ${LAYOUT_ENGINE_HEADERS} )
-set ( LAYOUT_ENGINE_LIBRATY "C:/Work/looker_core/build/lib/Debug/cored.lib" "C:/Work/looker_core/build/lib/Debug/LayoutEngined.lib" "C:/Work/looker_core/build/lib/Debug/platformd.lib")
+set ( LAYOUT_ENGINE_LIBRATY "C:/Work/looker_core/build/lib/Release/core.lib" "C:/Work/looker_core/build/lib/Release/LayoutEngine.lib" "C:/Work/looker_core/build/lib/Release/platform.lib")
 set ( ICU_LIBRARY ${ICU_LIB_FILES} )
 # We make bundles for Mac OS X
 if ( APPLE )

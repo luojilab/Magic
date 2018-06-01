@@ -4,6 +4,6 @@ namespace future_core {
 	public:
 		const int GetPageCount() const;
 		int GetPageIndex(int);
-		int GetBeginHtmlOffset(int, std::string &);
+		int GetBeginHtmlOffset(int, std::string &, size_t &strStartOffset);
 	};
 }
