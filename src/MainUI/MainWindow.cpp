@@ -4282,6 +4282,10 @@ void MainWindow::layout(PreviewPhoneType type) {
 		connect(this->previewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
 		connect(this->previewer, SIGNAL(windowClose()), this, SLOT(closeBookContentDock()));
 		connect(m_bookContentView, SIGNAL(doubleClicked(const QModelIndex)), previewer, SLOT(gotoChapterByIndex(const QModelIndex)));
+		connect(ui.actionNormalColor, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorNormal()));
+		connect(ui.actionYellow, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorYellow()));
+		connect(ui.actionGreen, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorGreen()));
+		connect(ui.actionNight, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorNight()));
 		//size hint
 		this->previewer->setMaximumSize(width, height);
 		this->previewer->setMinimumSize(width / 2, height / 2);

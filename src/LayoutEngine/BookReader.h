@@ -28,6 +28,7 @@ namespace future_core {
 		void GotoPreviousPage();
 		void GotoNextChapter();
 		void GotoPreviousChapter();
+		void SetIsNightTime(bool isNightTime);
 	};
 
 	/*

@@ -142,6 +142,7 @@ void PreviewHTMLWindow::keyPressEvent(QKeyEvent *event) {
 void PreviewHTMLWindow::closed()
 {
 	closeEvent(nullptr);
+	cleanTempFile();
 }
 // mouse right click
 void PreviewHTMLWindow::contextMenuEvent(QContextMenuEvent *event) {

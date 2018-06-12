@@ -14,13 +14,7 @@ class PreviewEPUBWindow : public QDockWidget, public LayoutEngineDelegate {
 
 public:
 	QImage * pic;
-private:
-	std::string epubPath;
-	LayoutEngine * engine;
-	BookReader* m_bookModel;
-	QSize m_defaultSize;
-	QStandardItemModel *m_bookContents;
-	std::vector<QStandardItem *>m_bookItems;
+
 public:
 	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize);
 	~PreviewEPUBWindow();
@@ -49,9 +43,29 @@ public:
 
 public slots:
 	void gotoChapterByIndex(const QModelIndex);
+	void changeBGColorNormal() { changeBGColor(0); };
+	void changeBGColorYellow() { changeBGColor(1); };
+	void changeBGColorGreen() { changeBGColor(2); };
+	void changeBGColorNight() { changeBGColor(3, true); };
+
+private:
+	std::string epubPath;
+	LayoutEngine * engine;
+	BookReader* m_bookModel;
+	QSize m_defaultSize;
+	QStandardItemModel *m_bookContents;
+	std::vector<QStandardItem *>m_bookItems;
+	std::map<int, std::string> m_supportBGColor{
+		{ 0,"rgb(255,255,255)" },
+		{ 1,"rgb(244,240,221)" },
+		{ 2,"rgb(174,200,174)" },
+		{ 3,"rgb(52,55,59);" }
+	};
+	bool m_isNightMode{ false };
 
 private:
 	void generateContentsModel();
+	void changeBGColor(int color, bool isNightMode = false);
 
 private slots:
 	void canDraw();

@@ -167,10 +167,10 @@ void PreviewEPUBWindow::engineOpenBook(BookReader * bookModel, QList<BookContent
 		}
 		this->m_bookModel = bookModel;
 		this->engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
+		m_bookModel->GetTextReader()->SetIsNightTime(m_isNightMode);
 		generateContentsModel();
-		
-
 		canDraw();
+		QApplication::restoreOverrideCursor();
 	}
 	else {
 		this->m_bookModel = NULL;
@@ -303,4 +303,22 @@ void PreviewEPUBWindow::closed()
 		delete m_bookContents;
 		m_bookContents = NULL;
 	}
+}
+
+void PreviewEPUBWindow::changeBGColor(int color, bool isNightMode)
+{
+	if (!isVisible()) {
+		return;
+	}
+	if (color >= m_supportBGColor.size()) {
+		return;
+	}
+	if (isNightMode != m_isNightMode) {
+		m_isNightMode = isNightMode;
+		QApplication::setOverrideCursor(Qt::WaitCursor);
+		closed();
+		engine->openEpub(this, this->epubPath, "", "");
+	}
+	QString prefix = "background-color:";
+	setStyleSheet(prefix + QString(m_supportBGColor[color].c_str()));
 }
