@@ -228,8 +228,6 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(MessageHandler);
 #endif
     MainApplication app(argc, argv);
-	qreal dpi_l = app.primaryScreen()->logicalDotsPerInchX();
-	qreal dpi_p = app.primaryScreen()->physicalDotsPerInchY();
 
     // Set up embedded python integration first thing
     EmbeddedPython* epython = EmbeddedPython::instance();

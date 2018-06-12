@@ -18,8 +18,8 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	m_bookContents(NULL),
 	m_bookItems(std::vector<QStandardItem *>()) {
 	this->engine->delegate = dynamic_cast<LayoutEngineDelegate *>(this);
-	this->engine->SetViewTopMargin(0);
-	this->engine->SetViewBottomMargin(0);
+	this->engine->SetViewTopMargin(60.f * 128.f / 112.f);
+	this->engine->SetViewBottomMargin(60.f * 128.f / 112.f);
 	this->setFocusPolicy(Qt::ClickFocus);
 }
 
@@ -113,6 +113,7 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
 			}
 			if (defaultSize != m_defaultSize) {
 				m_defaultSize = defaultSize;
+				this->engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
 			}
 			this->epubPath = epubPath;
 			this->engine->openEpub(this, this->epubPath, "/", "\n");

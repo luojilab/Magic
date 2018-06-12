@@ -4266,12 +4266,11 @@ void MainWindow::layout(PreviewPhoneType type) {
 		return;
 	}
 	QSize d_size = m_previewPhoneSizeMap[type];
-	int w_fix = m_previewPhoneSimulatorFix[type][0];
-	int h_fix = m_previewPhoneSimulatorFix[type][1];
-	float width = (d_size.width() + w_fix) / 0.87;
-	float height = (d_size.height() + h_fix) / 0.87;
+	float width = d_size.width() / 0.85;
+	float height = d_size.height() / 0.85;
 	if ( !this->previewer ) {
 		this->previewer = new PreviewEPUBWindow(nullptr, "", std::string(m_CurrentFilePath.toUtf8().data()), QSize(width, height));
+		this->previewer->setContextMenuPolicy(Qt::PreventContextMenu);
 		addDockWidget(Qt::RightDockWidgetArea, this->previewer);
 		//contents view
 		m_bookContentsDock = new CustomDockWidget();
@@ -4285,7 +4284,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 		connect(m_bookContentView, SIGNAL(doubleClicked(const QModelIndex)), previewer, SLOT(gotoChapterByIndex(const QModelIndex)));
 		//size hint
 		this->previewer->setMaximumSize(width, height);
-		this->previewer->setMinimumSize(width, height);
+		this->previewer->setMinimumSize(width / 2, height / 2);
 	}
 	this->previewer->updateEngine("", m_CurrentFilePath.toStdString(), QSize(width, height));
 	this->previewer->show();
@@ -5265,8 +5264,6 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		return;
 	}
 	QSize d_size = m_previewPhoneSizeMap[type];
-	int w_fix = m_previewPhoneSimulatorFix[type][0];
-	int h_fix = m_previewPhoneSimulatorFix[type][1];
 	float width = (d_size.width()) / 0.85;
 	float height = (d_size.height()) / 0.85;
 	if (!m_previewerToHTML) {
