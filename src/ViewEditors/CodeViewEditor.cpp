@@ -1526,13 +1526,7 @@ void CodeViewEditor::OpenImageAction()
 
 void CodeViewEditor::GoToLinkOrStyleAction()
 {
-    //GoToLinkOrStyle();
-	QTextCursor c = textCursor();
-	QString string = c.document()->toPlainText();
-	QString subString = string.left(c.position());
-	int length = subString.length();
-	int bytesLength = subString.toUtf8().length();
-	printf("");
+    GoToLinkOrStyle();
 }
 
 void CodeViewEditor::GoToLinkOrStyle()
