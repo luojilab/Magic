@@ -95,11 +95,12 @@ void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
 			int w = width();
 			int h = height();
 			p.eraseRect(QRect(0, 0, width(), height()));
-			p.drawImage(QRect(0, 0, width(), height()), m_pic->scaled(width(), height()));
+			p.drawImage(QRect(0, 0, width(), height()), m_pic->scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 			p.end();
 		}
 	}
 }
+// resize
 void PreviewHTMLWindow::resizeEvent(QResizeEvent *event) 
 {
 	if (event->size() != event->oldSize()) {

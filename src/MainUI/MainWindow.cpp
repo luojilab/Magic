@@ -4289,6 +4289,8 @@ void MainWindow::layout(PreviewPhoneType type) {
 		//size hint
 		this->previewer->setMaximumSize(width, height);
 		this->previewer->setMinimumSize(width / 2, height / 2);
+		// style
+		this->previewer->setStyleSheet("background-color:white;");
 	}
 	this->previewer->updateEngine("", m_CurrentFilePath.toStdString(), QSize(width, height));
 	this->previewer->show();
@@ -5284,6 +5286,8 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		connect(ui.actionYellow, SIGNAL(triggered()), m_previewerToHTML, SLOT(bgColorToYellow()));
 		connect(ui.actionGreen, SIGNAL(triggered()), m_previewerToHTML, SLOT(bgColorToGreen()));
 		connect(ui.actionNormalColor, SIGNAL(triggered()), m_previewerToHTML, SLOT(bgColorToNormal()));
+		// style
+		m_previewerToHTML->setStyleSheet("background-color:white;");
 	} else {
 		m_previewerToHTML->reloadHTML(QfullPath.toStdString(), true, QSize(width, height));
 	}

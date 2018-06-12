@@ -45,7 +45,7 @@ void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
 		QPainter p(this);
 		if (p.isActive()) {
 			p.eraseRect(0, 0, width(), height());
-			p.drawImage(QRect(0, 0, width(), height()), this->pic->scaled(width(), height()));
+			p.drawImage(QRect(0, 0, width(), height()), this->pic->scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 			p.end();
 		} else {
 			printf("painter isn't actived");
