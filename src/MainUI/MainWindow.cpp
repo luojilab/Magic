@@ -4272,10 +4272,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 	float height = (d_size.height() + h_fix) / 0.87;
 	if ( !this->previewer ) {
 		this->previewer = new PreviewEPUBWindow(nullptr, "", std::string(m_CurrentFilePath.toUtf8().data()), QSize(width, height));
-		m_previewEPUBDock = new CustomDockWidget();
-		AspectRatioView *asptView = new AspectRatioView(this->previewer, width/height);
-		m_previewEPUBDock->setWidget(asptView);
-		addDockWidget(Qt::RightDockWidgetArea, m_previewEPUBDock);
+		addDockWidget(Qt::RightDockWidgetArea, this->previewer);
 		//contents view
 		m_bookContentsDock = new CustomDockWidget();
 		m_bookContentView = new QTreeView();
@@ -4283,15 +4280,15 @@ void MainWindow::layout(PreviewPhoneType type) {
 		m_bookContentsDock->setWidget(m_bookContentView);
 		addDockWidget(Qt::TopDockWidgetArea, m_bookContentsDock);
 		//connect
-		connect(previewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
-		connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this->previewer, SLOT(closed()));
-		connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this, SLOT(closeBookContentDock()));
+		connect(this->previewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
+		connect(this->previewer, SIGNAL(windowClose()), this, SLOT(closeBookContentDock()));
 		connect(m_bookContentView, SIGNAL(doubleClicked(const QModelIndex)), previewer, SLOT(gotoChapterByIndex(const QModelIndex)));
+		//size hint
+		this->previewer->setMaximumSize(width, height);
+		this->previewer->setMinimumSize(width, height);
 	}
 	this->previewer->updateEngine("", m_CurrentFilePath.toStdString(), QSize(width, height));
-	m_previewEPUBDock->widget()->setMinimumSize(width / 2, height / 2);
-	m_previewEPUBDock->show();
-	m_bookContentsDock->show();
+	this->previewer->show();
 	this->previewer->setFocus();
 }
 
@@ -5276,27 +5273,20 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		// previewer to html
 		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString(), QSize(width, height));
 		m_previewerToHTML->setContextMenuPolicy(Qt::PreventContextMenu);
-		AspectRatioView *asptView = new AspectRatioView(m_previewerToHTML, width / height);
-		asptView->setMinimumSize(width / 2, height / 2);
-		asptView->setMinContentSize(QSize(width / 2, height / 2));
-		// tools
-		ButtonCollectionView *toolView = new ButtonCollectionView(m_previewerToHTML->supportedColorNames());
-		asptView->addTopWidget(toolView);	
-		// docker
-		m_previewHTMLDock = new CustomDockWidget();
-		m_previewHTMLDock->setWidget(asptView);
-		addDockWidget(Qt::RightDockWidgetArea, m_previewHTMLDock);
-
-		m_previewHTMLDock->setStyleSheet("background-color:rgb(223,230,233);");
-		connect(m_previewHTMLDock, SIGNAL(DockCloseSig()), m_previewerToHTML, SLOT(closed()));
+		m_previewerToHTML->setMaximumSize(QSize(width, height));
+		m_previewerToHTML->setMinimumSize(QSize(width / 2, height / 2));
+		// add to widget
+		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
+		// connect
 		connect(m_previewerToHTML, SIGNAL(mapbackToHtml(unsigned int)), this, SLOT(gobackToHtmlOffset(unsigned int)));
-		connect(toolView, SIGNAL(buttonClick(int)), m_previewerToHTML, SLOT(bgColorChange(int)));
+		connect(ui.actionNight, SIGNAL(triggered()), m_previewerToHTML, SLOT(bgColorToNight()));
+		connect(ui.actionYellow, SIGNAL(triggered()), m_previewerToHTML, SLOT(bgColorToYellow()));
+		connect(ui.actionGreen, SIGNAL(triggered()), m_previewerToHTML, SLOT(bgColorToGreen()));
+		connect(ui.actionNormalColor, SIGNAL(triggered()), m_previewerToHTML, SLOT(bgColorToNormal()));
 	} else {
-		dynamic_cast<AspectRatioView *>(m_previewHTMLDock->widget())->setMaximumSize(width, height);
-		dynamic_cast<AspectRatioView *>(m_previewHTMLDock->widget())->setMinimumSize(width / 2, height / 2);
 		m_previewerToHTML->reloadHTML(QfullPath.toStdString(), true, QSize(width, height));
 	}
-	m_previewHTMLDock->show();
+	m_previewerToHTML->show();
 	m_previewerToHTML->setFocus();
 }
 

@@ -483,6 +483,10 @@
    <addaction name="actionPlugin3"/>
    <addaction name="actionPlugin4"/>
    <addaction name="actionPlugin5"/>
+   <addaction name="actionNormalColor"/>
+   <addaction name="actionGreen"/>
+   <addaction name="actionYellow"/>
+   <addaction name="actionNight"/>
   </widget>
   <widget class="QToolBar" name="toolBarHeadings">
    <property name="windowTitle">
@@ -2423,6 +2427,26 @@
   <action name="actionContents_List">
    <property name="text">
     <string>全书目录</string>
+   </property>
+  </action>
+  <action name="actionYellow">
+   <property name="text">
+    <string>黄色</string>
+   </property>
+  </action>
+  <action name="actionGreen">
+   <property name="text">
+    <string>绿色</string>
+   </property>
+  </action>
+  <action name="actionNormalColor">
+   <property name="text">
+    <string>正常</string>
+   </property>
+  </action>
+  <action name="actionNight">
+   <property name="text">
+    <string>夜间模式</string>
    </property>
   </action>
  </widget>

@@ -11,8 +11,6 @@ namespace future_core {
 	struct HighlightInfo;
 };
 
-using namespace future_core;
-
 typedef enum {
 	OPEN_EPUB_SUCCESS = 0,          //成功打开EPUB
 	EPUB_FILENAME_ERROR,            //EPUB文件名错误
@@ -115,6 +113,8 @@ struct EngineHighlightInfo {
 	EngineHighlightInfo operator<<(future_core::HighlightInfo& info);
 };
 
+using future_core::BookReader;
+using future_core::BookChapter;
 class LayoutEngineDelegate
 {
 public:
@@ -159,6 +159,7 @@ public:
 	void openHtml(QWidget *view,const std::string htmlPath, std::string uniqueKey);
 	void paintHtml(BookChapter *html, unsigned int pageIndex);
 	void closeHtml(BookChapter* html);
+	void setIsNightMode(bool, BookChapter *, unsigned);
 	/*void getTotalPageCount(BookReader *bookModel);
 	int getCurrentPageIndex(BookReader *bookModel);
 	QString getSummaryByPageOffset(BookReader *bookModel, qint32 pageOffset);

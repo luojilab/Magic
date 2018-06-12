@@ -9,7 +9,7 @@
 #include <QAction>
 
 PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPath, const QSize& standardSize)
-	:QWidget(parent),
+	:QDockWidget(parent),
 	m_htmlPath(htmlPath),
 	m_engine(new LayoutEngine), 
 	m_htmlPageIndex(0),
@@ -24,7 +24,9 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
 	// Must initial engine at last!
 	// in case the width and height value get wrong
 	m_engine->InitLayoutEngine("");
-	setStyleSheet("background-color:rgb(178,190,195);");
+	std::string bgPrefix("background-color:");
+	std::string bgColorStyle = bgPrefix + m_supportBGColor[0];
+	setStyleSheet(QString(bgColorStyle.c_str()));
 }
 
 PreviewHTMLWindow::~PreviewHTMLWindow()
@@ -72,7 +74,7 @@ void PreviewHTMLWindow::engineOpenHTML(BookChapter *html, LAYOUT_ENGINE_OPEN_EPU
 // html pic render finish
 void PreviewHTMLWindow::htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic) {
 	safeSetRenderStatus(false);
-	if (pic != nullptr) {
+	if (pic.get() != nullptr) {
 		m_pic = pic;
 		m_old_htmlPageIndex = m_htmlPageIndex;
 		update();
@@ -87,7 +89,7 @@ void PreviewHTMLWindow::htmlImageRenderFinish(BookChapter *html, std::shared_ptr
 
 // paint event
 void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
-	if ( m_pic != nullptr && !(*m_pic).isNull() ) {
+	if ( m_pic.get() != nullptr && !(*m_pic).isNull() ) {
 		QPainter p(this);
 		if (p.isActive()) {
 			int w = width();
@@ -96,6 +98,13 @@ void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
 			p.drawImage(QRect(0, 0, width(), height()), m_pic->scaled(width(), height()));
 			p.end();
 		}
+	}
+}
+void PreviewHTMLWindow::resizeEvent(QResizeEvent *event) 
+{
+	if (event->size() != event->oldSize()) {
+		float ratio = m_standardSize.width() / float(m_standardSize.height());
+		resize(event->size().width(), int(event->size().width() / ratio));
 	}
 }
 // mouse click event
@@ -285,14 +294,19 @@ void PreviewHTMLWindow::gobackToHTMLOffset() {
 	emit mapbackToHtml(offset);
 }
 
-void PreviewHTMLWindow::bgColorChange(int idx)
+void PreviewHTMLWindow::bgColorChange(int idx, bool isNightMode)
 {
-	if ( idx >= m_supportedBGColorCnt ) {
+	if ( !isVisible() && idx >= m_supportedBGColorCnt ) {
 		return;
 	}
 	std::string color = m_supportBGColor[idx];
 	if (color.empty()) {
 		return;
+	}
+	if (m_isNightMode != isNightMode) {
+		m_isNightMode = isNightMode;
+		m_pic.reset();
+		m_engine->setIsNightMode(isNightMode, m_htmlModel, m_htmlPageIndex);
 	}
 	std::string prop = "background-color:";
 	setStyleSheet((prop + color).c_str());

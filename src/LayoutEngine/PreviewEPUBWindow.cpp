@@ -9,7 +9,7 @@
 #include <QApplication>
 
 PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize):
-	QWidget(parent),
+	QDockWidget(parent),
 	pic(nullptr),
 	engine(new LayoutEngine),
 	epubPath(epubPath),
@@ -33,10 +33,10 @@ PreviewEPUBWindow::~PreviewEPUBWindow()
 void PreviewEPUBWindow::canDraw() {
 	if (this->engine->EngineIsReady()) {
 		this->m_bookModel->GetTextReader()->GotoFirstPage();
-		this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
-		if (this->pic != nullptr) {
-			this->update();
+		while (this->pic == nullptr) {
+			this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
 		}
+		this->update();
 	}
 }
 
@@ -83,6 +83,22 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
 		}
 		this->update();
 	}
+}
+
+void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
+{
+	event->accept();
+	if (event->size() == event->oldSize()) {
+		return;
+	}
+	float ratio = m_defaultSize.width() / float(m_defaultSize.height());
+	resize(event->size().width(), int(event->size().width() / ratio));
+}
+
+void PreviewEPUBWindow::closeEvent(QCloseEvent *event) 
+{
+	emit windowClose();
+	closed();
 }
 
 void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::string & epubPath, const QSize& defaultSize)

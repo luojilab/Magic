@@ -5,7 +5,7 @@
 #include <QDockWidget>
 #include <memory>
 
-class PreviewHTMLWindow : public QWidget, public LayoutEngineDelegate
+class PreviewHTMLWindow : public QDockWidget, public LayoutEngineDelegate
 {
 	Q_OBJECT
 
@@ -36,6 +36,7 @@ protected:
 	virtual void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic);
 
 	void paintEvent(QPaintEvent *);
+	void resizeEvent(QResizeEvent * event);
 	void mousePressEvent(QMouseEvent *);
 
 	void closeEvent(QCloseEvent *);
@@ -50,7 +51,11 @@ signals:
 	void mapbackToHtml(unsigned int);
 
 public slots:
-	void bgColorChange(int idx);
+	void bgColorToNormal() { bgColorChange(0); };
+	void bgColorToYellow() { bgColorChange(1); };
+	void bgColorToGreen() { bgColorChange(2); };
+	void bgColorToNight() { bgColorChange(3, true); };
+	void bgColorChange(int idx, bool isNightMode = false);
 private slots:
 	void closed();
 	void gobackToHTMLOffset();
@@ -67,6 +72,7 @@ private:
 	QReadWriteLock m_locker;
 	QReadWriteLock m_ModelLocker;
 	QSize m_standardSize;
+	bool m_isNightMode{ false };
 
 private:
 	inline void safeSetRenderStatus(bool);
@@ -78,13 +84,13 @@ private:
 	void refreshView() const;
 	std::string tempFilePath(const std::string& fileName);
 	std::map<int, std::string> m_supportBGColor {
-		{0,"rgb(178,190,195)"},
-		{1,"red;"},
-		{2,"blue;"},
-		{3,"rgb(255,255,0);"}
+		{0,"rgb(255,255,255)"},
+		{1,"rgb(244,240,221)"},
+		{2,"rgb(174,200,174)"},
+		{3,"rgb(52,55,59);"}
 	};
 	const int m_supportedBGColorCnt = m_supportBGColor.size();
 	QStringList m_supportedColorNames {
-		u8"复原",u8"红色",u8"蓝色",u8"黄色"
+		u8"复原",u8"黄色",u8"绿色",u8"夜间"
 	};
 };
