@@ -16,7 +16,6 @@ public:
 	void updateCurrentPage(const QString& contentTexts);
 	void updateForOffset(unsigned int);
 	void cleanTempFile();
-	inline QStringList supportedColorNames() { return m_supportedColorNames; };
 
 protected:
 	virtual void engineInitFinish();
@@ -87,7 +86,4 @@ private:
 		{3,"rgb(52,55,59);"}
 	};
 	const int m_supportedBGColorCnt = m_supportBGColor.size();
-	QStringList m_supportedColorNames {
-		u8"复原",u8"黄色",u8"绿色",u8"夜间"
-	};
 };

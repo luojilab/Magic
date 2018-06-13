@@ -18,7 +18,7 @@ public:
 public:
 	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize);
 	~PreviewEPUBWindow();
-	void PreviewEPUBWindow::paintEvent(QPaintEvent *);
+	void paintEvent(QPaintEvent *);
 	void updateEngine(const std::string& bundlePath = "", const std::string& epubPath = "", const QSize& defaultSize = QSize(0, 0));
 	QStandardItemModel *getBookContentList() { return m_bookContents; };
 

@@ -4271,7 +4271,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 		return;
 	}
 	if ( !this->Save() ) {
-		QMessageBox::information(this, "", u8"请先保存文件！然后才能预览", QMessageBox::Ok);
+		QMessageBox::information(this, "", "", QMessageBox::Ok);
 		return;
 	}
 	QSize d_size = m_previewPhoneSizeMap[type];
@@ -5392,12 +5392,12 @@ void MainWindow::gotoHtmlSourceCodeForBookPreview(const std::string& chapterFile
 {
 	QList<Resource *>htmls = m_BookBrowser->AllHTMLResources();
 	Resource* needOpenRes = nullptr;
-	for each (Resource* res in htmls) {
-		if (chapterFileName == res->Filename().toStdString()) {
-			needOpenRes = res;
-			break;
-		}
-	}
+    for(Resource *res : htmls) {
+        if (chapterFileName == res->Filename().toStdString()) {
+            needOpenRes = res;
+            break;
+        }
+    }
 	if (needOpenRes == nullptr) {
 		return;
 	}

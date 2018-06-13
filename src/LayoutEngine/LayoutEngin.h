@@ -155,11 +155,12 @@ public:
 	void gotoChapterByFileName(BookReader *bookModel, const QString& fileName);
 	void updateAllView(BookReader *bookModel);
 	void closeEpub(BookReader *bookModel);
+    void repaint(BookReader *bookModel);
 	// HTML utils
 	void openHtml(QWidget *view,const std::string htmlPath, std::string uniqueKey);
 	void paintHtml(BookChapter *html, unsigned int pageIndex);
 	void closeHtml(BookChapter* html);
-	void setIsNightMode(bool, BookChapter *, unsigned);
+	void setIsNightMode(bool);
 	/*void getTotalPageCount(BookReader *bookModel);
 	int getCurrentPageIndex(BookReader *bookModel);
 	QString getSummaryByPageOffset(BookReader *bookModel, qint32 pageOffset);

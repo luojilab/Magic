@@ -271,20 +271,6 @@ bool EmbeddedPython::addToPythonSysPath(const QString &mpath)
     // PySys_GetObject borrows a reference */
     sysPath = PySys_GetObject((char*)"path");
 
-	int size = PyList_Size(sysPath);
-	for (int i = 0; i < size; i++) {
-		PyObject* item = PyList_GetItem(sysPath, i);
-		char *ss = PyUnicode_AsUTF8(item);
-		if (ss != nullptr) {
-			std::string s = std::string();
-			printf("%s\n", s);
-		}
-		else
-		{
-			printf("Empty ss");
-		}
-	}
-
     if (sysPath != NULL) {
         aPath = PyUnicode_FromString(mpath.toUtf8().constData());
         if (aPath != NULL) {

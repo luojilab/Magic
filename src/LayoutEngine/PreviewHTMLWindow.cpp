@@ -204,13 +204,11 @@ void PreviewHTMLWindow::cleanTempFile()
 {
 	QDir dir(QFileInfo(m_htmlPath.c_str()).absolutePath());
 	QFileInfoList file_list = dir.entryInfoList(QDir::Files | QDir::NoSymLinks);
-	for each (QFileInfo f_info in file_list)
-	{
-		if (f_info.fileName().startsWith("__Temp__")) 
-		{
-			QFile(f_info.filePath()).remove();
-		}
-	}
+    for (QFileInfo f_info : file_list) {
+        if (f_info.fileName().startsWith("__Temp__")) {
+            QFile(f_info.filePath()).remove();
+        }
+    }
 }
 
 void PreviewHTMLWindow::safeSetRenderStatus(bool status)
@@ -300,7 +298,8 @@ void PreviewHTMLWindow::bgColorChange(int idx, bool isNightMode)
 	if (m_isNightMode != isNightMode) {
 		m_isNightMode = isNightMode;
 		m_pic.reset();
-		m_engine->setIsNightMode(isNightMode, m_htmlModel, m_htmlPageIndex);
+		m_engine->setIsNightMode(isNightMode);
+        m_engine->paintHtml(m_htmlModel, m_htmlPageIndex);
 	}
 	std::string prop = "background-color:";
 	setStyleSheet((prop + color).c_str());
