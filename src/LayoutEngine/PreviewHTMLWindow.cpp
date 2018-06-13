@@ -145,14 +145,6 @@ void PreviewHTMLWindow::closed()
 	closeEvent(nullptr);
 	cleanTempFile();
 }
-// mouse right click
-void PreviewHTMLWindow::contextMenuEvent(QContextMenuEvent *event) {
-	QMenu *menu = new QMenu(this);
-	QAction *ac = new QAction(tr("a action"),menu);
-	menu->addAction(ac);
-	menu->exec(event->globalPos());
-	delete menu;
-}
 
 QSize PreviewHTMLWindow::sizeHint() 
 {

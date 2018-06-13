@@ -304,6 +304,7 @@ private:typedef enum {
 		void updateBookContentView();
 		void closeBookContentDock();
 		void showBookContentList();
+		void gotoHtmlSourceCodeForBookPreview(const std::string&, size_t);
 
 		void AddCover();
 
@@ -1080,6 +1081,8 @@ private:
 	CustomDockWidget *m_previewHTMLDock{ NULL };
 	CustomDockWidget *m_bookContentsDock{ NULL };
 	QTreeView *m_bookContentView{ NULL };
+	bool m_needSeekToHtmlSoruceCodeForBookPreview{ false };
+	size_t m_seekOffsite{ 0 };
 
 	bool m_tabChanged{ false };
 	bool m_contentChanged{ false };

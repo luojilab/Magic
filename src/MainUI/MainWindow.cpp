@@ -563,9 +563,18 @@ void MainWindow::OpenResource(Resource *resource,
     m_TabManager->OpenResource(resource, line_to_scroll_to, position_to_scroll_to, caret_location_to_scroll_to,
                               view_state, fragment, precede_current_tab);
 
-    if (view_state != m_ViewState) {
-        SetViewState(view_state);
-    }
+	if (view_state != m_ViewState) {
+		SetViewState(view_state);
+	}
+
+	// seek to html offset
+	if ( m_needSeekToHtmlSoruceCodeForBookPreview) {
+		m_needSeekToHtmlSoruceCodeForBookPreview = false;
+		if (m_seekOffsite < 0) {
+			return;
+		}
+		gobackToHtmlOffset(m_seekOffsite);
+	}
 }
 
 void MainWindow::OpenResourceAndWaitUntilLoaded(Resource *resource,
@@ -4281,6 +4290,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 		//connect
 		connect(this->previewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
 		connect(this->previewer, SIGNAL(windowClose()), this, SLOT(closeBookContentDock()));
+		connect(this->previewer, SIGNAL(gotoHtmlSourceCode(const std::string&, size_t)), this, SLOT(gotoHtmlSourceCodeForBookPreview(const std::string&, size_t)));
 		connect(m_bookContentView, SIGNAL(doubleClicked(const QModelIndex)), previewer, SLOT(gotoChapterByIndex(const QModelIndex)));
 		connect(ui.actionNormalColor, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorNormal()));
 		connect(ui.actionYellow, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorYellow()));
@@ -5376,6 +5386,24 @@ void MainWindow::gobackToHtmlOffset(unsigned int offset) {
 	cursor.setPosition(length == 0 ? 0 : length - 1);
 	codeView->setTextCursor(cursor);
 	codeView->ensureCursorVisible();
+}
+
+void MainWindow::gotoHtmlSourceCodeForBookPreview(const std::string& chapterFileName, size_t offsite) 
+{
+	QList<Resource *>htmls = m_BookBrowser->AllHTMLResources();
+	Resource* needOpenRes = nullptr;
+	for each (Resource* res in htmls) {
+		if (chapterFileName == res->Filename().toStdString()) {
+			needOpenRes = res;
+			break;
+		}
+	}
+	if (needOpenRes == nullptr) {
+		return;
+	}
+	m_needSeekToHtmlSoruceCodeForBookPreview = true;
+	m_seekOffsite = offsite;
+	emit m_BookBrowser->ResourceActivated(needOpenRes);
 }
 
 void MainWindow::updateBookContentView() {

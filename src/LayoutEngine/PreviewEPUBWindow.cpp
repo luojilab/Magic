@@ -7,6 +7,7 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QApplication>
+#include <QMenu>
 
 PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize):
 	QDockWidget(parent),
@@ -179,19 +180,14 @@ void PreviewEPUBWindow::engineOpenBook(BookReader * bookModel, QList<BookContent
 }
 
 void PreviewEPUBWindow::mousePressEvent(QMouseEvent *event) {
-	if (event->button() == Qt::LeftButton) {
-		this->m_bookModel->GetTextReader()->GotoNextPage();
+	if (event->button() == Qt::RightButton) {
+		QMenu* menu = new QMenu(this);
+		QAction* action = new QAction("Go to Html", menu);
+		connect(action, SIGNAL(triggered()), this, SLOT(GoToHtml()));
+		menu->addAction(action);
+		menu->exec(event->globalPos());
+		delete menu;
 	}
-	else if (event->button() == Qt::RightButton)
-	{
-		this->m_bookModel->GetTextReader()->GotoPreviousPage();
-	}
-	this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
-	while (this->pic == nullptr)
-	{
-		this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
-	}
-	this->update();
 }
 
 void PreviewEPUBWindow::engineClickResponse(const qint32 & originX, const qint32 & originY, const QString & chapterId, const qint32 & htmlOffset)
@@ -303,6 +299,14 @@ void PreviewEPUBWindow::closed()
 		delete m_bookContents;
 		m_bookContents = NULL;
 	}
+}
+
+void PreviewEPUBWindow::GoToHtml()
+{
+	int offset = m_bookModel->GetTextReader()->GetCurrentPageOffset();
+	std::string chapterId = m_bookModel->GetTextReader()->GetCurrentChapterId();
+	std::string name = m_bookModel->GetTextReader()->GetChapterFileNameById(chapterId);
+	emit gotoHtmlSourceCode(name, offset);
 }
 
 void PreviewEPUBWindow::changeBGColor(int color, bool isNightMode)

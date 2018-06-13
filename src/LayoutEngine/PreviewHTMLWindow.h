@@ -38,10 +38,7 @@ protected:
 	void paintEvent(QPaintEvent *);
 	void resizeEvent(QResizeEvent * event);
 	void mousePressEvent(QMouseEvent *);
-
 	void closeEvent(QCloseEvent *);
-
-	void contextMenuEvent(QContextMenuEvent *);
 	QSize sizeHint();
 	QSize minimumSizeHint();
 	void keyPressEvent(QKeyEvent *);

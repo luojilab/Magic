@@ -29,6 +29,10 @@ namespace future_core {
 		void GotoNextChapter();
 		void GotoPreviousChapter();
 		void SetIsNightTime(bool isNightTime);
+		int GetCurrentPageOffset();
+		const std::string &GetCurrentChapterId();
+		const std::string GetChapterNameById(std::string &chapterId);
+		const std::string GetChapterFileNameById(const std::string& chapterId);
 	};
 
 	/*
