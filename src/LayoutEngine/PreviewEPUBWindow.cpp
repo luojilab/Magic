@@ -147,10 +147,14 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 	QList<BookContents *>items = this->engine->getContentList(m_bookModel);
 	if (idx == -1 || idx > items.count()) { return; }
 	// goto chapter
-	qDebug("ref = %s", items[idx]->ContentHRef.toStdString().c_str());
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 	engine->gotoChapterByFileName(m_bookModel, items[idx]->ContentHRef);
 	engine->updateAllView(m_bookModel);
+	// clean resource
+	for each (BookContents* item in items) {
+		delete item;
+	}
+	items.clear();
 }
 
 void PreviewEPUBWindow::engineInitFinish() {
@@ -257,15 +261,19 @@ void PreviewEPUBWindow::generateContentsModel()
 	model->setHorizontalHeaderLabels(QStringList() << "");
 	QList<BookContents *> contents = this->engine->getContentList(m_bookModel);
 	for (BookContents *item : contents) {
+		int level		= item->level;
+		QString text	= item->text;
+		// clean resource
+		delete item;
 
-		int diff = item->level - lastLevel;
+		int diff = level - lastLevel;
 		Q_ASSERT(diff < 2);
 
-		QStandardItem* content = new QStandardItem(item->text);
-		lastLevel = item->level;
+		QStandardItem* content = new QStandardItem(text);
+		lastLevel = level;
 		m_bookItems.push_back(content);
 
-		if (item->level == 0) {
+		if (level == 0) {
 			model->appendRow(content);
 			lastItem = content;
 			continue;
@@ -287,6 +295,7 @@ void PreviewEPUBWindow::generateContentsModel()
 		}
 	}
 	m_bookContents = model;
+	contents.clear();
 	emit bookContentReady();
 }
 
