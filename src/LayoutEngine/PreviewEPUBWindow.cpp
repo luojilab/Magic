@@ -33,6 +33,9 @@ PreviewEPUBWindow::~PreviewEPUBWindow()
 {
 	closed();
     if (this->engine) {
+#ifdef WIN32
+        engine->ReleaseLayoutEngine();
+#endif
         delete engine;
         engine = NULL;
     }

@@ -4313,7 +4313,7 @@ void MainWindow::layout(PreviewPhoneType type) {
         ws.push_back(m_bookContentView);
         m_previewerToEpubContainer->addWidgets(ws);
         m_previewEPUBDock->setWidget(m_previewerToEpubContainer);
-		//connect
+		/* connect */
 		connect(this->previewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
 		connect(this->previewer, SIGNAL(gotoHtmlSourceCode(const std::string&, size_t)), this, SLOT(gotoHtmlSourceCodeForBookPreview(const std::string&, size_t)));
         connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this->previewer, SLOT(closed()));
@@ -4323,7 +4323,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 		connect(ui.actionYellow, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorYellow()));
 		connect(ui.actionGreen, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorGreen()));
 		connect(ui.actionNight, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorNight()));
-		// style
+		/* initial style */
 		this->previewer->setStyleSheet("background-color:white;");
 	}
     //size hint
