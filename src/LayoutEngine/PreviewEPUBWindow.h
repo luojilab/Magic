@@ -8,7 +8,7 @@
 class QStandardItemModel;
 class QStandardItem;
 
-class PreviewEPUBWindow : public QDockWidget, public LayoutEngineDelegate {
+class PreviewEPUBWindow : public QWidget, public LayoutEngineDelegate {
 
 	Q_OBJECT
 
@@ -75,7 +75,6 @@ private slots:
 signals:
 	void canDrawSignal();
 	void bookContentReady();
-	void windowClose();
 	void gotoHtmlSourceCode(const std::string& htmlName, size_t offsite);
 
 protected:

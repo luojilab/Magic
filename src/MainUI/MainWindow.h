@@ -71,6 +71,7 @@ class SelectCharacter;
 class ViewImage;
 class FlowTab;
 class CustomDockWidget;
+class HorizonLayoutView;
 /**
  * @mainpage
  * The conversion of all source comments to Doxygen format
@@ -1078,9 +1079,9 @@ private:
 	PreviewEPUBWindow* previewer{ NULL };
 	PreviewHTMLWindow* m_previewerToHTML{ NULL };
 	CustomDockWidget *m_previewEPUBDock{ NULL };
-	CustomDockWidget *m_previewHTMLDock{ NULL };
 	CustomDockWidget *m_bookContentsDock{ NULL };
 	QTreeView *m_bookContentView{ NULL };
+    HorizonLayoutView *m_previewerToEpubContainer{ NULL };
 	bool m_needSeekToHtmlSoruceCodeForBookPreview{ false };
 	size_t m_seekOffsite{ 0 };
 
@@ -1096,7 +1097,7 @@ private:
 		{ PreviewPhoneType::iPhone6P ,QSize(414, 736) },
 		{ PreviewPhoneType::iPhoneX ,QSize(375, 812) },
 		{ PreviewPhoneType::XiaoMi ,QSize(375, 568) },
-		{ PreviewPhoneType::iPad,QSize(375, 568) }
+		{ PreviewPhoneType::iPad,QSize(768, 1024) }
 	};
 	std::map<PreviewPhoneType, std::vector<int>> m_previewPhoneSimulatorFix = {
 		{ iPhone5,{ 17, -160 } },

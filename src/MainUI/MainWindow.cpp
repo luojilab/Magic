@@ -45,6 +45,7 @@
 #include <QFont>
 #include <QFontMetrics>
 #include <QTimer>
+#include <QDesktopWidget>
 
 #include "BookManipulation/CleanSource.h"
 #include "BookManipulation/Index.h"
@@ -103,6 +104,7 @@
 #include "AspectRatioView.h"
 #include "CustomDockWidget.h"
 #include "ButtonCollectionView.h"
+#include "HorizonLayoutView.h"
 
 static const int TEXT_ELIDE_WIDTH   = 300;
 static const QString SETTINGS_GROUP = "mainwindow";
@@ -232,12 +234,6 @@ MainWindow::~MainWindow()
         m_ViewImage->close();
         m_ViewImage = NULL;
     }
-	removeDockWidget(m_previewEPUBDock);
-	removeDockWidget(m_previewHTMLDock);
-	removeDockWidget(m_bookContentsDock);
-	delete m_previewEPUBDock;
-	delete m_previewHTMLDock;
-	delete m_bookContentsDock;
 }
 
 
@@ -698,9 +694,24 @@ void MainWindow::closeEvent(QCloseEvent *event)
         if ((m_PreviewWindow)  && m_PreviewWindow->isVisible()) {
             m_PreviewWindow->close();
         }
-		if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
-			m_previewerToHTML->close();
+        if ( m_previewEPUBDock ) {
+            if (m_previewEPUBDock->isVisible()) {
+                m_previewEPUBDock->close();
+            }
+            removeDockWidget(m_previewEPUBDock);
+        }
+		if (m_previewerToHTML) {
+            if (m_previewerToHTML->isVisible()) {
+                m_previewerToHTML->close();
+            }
+            removeDockWidget(m_previewerToHTML);
 		}
+        if (m_bookContentsDock) {
+            if (m_bookContentsDock->isVisible()) {
+                m_bookContentsDock->close();
+            }
+            removeDockWidget(m_bookContentsDock);
+        }
         event->accept();
     } else {
         event->ignore();
@@ -4267,43 +4278,64 @@ void MainWindow::PlatformSpecificTweaks()
 }
 
 void MainWindow::layout(PreviewPhoneType type) {
-	if (m_previewEPUBDock && m_previewEPUBDock->isVisible()) {
-		return;
-	}
+    if (this->previewer && this->previewer->isVisible()) {
+        QMessageBox::information(this, "", "请先关闭当前预览窗口", QMessageBox::Ok);
+        return;
+    }
 	if ( !this->Save() ) {
-		QMessageBox::information(this, "", "", QMessageBox::Ok);
+        QMessageBox::information(this, "", "保存失败，清保存之后再打开");
 		return;
 	}
+#ifdef __APPLE__
+    float ratio = 1;
+#else
+    float ratio = 0.85;
+#endif
 	QSize d_size = m_previewPhoneSizeMap[type];
-	float width = d_size.width() / 0.85;
-	float height = d_size.height() / 0.85;
+    int screenHeight = QApplication::desktop()->screenGeometry().size().height();
+    float height = d_size.height() / ratio > screenHeight ? screenHeight - 100 : d_size.height() / ratio;
+    float width = (float(d_size.width()) / d_size.height()) * height / ratio;
+    int tocMinWidth = 100;
 	if ( !this->previewer ) {
+        /* dock */
+        m_previewEPUBDock = new CustomDockWidget();
+        addDockWidget(Qt::RightDockWidgetArea, m_previewEPUBDock);
+        /* preview view */
 		this->previewer = new PreviewEPUBWindow(nullptr, "", std::string(m_CurrentFilePath.toUtf8().data()), QSize(width, height));
 		this->previewer->setContextMenuPolicy(Qt::PreventContextMenu);
-		addDockWidget(Qt::RightDockWidgetArea, this->previewer);
-		//contents view
-		m_bookContentsDock = new CustomDockWidget();
+		/* table of contents view */
 		m_bookContentView = new QTreeView();
 		m_bookContentView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-		m_bookContentsDock->setWidget(m_bookContentView);
-		addDockWidget(Qt::TopDockWidgetArea, m_bookContentsDock);
+        /* container view */
+        m_previewerToEpubContainer = new HorizonLayoutView(QSize(width, height), tocMinWidth);
+        QList<QWidget *>ws;
+        ws.push_back(this->previewer);
+        ws.push_back(m_bookContentView);
+        m_previewerToEpubContainer->addWidgets(ws);
+        m_previewEPUBDock->setWidget(m_previewerToEpubContainer);
 		//connect
 		connect(this->previewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
-		connect(this->previewer, SIGNAL(windowClose()), this, SLOT(closeBookContentDock()));
 		connect(this->previewer, SIGNAL(gotoHtmlSourceCode(const std::string&, size_t)), this, SLOT(gotoHtmlSourceCodeForBookPreview(const std::string&, size_t)));
+        connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this->previewer, SLOT(closed()));
+        connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this, SLOT(closeBookContentDock()));
 		connect(m_bookContentView, SIGNAL(doubleClicked(const QModelIndex)), previewer, SLOT(gotoChapterByIndex(const QModelIndex)));
 		connect(ui.actionNormalColor, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorNormal()));
 		connect(ui.actionYellow, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorYellow()));
 		connect(ui.actionGreen, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorGreen()));
 		connect(ui.actionNight, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorNight()));
-		//size hint
-		this->previewer->setMaximumSize(width, height);
-		this->previewer->setMinimumSize(width / 2, height / 2);
 		// style
 		this->previewer->setStyleSheet("background-color:white;");
 	}
+    //size hint
+    this->previewer->setMaximumSize(width, height);
+    this->previewer->setMinimumSize(width / 2, height / 2);
+    m_bookContentView->setMaximumSize(width,height);
+    m_previewerToEpubContainer->setDefaultMainSize(QSize(width, height));
+    m_previewerToEpubContainer->setMinimumSize(QSize(width + tocMinWidth, height));
+    m_previewerToEpubContainer->setMaximumSize(QSize(width * 2, height));
+    //update content
 	this->previewer->updateEngine("", m_CurrentFilePath.toStdString(), QSize(width, height));
-	this->previewer->show();
+	this->m_previewEPUBDock->show();
 	this->previewer->setFocus();
 }
 
@@ -5256,38 +5288,42 @@ void MainWindow::BreakTabConnections(ContentTab *tab)
 
 void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 {
-	if ( m_previewerToHTML && m_previewerToHTML->isVisible() ) {
-		return;
-	}
+    if ( m_previewerToHTML && m_previewerToHTML->isVisible() ) {
+        QMessageBox::information(this, "", "请先关闭当前预览窗口", QMessageBox::Ok);
+        return;
+    }
 	if (type == Unknown) {
-		QMessageBox::information(this, "", "δ֪��չʾ����", QMessageBox::Ok);
+		QMessageBox::information(this, "", "未知的展示类型", QMessageBox::Ok);
 		return;
 	}
 	ContentTab *tab = m_TabManager->GetCurrentContentTab();
 	QString QfullPath = "";
 	if (!tab) {
-		QMessageBox::information(this, "", "û�д�һ��html�ļ�", QMessageBox::Ok);
+		QMessageBox::information(this, "", "没有打开一个html文件", QMessageBox::Ok);
 		return;
 	}
 	Resource* res = tab->GetLoadedResource();
 	if ( !res || res->Type() != Resource::HTMLResourceType ) {
-		QMessageBox::information(this, "", "��֧��ʵʱԤ������Դ�ļ�", QMessageBox::Ok);
+		QMessageBox::information(this, "", "不支持实时预览的资源文件", QMessageBox::Ok);
 		return;
 	}
 	QfullPath = res->GetFullPath();
 	if (QfullPath.isEmpty()) {
-		QMessageBox::information(this, "", "��Դ�ļ�·��Ϊ�գ����ȱ���", QMessageBox::Ok);
+		QMessageBox::information(this, "", "资源文件路径为空，请先保存", QMessageBox::Ok);
 		return;
 	}
 	QSize d_size = m_previewPhoneSizeMap[type];
-	float width = (d_size.width()) / 0.85;
-	float height = (d_size.height()) / 0.85;
+#ifdef __APPLE__
+    float ratio = 1;
+#else
+    float ratio = 0.85;
+#endif
+	float width = (d_size.width()) / ratio;
+	float height = (d_size.height()) / ratio;
 	if (!m_previewerToHTML) {
 		// previewer to html
 		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString(), QSize(width, height));
 		m_previewerToHTML->setContextMenuPolicy(Qt::PreventContextMenu);
-		m_previewerToHTML->setMaximumSize(QSize(width, height));
-		m_previewerToHTML->setMinimumSize(QSize(width / 2, height / 2));
 		// add to widget
 		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
 		// connect
@@ -5301,6 +5337,10 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 	} else {
 		m_previewerToHTML->reloadHTML(QfullPath.toStdString(), true, QSize(width, height));
 	}
+    // set size
+    m_previewerToHTML->setMaximumSize(QSize(width, height));
+    m_previewerToHTML->setMinimumSize(QSize(width / 2, height / 2));
+    // focus
 	m_previewerToHTML->show();
 	m_previewerToHTML->setFocus();
 }
@@ -5408,6 +5448,7 @@ void MainWindow::gotoHtmlSourceCodeForBookPreview(const std::string& chapterFile
 
 void MainWindow::updateBookContentView() {
 	QStandardItemModel* model = previewer->getBookContentList();
+    model->setHorizontalHeaderLabels(QStringList() << "目录");
 	if (!model) { return; }
 	m_bookContentView->setModel(model);
 }
@@ -5420,7 +5461,6 @@ void MainWindow::showBookContentList() {
 }
 
 void MainWindow::closeBookContentDock() {
-	m_bookContentsDock->close();
 	m_bookContentView->setModel(NULL);
 	/*removeDockWidget(m_bookContentsDock);
 	removeDockWidget(m_previewEPUBDock);

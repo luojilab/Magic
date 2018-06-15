@@ -10,25 +10,32 @@
 #include <QMenu>
 
 PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize):
-	QDockWidget(parent),
+	QWidget(parent),
 	pic(nullptr),
-	engine(new LayoutEngine),
 	epubPath(epubPath),
+    engine(new LayoutEngine),
 	m_bookModel(NULL),
 	m_defaultSize(defaultSize),
 	m_bookContents(NULL),
 	m_bookItems(std::vector<QStandardItem *>()) {
 	this->engine->delegate = dynamic_cast<LayoutEngineDelegate *>(this);
-	this->engine->SetViewTopMargin(60.f * 128.f / 112.f);
-	this->engine->SetViewBottomMargin(60.f * 128.f / 112.f);
+#if __APPLE__
+        float ratio = 1;
+#else
+        float ratio = 0.85;
+#endif
+	this->engine->SetViewTopMargin(60.f / ratio);
+	this->engine->SetViewBottomMargin(60.f / ratio);
 	this->setFocusPolicy(Qt::ClickFocus);
 }
 
 PreviewEPUBWindow::~PreviewEPUBWindow()
 {
 	closed();
-	this->engine->ReleaseLayoutEngine();
-	delete engine;
+    if (this->engine) {
+        delete engine;
+        engine = NULL;
+    }
 }
 
 void PreviewEPUBWindow::canDraw() {
@@ -88,17 +95,19 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
 {
-	event->accept();
-	if (event->size() == event->oldSize()) {
-		return;
-	}
-	float ratio = m_defaultSize.width() / float(m_defaultSize.height());
-	resize(event->size().width(), int(event->size().width() / ratio));
+//    event->accept();
+//    if (event->size() == event->oldSize()) {
+//        return;
+//    }
+//    float ratio = m_defaultSize.width() / float(m_defaultSize.height());
+//    resize(event->size().width(), int(event->size().width() / ratio));
+//    if (m_TOCView) {
+//        m_TOCView->resize(event->size().width() / 2, int(event->size().width() / ratio));
+//    }
 }
 
 void PreviewEPUBWindow::closeEvent(QCloseEvent *event) 
 {
-	emit windowClose();
 	closed();
 }
 

@@ -53,8 +53,13 @@ void PreviewHTMLWindow::engineInitFinish() {
 	int w = width();
 	int h = height();
 	m_engine->setPageSize(NULL, m_standardSize.width(), m_standardSize.height(), 1);
-	m_engine->SetViewTopMargin(60.f * 128.f / 112.f);
-	m_engine->SetViewBottomMargin(60.f * 128.f / 112.f);
+#if __APPLE__
+    float ratio = 1;
+#else
+    float ratio = 0.85;
+#endif
+	m_engine->SetViewTopMargin(60.f / ratio);
+	m_engine->SetViewBottomMargin(60.f / ratio);
 	m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
 }
 /*
@@ -173,8 +178,13 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
 		}
 		m_htmlPageIndex = 0;
 		m_engine->setPageSize(NULL, m_standardSize.width(), m_standardSize.height(), 1);
-		m_engine->SetViewTopMargin(60.f * 128.f / 112.f);
-		m_engine->SetViewBottomMargin(60.f * 128.f / 112.f);
+#if __APPLE__
+        float ratio = 1;
+#else
+        float ratio = 0.85;
+#endif
+		m_engine->SetViewTopMargin(60.f / ratio);
+		m_engine->SetViewBottomMargin(60.f / ratio);
 		m_engine->openHtml(this, m_htmlPath, "html_id_key");
 	}
 }
