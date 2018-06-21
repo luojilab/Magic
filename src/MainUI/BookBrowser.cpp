@@ -1722,6 +1722,20 @@ Resource *BookBrowser::GetResourceByIndex(QModelIndex index) const
 
 void BookBrowser::AddCopyrightPage()
 {
+    QString fileNameWithoutSuffix_lower = "copyright";
+    QString copyrightFileName = "Copyright.xhtml";
+    QList<HTMLResource *> htmls = m_Book->GetHTMLResources();
+    bool haveSameName = false;
+    for( HTMLResource *html : htmls ) {
+        haveSameName = html->Filename().toLower().startsWith(fileNameWithoutSuffix_lower);
+        if (haveSameName) {
+            break;
+        }
+    }
+    if (haveSameName) {
+        Utility::DisplayStdWarningDialog("有重复的版权文件，请删除原有版权文件");
+        return;
+    }
     Resource *current_resource = GetCurrentResource();
     HTMLResource *current_html_resource = qobject_cast<HTMLResource *>(current_resource);
     HTMLResource *new_html_resource = m_Book->CreateCopyrightHtmlFile(current_html_resource);
@@ -1736,5 +1750,5 @@ void BookBrowser::AddCopyrightPage()
     Refresh();
     
     // rename
-    m_OPFModel->RenameResource(new_html_resource, "Copyright.xhtml");
+    m_OPFModel->RenameResource(new_html_resource, copyrightFileName);
 }
