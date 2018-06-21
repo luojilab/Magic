@@ -100,15 +100,6 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
 {
-//    event->accept();
-//    if (event->size() == event->oldSize()) {
-//        return;
-//    }
-//    float ratio = m_defaultSize.width() / float(m_defaultSize.height());
-//    resize(event->size().width(), int(event->size().width() / ratio));
-//    if (m_TOCView) {
-//        m_TOCView->resize(event->size().width() / 2, int(event->size().width() / ratio));
-//    }
 }
 
 void PreviewEPUBWindow::closeEvent(QCloseEvent *event) 

@@ -50,7 +50,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -369,7 +369,6 @@
     <addaction name="separator"/>
     <addaction name="menuPreview"/>
     <addaction name="menu"/>
-    <addaction name="actionContents_List"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
     <property name="title">
@@ -403,6 +402,7 @@
    <addaction name="actionOpen"/>
    <addaction name="actionAddExistingFile"/>
    <addaction name="actionSave"/>
+   <addaction name="actionAddCopyrightPage"/>
   </widget>
   <widget class="QToolBar" name="toolBarTextManip">
    <property name="windowTitle">
@@ -574,6 +574,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionXiaomiQuick"/>
+   <addaction name="actionPreviewForIphone6PQuick"/>
    <addaction name="actionCasingLowercase"/>
    <addaction name="actionCasingUppercase"/>
    <addaction name="actionCasingTitlecase"/>
@@ -2447,6 +2449,21 @@
   <action name="actionNight">
    <property name="text">
     <string>夜间模式</string>
+   </property>
+  </action>
+  <action name="actionAddCopyrightPage">
+   <property name="text">
+    <string>添加版权页</string>
+   </property>
+  </action>
+  <action name="actionPreviewForIphone6PQuick">
+   <property name="text">
+    <string>iPhone6P预览</string>
+   </property>
+  </action>
+  <action name="actionXiaomiQuick">
+   <property name="text">
+    <string>小米预览</string>
    </property>
   </action>
  </widget>

@@ -4140,11 +4140,6 @@ void MainWindow::UpdateUiWithCurrentFile(const QString &fullfilepath)
             mainWin->UpdateRecentFileActions();
         }
     }
-	if (this->previewer &&
-		this->previewer->isVisible() && 
-		!m_CurrentFilePath.isEmpty() ) {
-		this->previewer->updateEngine("c:/", m_CurrentFilePath.toStdString());
-	}
 }
 
 
@@ -4970,6 +4965,8 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(ui.actionIPhoneX_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphoneX()));
 	connect(ui.actionXiaoMi_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForXiaoMi()));
 	connect(ui.actionIPad_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIpad()));
+    connect(ui.actionPreviewForIphone6PQuick, SIGNAL(triggered()), this, SLOT(previewForIphone6P()));
+    connect(ui.actionXiaomiQuick, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
     // Change case
     connect(ui.actionCasingLowercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
     connect(ui.actionCasingUppercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
@@ -5116,7 +5113,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(pdb, SIGNAL(plugins_changed()), this, SLOT(loadPluginsMenu()));
 
 	// File Saved
-	connect(this, SIGNAL(FileSaved(bool)), this, SLOT(fileSavedSuccessAction()));
+    connect(this, SIGNAL(FileSaved(bool)), this, SLOT(fileSavedSuccessAction()));
 
 	// timer
 	m_contentChangedTimer->setInterval(500);

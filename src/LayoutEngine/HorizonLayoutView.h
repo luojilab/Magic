@@ -29,5 +29,7 @@ private:
     QList<QWidget *>m_widgets;
     QSize m_mainWidgetSize;
     int m_subWidgetMiniWidth;
+    
+    void reLayoutWidgets();
 };
 #endif /* HorizonLayoutView_hpp */
