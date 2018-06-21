@@ -1719,3 +1719,22 @@ Resource *BookBrowser::GetResourceByIndex(QModelIndex index) const
     const QString &identifier = item->data().toString();
     return m_Book->GetFolderKeeper()->GetResourceByIdentifier(identifier);
 }
+
+void BookBrowser::AddCopyrightPage()
+{
+    Resource *current_resource = GetCurrentResource();
+    HTMLResource *current_html_resource = qobject_cast<HTMLResource *>(current_resource);
+    HTMLResource *new_html_resource = m_Book->CreateCopyrightHtmlFile(current_html_resource);
+    
+    if (current_resource != NULL) {
+        m_Book->MoveResourceAfter(new_html_resource, current_html_resource);
+    }
+    
+    // Open the new file in a tab
+    emit ResourceActivated(new_html_resource);
+    emit BookContentModified();
+    Refresh();
+    
+    // rename
+    m_OPFModel->RenameResource(new_html_resource, "Copyright.xhtml");
+}

@@ -164,6 +164,7 @@ public:
      */
     HTMLResource *CreateEmptyHTMLFile(HTMLResource *resource);
 
+    HTMLResource* CreateCopyrightHtmlFile(HTMLResource *resource);
     /**
      * Creates a new CSSResource file with no stored data.
      * The file on disk is empty.

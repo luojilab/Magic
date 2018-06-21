@@ -4283,7 +4283,7 @@ void MainWindow::layout(PreviewPhoneType type) {
         return;
     }
 	if ( !this->Save() ) {
-        QMessageBox::information(this, "", "保存失败，清保存之后再打开");
+        QMessageBox::information(this, "", "保存失败，请保存之后再打开");
 		return;
 	}
 #ifdef __APPLE__
@@ -4334,7 +4334,7 @@ void MainWindow::layout(PreviewPhoneType type) {
     m_previewerToEpubContainer->setMinimumSize(QSize(width + tocMinWidth, height));
     m_previewerToEpubContainer->setMaximumSize(QSize(width * 2, height));
     //update content
-	this->previewer->updateEngine("", m_CurrentFilePath.toStdString(), QSize(width, height));
+    this->previewer->updateEngine("", m_CurrentFilePath.toStdString(), QSize(width, height));
 	this->m_previewEPUBDock->show();
 	this->previewer->setFocus();
 }
@@ -4907,6 +4907,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionSaveACopy,     SIGNAL(triggered()), this, SLOT(SaveACopy()));
     connect(ui.actionClose,         SIGNAL(triggered()), this, SLOT(close()));
     connect(ui.actionExit,          SIGNAL(triggered()), this, SLOT(Exit()));
+    connect(ui.actionAddCopyrightPage, SIGNAL(triggered()), m_BookBrowser, SLOT(AddCopyrightPage()));
     // Edit
     connect(ui.actionInsertFile,     SIGNAL(triggered()), this, SLOT(InsertFileDialog()));
     connect(ui.actionInsertSpecialCharacter, SIGNAL(triggered()), this, SLOT(InsertSpecialCharacter()));

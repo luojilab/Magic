@@ -225,6 +225,51 @@ const QString HTML5_COVER_SOURCE =
     "</body>\n"
     "</html>\n";
 
+const QString HTML_COPYRIGHT_TEMPLATE =
+    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\
+  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n\n\
+<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\
+<head>\n\
+        <title></title>\n\
+        <style type=\"text/css\">\n\
+            h1.bqbt2 {\n\
+                font-size:1.38em;\n\
+                margin:3em 0 0em 0;\n\
+                letter-spacing:1px;\n\
+                text-align:center;\n\
+            }\n\
+            p.yingwen2{\n\
+                line-height: 1;\n\
+                margin:0px 0 23px 0 !important;\n\
+                color:#b2b2b2;\n\
+                font-size:.6em;\n\
+                font-weight:bold;\n\
+                letter-spacing:6px;\n\
+                text-align:center;\n\
+                padding-left:3px;\n\
+            }\n\
+            p.banquan2{\n\
+                line-height:1.84;\n\
+                margin:15px 10px 0 10px;\n\
+                letter-spacing:.5px;\n\
+                font-size:1em;\n\
+            }\n\
+        </style>\n\
+    </head>\n\
+    <body>\n\
+        <h1 class=\"bqbt2\">版权信息</h1>\n\
+        <p class=\"yingwen2\">COPYRIGHT</p>\n\
+        <p class=\"banquan2\">书名：XXX\n\
+        <br/>作者：XXX\n\
+        <br/>出版社：XXX\n\
+        <br/>出版时间：xxxx年x月\n\
+        <br/>ISBN：xxx\n\
+        <br/>本书由XXXX授权得到APP电子版制作与发行\n\
+        <br/>版权所有·侵权必究</p>\n\
+</body>\n\
+</html>";
+
 Book::Book()
     :
     m_Mainfolder(new FolderKeeper(this)),
@@ -360,6 +405,12 @@ HTMLResource *Book::CreateEmptyHTMLFile()
     return html_resource;
 }
 
+HTMLResource* Book::CreateCopyrightHtmlFile(HTMLResource *resource)
+{
+    HTMLResource* html = CreateEmptyHTMLFile(resource);
+    html->SetText(HTML_COPYRIGHT_TEMPLATE);
+    return html;
+}
 
 HTMLResource *Book::CreateEmptyNavFile(bool update_opf)
 {
@@ -431,7 +482,6 @@ HTMLResource *Book::CreateEmptyHTMLFile(HTMLResource *resource)
     SetModified(true);
     return new_resource;
 }
-
 
 void Book::MoveResourceAfter(HTMLResource *from_resource, HTMLResource *to_resource)
 {
