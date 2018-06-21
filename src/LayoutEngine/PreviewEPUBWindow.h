@@ -71,11 +71,13 @@ private slots:
 	void canDraw();
 	void closed();
 	void GoToHtml();
+    void showError(const QString&);
 
 signals:
 	void canDrawSignal();
 	void bookContentReady();
 	void gotoHtmlSourceCode(const std::string& htmlName, size_t offsite);
+    void showErrorDialog(const QString&);
 
 protected:
 	void keyPressEvent(QKeyEvent *);

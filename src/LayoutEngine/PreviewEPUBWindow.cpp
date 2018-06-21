@@ -17,7 +17,8 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	m_bookModel(NULL),
 	m_defaultSize(defaultSize),
 	m_bookContents(NULL),
-	m_bookItems(std::vector<QStandardItem *>()) {
+	m_bookItems(std::vector<QStandardItem *>())
+{
 	this->engine->delegate = dynamic_cast<LayoutEngineDelegate *>(this);
 #if __APPLE__
         float ratio = 1;
@@ -27,6 +28,7 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	this->engine->SetViewTopMargin(60.f / ratio);
 	this->engine->SetViewBottomMargin(60.f / ratio);
 	this->setFocusPolicy(Qt::ClickFocus);
+    connect(this, SIGNAL(showErrorDialog(const QString&)), this, SLOT(showError(const QString&)));
 }
 
 PreviewEPUBWindow::~PreviewEPUBWindow()
@@ -129,7 +131,7 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
 				this->engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
 			}
 			this->epubPath = epubPath;
-			this->engine->openEpub(this, this->epubPath, "/", "\n");
+			this->engine->openEpub(this, this->epubPath, "", "");
 		} else {
 			this->engine->closeEpub(this->m_bookModel);
 		}
@@ -172,7 +174,7 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 void PreviewEPUBWindow::engineInitFinish() {
 	if ( this->engine->EngineIsReady() && this->epubPath.length() ) {
 		this->engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
-		this->engine->openEpub(this, this->epubPath, "/", "\n");
+		this->engine->openEpub(this, this->epubPath, "", "");
 	}
 }
 
@@ -190,7 +192,7 @@ void PreviewEPUBWindow::engineOpenBook(BookReader * bookModel, QList<BookContent
 	}
 	else {
 		this->m_bookModel = NULL;
-		QMessageBox::information(this, "Opne Epub failed", "Fail open", QMessageBox::Ok);
+        emit showErrorDialog("Opne Epub failed");
 	}
 }
 
@@ -346,4 +348,9 @@ void PreviewEPUBWindow::changeBGColor(int color, bool isNightMode)
 	}
 	QString prefix = "background-color:";
 	setStyleSheet(prefix + QString(m_supportBGColor[color].c_str()));
+}
+
+void PreviewEPUBWindow::showError(const QString& error)
+{
+    QMessageBox::information(this, "", error, QMessageBox::Ok);
 }
