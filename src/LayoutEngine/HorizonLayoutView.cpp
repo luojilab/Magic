@@ -44,6 +44,11 @@ void HorizonLayoutView::addWidgets(QList<QWidget *>ws)
     }
 }
 
+QSize HorizonLayoutView::sizeHint()
+{
+    return m_mainWidgetSize * 2;
+}
+
 void HorizonLayoutView::setDefaultMainSize(QSize size)
 {
     m_mainWidgetSize = size;

@@ -23,6 +23,7 @@ public:
     
 protected:
     void resizeEvent(QResizeEvent *);
+    QSize sizeHint();
     
 private:
     QList<QWidget *>m_widgets;

@@ -187,7 +187,6 @@ void PreviewEPUBWindow::engineOpenBook(BookReader * bookModel, QList<BookContent
 		m_bookModel->GetTextReader()->SetIsNightTime(m_isNightMode);
 		generateContentsModel();
 		canDraw();
-		QApplication::restoreOverrideCursor();
 	}
 	else {
 		this->m_bookModel = NULL;
@@ -220,8 +219,8 @@ void PreviewEPUBWindow::enginUpdateAllViewPage()
 	while (pic == nullptr) {
 		this->pic = this->engine->paintDisplayImageByOffset(m_bookModel, 0);
 	}
+    QApplication::restoreOverrideCursor();
 	update();
-	QApplication::restoreOverrideCursor();
 }
 
 void PreviewEPUBWindow::engineUpdateVisibleViewPage(EngineHighlightInfo * info)
