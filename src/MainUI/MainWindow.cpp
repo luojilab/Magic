@@ -4965,7 +4965,7 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(ui.actionIPhoneX_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphoneX()));
 	connect(ui.actionXiaoMi_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForXiaoMi()));
 	connect(ui.actionIPad_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIpad()));
-    connect(ui.actionPreviewForIphone6PQuick, SIGNAL(triggered()), this, SLOT(previewForIphone6P()));
+    connect(ui.actionPreviewForIphoneXQuick, SIGNAL(triggered()), this, SLOT(previewForIphoneX()));
     connect(ui.actionXiaomiQuick, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
     // Change case
     connect(ui.actionCasingLowercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));

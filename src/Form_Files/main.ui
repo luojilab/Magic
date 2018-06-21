@@ -575,7 +575,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionXiaomiQuick"/>
-   <addaction name="actionPreviewForIphone6PQuick"/>
+   <addaction name="actionPreviewForIphoneXQuick"/>
    <addaction name="actionCasingLowercase"/>
    <addaction name="actionCasingUppercase"/>
    <addaction name="actionCasingTitlecase"/>
@@ -2456,9 +2456,12 @@
     <string>添加版权页</string>
    </property>
   </action>
-  <action name="actionPreviewForIphone6PQuick">
+  <action name="actionPreviewForIphoneXQuick">
    <property name="text">
-    <string>iPhone6P预览</string>
+    <string>iPhoneX预览</string>
+   </property>
+   <property name="toolTip">
+    <string>iPhoneX预览</string>
    </property>
   </action>
   <action name="actionXiaomiQuick">
