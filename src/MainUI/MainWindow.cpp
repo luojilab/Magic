@@ -4274,11 +4274,11 @@ void MainWindow::PlatformSpecificTweaks()
 
 void MainWindow::layout(PreviewPhoneType type) {
     if (this->previewer && this->previewer->isVisible()) {
-        QMessageBox::information(this, "", "请先关闭当前预览窗口", QMessageBox::Ok);
+        QMessageBox::information(this, "", u8"请先关闭当前预览窗口", QMessageBox::Ok);
         return;
     }
 	if ( !this->Save() ) {
-        QMessageBox::information(this, "", "保存失败，请保存之后再打开");
+        QMessageBox::information(this, "", u8"保存失败，请保存之后再打开");
 		return;
 	}
 #ifdef __APPLE__
@@ -5288,27 +5288,27 @@ void MainWindow::BreakTabConnections(ContentTab *tab)
 void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 {
     if ( m_previewerToHTML && m_previewerToHTML->isVisible() ) {
-        QMessageBox::information(this, "", "请先关闭当前预览窗口", QMessageBox::Ok);
+        QMessageBox::information(this, "", u8"请先关闭当前预览窗口", QMessageBox::Ok);
         return;
     }
 	if (type == Unknown) {
-		QMessageBox::information(this, "", "未知的展示类型", QMessageBox::Ok);
+		QMessageBox::information(this, "", u8"未知的展示类型", QMessageBox::Ok);
 		return;
 	}
 	ContentTab *tab = m_TabManager->GetCurrentContentTab();
 	QString QfullPath = "";
 	if (!tab) {
-		QMessageBox::information(this, "", "没有打开一个html文件", QMessageBox::Ok);
+		QMessageBox::information(this, "", u8"没有打开一个html文件", QMessageBox::Ok);
 		return;
 	}
 	Resource* res = tab->GetLoadedResource();
 	if ( !res || res->Type() != Resource::HTMLResourceType ) {
-		QMessageBox::information(this, "", "不支持实时预览的资源文件", QMessageBox::Ok);
+		QMessageBox::information(this, "", u8"不支持实时预览的资源文件", QMessageBox::Ok);
 		return;
 	}
 	QfullPath = res->GetFullPath();
 	if (QfullPath.isEmpty()) {
-		QMessageBox::information(this, "", "资源文件路径为空，请先保存", QMessageBox::Ok);
+		QMessageBox::information(this, "", u8"资源文件路径为空，请先保存", QMessageBox::Ok);
 		return;
 	}
 	QSize d_size = m_previewPhoneSizeMap[type];
