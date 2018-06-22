@@ -4903,6 +4903,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionClose,         SIGNAL(triggered()), this, SLOT(close()));
     connect(ui.actionExit,          SIGNAL(triggered()), this, SLOT(Exit()));
     connect(ui.actionAddCopyrightPage, SIGNAL(triggered()), m_BookBrowser, SLOT(AddCopyrightPage()));
+    connect(ui.actionAddFullScreenPage, SIGNAL(triggered()), m_BookBrowser, SLOT(AddFullScreenPage()));
     // Edit
     connect(ui.actionInsertFile,     SIGNAL(triggered()), this, SLOT(InsertFileDialog()));
     connect(ui.actionInsertSpecialCharacter, SIGNAL(triggered()), this, SLOT(InsertSpecialCharacter()));

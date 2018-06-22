@@ -32,7 +32,9 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
 PreviewHTMLWindow::~PreviewHTMLWindow()
 {
 	cleanResource();
+#ifdef WIN32
 	m_engine->ReleaseLayoutEngine();
+#endif
 	delete m_engine;
 }
 

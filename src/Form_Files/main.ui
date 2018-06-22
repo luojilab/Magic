@@ -403,6 +403,7 @@
    <addaction name="actionAddExistingFile"/>
    <addaction name="actionSave"/>
    <addaction name="actionAddCopyrightPage"/>
+   <addaction name="actionAddFullScreenPage"/>
   </widget>
   <widget class="QToolBar" name="toolBarTextManip">
    <property name="windowTitle">
@@ -2426,11 +2427,6 @@
     <string>iPad实时预览</string>
    </property>
   </action>
-  <action name="actionContents_List">
-   <property name="text">
-    <string>全书目录</string>
-   </property>
-  </action>
   <action name="actionYellow">
    <property name="text">
     <string>黄色</string>
@@ -2467,6 +2463,11 @@
   <action name="actionXiaomiQuick">
    <property name="text">
     <string>小米预览</string>
+   </property>
+  </action>
+  <action name="actionAddFullScreenPage">
+   <property name="text">
+    <string>添加全屏页</string>
    </property>
   </action>
  </widget>

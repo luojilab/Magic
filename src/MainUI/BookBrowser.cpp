@@ -27,6 +27,7 @@
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QProgressDialog>
 #include <QtWidgets/QScrollBar>
+#include <QtCore/QStringList>
 
 #include "BookManipulation/Book.h"
 #include "BookManipulation/FolderKeeper.h"
@@ -55,6 +56,9 @@
 static const QString SETTINGS_GROUP = "bookbrowser";
 static const QString OPF_NCX_EDIT_WARNING_KEY = SETTINGS_GROUP + "-opfncx-warning";
 static const int COLUMN_INDENTATION = 10;
+const QString FULL_SCREEN_PAGE_NAME = "cover";
+const QString COPYRIGHT_PAEG_NAME = "Copyright";
+const QString XHTML_FILE_FORMAT = ".xhtml";
 
 BookBrowser::BookBrowser(QWidget *parent)
     :
@@ -1722,18 +1726,9 @@ Resource *BookBrowser::GetResourceByIndex(QModelIndex index) const
 
 void BookBrowser::AddCopyrightPage()
 {
-    QString fileNameWithoutSuffix_lower = "copyright";
-    QString copyrightFileName = "Copyright.xhtml";
-    QList<HTMLResource *> htmls = m_Book->GetHTMLResources();
-    bool haveSameName = false;
-    for( HTMLResource *html : htmls ) {
-        haveSameName = html->Filename().toLower().startsWith(fileNameWithoutSuffix_lower);
-        if (haveSameName) {
-            break;
-        }
-    }
-    if (haveSameName) {
-        Utility::DisplayStdWarningDialog("有重复的版权文件，请删除原有版权文件");
+    QString copyrightFileName = COPYRIGHT_PAEG_NAME + ".xhtml";
+    if (fileExits(COPYRIGHT_PAEG_NAME)) {
+        Utility::DisplayStdWarningDialog(u8"有重复的版权文件，请删除原有版权文件");
         return;
     }
     Resource *current_resource = GetCurrentResource();
@@ -1751,4 +1746,54 @@ void BookBrowser::AddCopyrightPage()
     
     // rename
     m_OPFModel->RenameResource(new_html_resource, copyrightFileName);
+}
+
+void BookBrowser::AddFullScreenPage()
+{
+    if (fileExits("cover")) {
+        Utility::DisplayStdWarningDialog(u8"有重复的全屏页，请删除原有全屏页文件");
+        return;
+    }
+    bool allowMultyMedia = false;
+    bool allowImage = true;
+    QStringList files = AddExisting(allowMultyMedia,allowImage);
+    if (files.isEmpty()) {
+        return;
+    }
+#ifdef WIN32
+    const QChar fileDelimiter = '\\';
+#else
+    const QChar fileDelimiter = '/';
+#endif
+    QString filePath = files[0];
+    QString fileName = filePath.right(filePath.length() - filePath.lastIndexOf(fileDelimiter) - 1);
+    Resource *current_resource = GetCurrentResource();
+    HTMLResource *current_html_resource = qobject_cast<HTMLResource *>(current_resource);
+    HTMLResource *new_html_resource = m_Book->CreateFullScreenHtmlFile(current_html_resource, "../Images/" + fileName);
+    
+    if (current_resource != NULL) {
+        m_Book->MoveResourceAfter(new_html_resource, current_html_resource);
+    }
+    
+    // Open the new file in a tab
+    emit ResourceActivated(new_html_resource);
+    emit BookContentModified();
+    Refresh();
+    
+    // rename
+    m_OPFModel->RenameResource(new_html_resource, FULL_SCREEN_PAGE_NAME + XHTML_FILE_FORMAT);
+}
+
+bool BookBrowser::fileExits(const QString& fileName)
+{
+    QString lowerName = fileName.toLower();
+    QList<HTMLResource *> htmls = m_Book->GetHTMLResources();
+    bool haveSameName = false;
+    for( HTMLResource *html : htmls ) {
+        haveSameName = html->Filename().toLower().startsWith(lowerName);
+        if (haveSameName) {
+            break;
+        }
+    }
+    return haveSameName;
 }

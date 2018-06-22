@@ -164,6 +164,7 @@ public slots:
     void CreateHTMLTOCCSSFile();
     void CreateIndexCSSFile();
     void AddCopyrightPage();
+    void AddFullScreenPage();
     
     /**
      * Implements the Add Existing context menu action functionality.
@@ -415,6 +416,7 @@ private:
     QList <Resource *> ValidSelectedResources(Resource::ResourceType resource_type);
 
     void RefreshCounts();
+    bool fileExits(const QString&);
 
 
     ///////////////////////////////

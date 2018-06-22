@@ -165,6 +165,7 @@ public:
     HTMLResource *CreateEmptyHTMLFile(HTMLResource *resource);
 
     HTMLResource* CreateCopyrightHtmlFile(HTMLResource *resource);
+    HTMLResource* CreateFullScreenHtmlFile(HTMLResource *resource, const QString&);
     /**
      * Creates a new CSSResource file with no stored data.
      * The file on disk is empty.

@@ -39,7 +39,6 @@ PreviewEPUBWindow::~PreviewEPUBWindow()
         engine->ReleaseLayoutEngine();
 #endif
         delete engine;
-        engine = NULL;
     }
 }
 

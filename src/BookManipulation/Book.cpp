@@ -226,7 +226,7 @@ const QString HTML5_COVER_SOURCE =
     "</html>\n";
 
 const QString HTML_COPYRIGHT_TEMPLATE =
-    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\
+    u8"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\
   \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n\n\
 <html xmlns=\"http://www.w3.org/1999/xhtml\">\n\
@@ -268,6 +268,15 @@ const QString HTML_COPYRIGHT_TEMPLATE =
         <br/>本书由XXXX授权得到APP电子版制作与发行\n\
         <br/>版权所有·侵权必究</p>\n\
 </body>\n\
+</html>";
+
+const static QString FULL_SCREEN_TEMPLATE =
+"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\
+\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n\n\
+<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\
+    <body style=\"background-image:url('%1');background-repeat:no-repeat;background-size: contain;background-position: center center;\">\
+    </body>\
 </html>";
 
 Book::Book()
@@ -409,6 +418,16 @@ HTMLResource* Book::CreateCopyrightHtmlFile(HTMLResource *resource)
 {
     HTMLResource* html = CreateEmptyHTMLFile(resource);
     html->SetText(HTML_COPYRIGHT_TEMPLATE);
+    return html;
+}
+
+HTMLResource* Book::CreateFullScreenHtmlFile(HTMLResource* resource, const QString& file)
+{
+    if (file.isEmpty()) {
+        return NULL;
+    }
+    HTMLResource* html = CreateEmptyHTMLFile(resource);
+    html->SetText(FULL_SCREEN_TEMPLATE.arg(file));
     return html;
 }
 
