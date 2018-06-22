@@ -1760,11 +1760,7 @@ void BookBrowser::AddFullScreenPage()
     if (files.isEmpty()) {
         return;
     }
-#ifdef WIN32
-    const QChar fileDelimiter = '\\';
-#else
     const QChar fileDelimiter = '/';
-#endif
     QString filePath = files[0];
     QString fileName = filePath.right(filePath.length() - filePath.lastIndexOf(fileDelimiter) - 1);
     Resource *current_resource = GetCurrentResource();
