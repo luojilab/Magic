@@ -11,90 +11,68 @@
 
 PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize):
 	QWidget(parent),
-	pic(nullptr),
-	epubPath(epubPath),
-    engine(new LayoutEngine),
+	m_epubPath(epubPath),
+    m_engine(new LayoutEngine),
 	m_bookModel(NULL),
 	m_defaultSize(defaultSize),
-	m_bookContents(NULL),
-	m_bookItems(std::vector<QStandardItem *>())
+	m_bookContents(NULL)
 {
-	this->engine->delegate = dynamic_cast<LayoutEngineDelegate *>(this);
+    m_engine->setDelegate(this);
 #if __APPLE__
         float ratio = 1;
 #else
         float ratio = 0.85;
 #endif
-	this->engine->SetViewTopMargin(60.f / ratio);
-	this->engine->SetViewBottomMargin(60.f / ratio);
-	this->setFocusPolicy(Qt::ClickFocus);
+	m_engine->SetViewTopMargin(60.f / ratio);
+	m_engine->SetViewBottomMargin(60.f / ratio);
+	setFocusPolicy(Qt::ClickFocus);
     connect(this, SIGNAL(showErrorDialog(const QString&)), this, SLOT(showError(const QString&)));
+    connect(this, SIGNAL(drawSignal()), this, SLOT(doDraw()));
 }
 
 PreviewEPUBWindow::~PreviewEPUBWindow()
 {
 	closed();
-    if (this->engine) {
-#ifdef WIN32
-        engine->ReleaseLayoutEngine();
-#endif
-        delete engine;
+    if (m_engine) {
+        delete m_engine;
     }
 }
 
-void PreviewEPUBWindow::canDraw() {
-	if (this->engine->EngineIsReady()) {
-		this->m_bookModel->GetTextReader()->GotoFirstPage();
-		while (this->pic == nullptr) {
-			this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
-		}
-		this->update();
-	}
+void PreviewEPUBWindow::doDraw() {
+    m_bookModel->GetTextReader()->GotoFirstPage();
+    m_engine->updateAllView(m_bookModel);
 }
 
 void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
-	if (this->pic != nullptr) {
-		QPainter p(this);
-		if (p.isActive()) {
-			p.eraseRect(0, 0, width(), height());
-			p.drawImage(QRect(0, 0, width(), height()), this->pic->scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-			p.end();
-		} else {
-			printf("painter isn't actived");
-		}
-	}
+    m_engine->paintImageByOffset(this, m_bookModel, 0);
 }
 
 void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
-	switch (event->key())
-	{
+    if ( !isVisible() ) {
+        return;
+    }
+	switch (event->key()) {
 	case Qt::Key_Right: {
-		this->m_bookModel->GetTextReader()->GotoNextPage();
+		m_bookModel->GetTextReader()->GotoNextPage();
 		break;
 	}
 	case Qt::Key_Left: {
-		this->m_bookModel->GetTextReader()->GotoPreviousPage();
+		m_bookModel->GetTextReader()->GotoPreviousPage();
 		break;
 	}
 	case Qt::Key_PageUp: {
-		this->m_bookModel->GetTextReader()->GotoPreviousChapter();
+		m_bookModel->GetTextReader()->GotoPreviousChapter();
 		break;
 	}
 	case Qt::Key_PageDown: {
-		this->m_bookModel->GetTextReader()->GotoNextChapter();
+		m_bookModel->GetTextReader()->GotoNextChapter();
 		break;
 	}
 	default:
 		return;
 	}
-	if (this->isVisible()) {
-		this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
-		while (this->pic == nullptr)
-		{
-			this->pic = this->engine->paintDisplayImageByOffset(this->m_bookModel, 0);
-		}
-		this->update();
-	}
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    m_engine->updateAllView(m_bookModel);
 }
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
@@ -106,24 +84,23 @@ void PreviewEPUBWindow::closeEvent(QCloseEvent *event)
 	closed();
 }
 
+// TODO close book
 void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::string & epubPath, const QSize& defaultSize)
 {
-	if ( !this->engine->EngineIsReady() ) {
-		this->engine->InitLayoutEngine(bundlePath);
-		this->epubPath = epubPath;
+    if ( !m_engine->isEngineReady() ) {
+        m_engine->initLayoutEngine(bundlePath);
+		m_epubPath = epubPath;
 	} else {
-		if (epubPath.length()) {
-			if (this->m_bookModel != NULL) {
-				this->engine->closeEpub(this->m_bookModel);
-			}
+        if (m_bookModel != NULL) {
+            m_engine->closeEpub(m_bookModel);
+        }
+        if (epubPath.length()) {
 			if (defaultSize != m_defaultSize) {
 				m_defaultSize = defaultSize;
-				this->engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
+				m_engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
 			}
-			this->epubPath = epubPath;
-			this->engine->openEpub(this, this->epubPath, "", "");
-		} else {
-			this->engine->closeEpub(this->m_bookModel);
+			m_epubPath = epubPath;
+			m_engine->openEpub(this, m_epubPath, "", "");
 		}
 	}
 }
@@ -131,59 +108,52 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
 void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 {
 	if (!m_bookContents) { return; }
-	if (!this->isVisible()) { return; }
+	if (!isVisible()) { return; }
 	QStandardItem *selectItem = static_cast<QStandardItem *>(index.internalPointer());
 	int idx{-1};
 	std::vector<QStandardItem *>::iterator it = m_bookItems.begin();
 	// get click index
-	if (index.parent().isValid()) {
-		// only have level0 content item
-		while (it != m_bookItems.end()) {
-			++idx;
-			if (selectItem == *it++) {
-				break;
-			}
-		}
-		idx += index.row() + 1;
+	if ( !index.parent().isValid() ) {
+        idx = index.row();
 	} else {
-		idx = index.row();
+        // only have level0 content item
+        while (it != m_bookItems.end()) {
+            ++idx;
+            if (selectItem == *it++) {
+                break;
+            }
+        }
+        idx += index.row() + 1;
 	}
-	QList<BookContents *>items = this->engine->getContentList(m_bookModel);
+    QList<std::shared_ptr<BookContents>>items = m_engine->getContentList(m_bookModel);
 	if (idx == -1 || idx > items.count()) { return; }
 	// goto chapter
 	QApplication::setOverrideCursor(Qt::WaitCursor);
-	engine->gotoChapterByFileName(m_bookModel, items[idx]->ContentHRef);
-	engine->updateAllView(m_bookModel);
-	// clean resource
-    for (BookContents* item : items) {
-		delete item;
-	}
-	items.clear();
+	m_engine->gotoChapterByFileName(m_bookModel, items[idx]->ContentHRef);
+	m_engine->updateAllView(m_bookModel);
 }
 
 void PreviewEPUBWindow::engineInitFinish() {
-	if ( this->engine->EngineIsReady() && this->epubPath.length() ) {
-		this->engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
-		this->engine->openEpub(this, this->epubPath, "", "");
+    if ( m_engine->isEngineReady() && !m_epubPath.empty() ) {
+		m_engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
+        m_engine->openEpub(this, m_epubPath, "", "");
 	}
 }
 
-void PreviewEPUBWindow::engineOpenBook(BookReader * bookModel, QList<BookContents*> list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error)
+void PreviewEPUBWindow::engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error)
 {
-	if (error == OPEN_EPUB_SUCCESS) {
-		if (m_bookModel) {
-			closed();
-		}
-		this->m_bookModel = bookModel;
-		this->engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
-		m_bookModel->GetTextReader()->SetIsNightTime(m_isNightMode);
-		generateContentsModel();
-		canDraw();
-	}
-	else {
-		this->m_bookModel = NULL;
+	if (error != 0) {
         emit showErrorDialog("Opne Epub failed");
+        return;
 	}
+    if (m_bookModel) {
+        closed();
+    }
+    m_bookModel = bookModel;
+    m_engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
+    m_bookModel->GetTextReader()->SetIsNightTime(m_isNightMode);
+    generateContentsModel();
+    emit drawSignal();
 }
 
 void PreviewEPUBWindow::mousePressEvent(QMouseEvent *event) {
@@ -207,10 +177,6 @@ void PreviewEPUBWindow::engineUpdateTotalCount(const qint32 & totolPageCount)
 
 void PreviewEPUBWindow::enginUpdateAllViewPage()
 {
-	this->pic = this->engine->paintDisplayImageByOffset(m_bookModel, 0);
-	while (pic == nullptr) {
-		this->pic = this->engine->paintDisplayImageByOffset(m_bookModel, 0);
-	}
     QApplication::restoreOverrideCursor();
 	update();
 }
@@ -250,7 +216,9 @@ void PreviewEPUBWindow::htmlImageRenderFinish(BookChapter *html, std::shared_ptr
 
 void PreviewEPUBWindow::generateContentsModel()
 {
-	if (!m_bookModel) { return; }
+	if (!m_bookModel) {
+        return;
+    }
 
 	if (m_bookContents) {
 		delete m_bookContents;
@@ -261,14 +229,11 @@ void PreviewEPUBWindow::generateContentsModel()
 	QStandardItemModel *model = new QStandardItemModel();
 	QStandardItem *lastItem = NULL;
 	int lastLevel = 0;
-	model->setHorizontalHeaderLabels(QStringList() << "");
-	QList<BookContents *> contents = this->engine->getContentList(m_bookModel);
-	for (BookContents *item : contents) {
+    QList<std::shared_ptr<BookContents>> contents = m_engine->getContentList(m_bookModel);
+	for (std::shared_ptr<BookContents>item : contents) {
 		int level		= item->level;
 		QString text	= item->text;
-		// clean resource
-		delete item;
-
+        
 		int diff = level - lastLevel;
 		Q_ASSERT(diff < 2);
 
@@ -298,15 +263,13 @@ void PreviewEPUBWindow::generateContentsModel()
 		}
 	}
 	m_bookContents = model;
-	contents.clear();
 	emit bookContentReady();
 }
 
 void PreviewEPUBWindow::closed()
 {
 	if (m_bookModel) {
-		this->engine->closeEpub(m_bookModel);
-		this->pic = NULL;
+		m_engine->closeEpub(m_bookModel);
 		m_bookModel = NULL;
 		delete m_bookContents;
 		m_bookContents = NULL;
@@ -332,9 +295,8 @@ void PreviewEPUBWindow::changeBGColor(int color, bool isNightMode)
 	if (isNightMode != m_isNightMode) {
         m_isNightMode = isNightMode;
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        engine->setIsNightMode(isNightMode);
-        engine->repaint(m_bookModel);
-        this->pic = NULL;
+        m_engine->setIsNightMode(isNightMode);
+        m_engine->repaint(m_bookModel);
 	}
 	QString prefix = "background-color:";
 	setStyleSheet(prefix + QString(m_supportBGColor[color].c_str()));
