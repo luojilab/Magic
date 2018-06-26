@@ -7,7 +7,7 @@
 
 class QStandardItemModel;
 class QStandardItem;
-class BookViewManager;
+class BookViewCore;
 
 class PreviewEPUBWindow : public QWidget, public LayoutEngineDelegate {
 
@@ -42,7 +42,7 @@ private:
 	QSize m_defaultSize;
 	QStandardItemModel *m_bookContents;
 	std::vector<QStandardItem *>m_bookItems;
-    BookViewManager *m_viewManager{ NULL };
+    BookViewCore *m_viewCore{ NULL };
 	std::map<int, std::string> m_supportBGColor {
 		{ 0,"rgb(255,255,255)" },
 		{ 1,"rgb(244,240,221)" },
@@ -63,10 +63,8 @@ private slots:
     void showError(const QString&);
 
 signals:
-	void drawSignal();
 	void bookContentReady();
 	void gotoHtmlSourceCode(const std::string& htmlName, size_t offsite);
-    void showErrorDialog(const QString&);
 
 protected:
     void paintEvent(QPaintEvent *) override;

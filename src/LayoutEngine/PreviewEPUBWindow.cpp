@@ -8,7 +8,7 @@
 #include <QStandardItem>
 #include <QApplication>
 #include <QMenu>
-#include "BookViewManager.h"
+#include "BookViewCore.h"
 
 PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize):
 	QWidget(parent),
@@ -17,7 +17,7 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	m_bookModel(NULL),
 	m_defaultSize(defaultSize),
 	m_bookContents(NULL),
-    m_viewManager(new BookViewManager(this))
+    m_viewCore(new BookViewCore(this))
 {
     m_engine->setDelegate(this);
 #if __APPLE__
@@ -28,7 +28,7 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	m_engine->SetViewTopMargin(60.f / ratio);
 	m_engine->SetViewBottomMargin(60.f / ratio);
 	setFocusPolicy(Qt::ClickFocus);
-    m_viewManager->setUpdateViewCallback([this](){
+    m_viewCore->setUpdateViewCallback([this](){
         update();
     });
     connect(this, SIGNAL(showErrorDialog(const QString&)), this, SLOT(showError(const QString&)));
@@ -40,9 +40,11 @@ PreviewEPUBWindow::~PreviewEPUBWindow()
 	closed();
     if (m_engine) {
         delete m_engine;
+        m_engine = NULL;
     }
-    if (m_viewManager) {
-        delete m_viewManager;
+    if (m_viewCore) {
+        delete m_viewCore;
+        m_viewCore = NULL;
     }
 }
 
@@ -51,7 +53,7 @@ void PreviewEPUBWindow::doDraw() {
 }
 
 void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
-    m_viewManager->onDraw();
+    m_viewCore->onDraw();
     QApplication::restoreOverrideCursor();
 }
 
@@ -150,18 +152,18 @@ void PreviewEPUBWindow::engineInitFinish() {
 void PreviewEPUBWindow::engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error)
 {
 	if (error != 0) {
-        emit showErrorDialog("Opne Epub failed");
+        showError("Opne Epub failed");
         return;
 	}
     if (m_bookModel) {
         closed();
     }
     m_bookModel = bookModel;
-    m_viewManager->setBookReader(bookModel);
+    m_viewCore->setBookReader(bookModel);
     m_engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
     m_engine->setIsNightMode(m_isNightMode);
     generateContentsModel();
-    emit drawSignal();
+    doDraw();
 }
 
 void PreviewEPUBWindow::mousePressEvent(QMouseEvent *event) {
