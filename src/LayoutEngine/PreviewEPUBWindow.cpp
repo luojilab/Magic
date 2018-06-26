@@ -8,6 +8,7 @@
 #include <QStandardItem>
 #include <QApplication>
 #include <QMenu>
+#include "BookViewManager.h"
 
 PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize):
 	QWidget(parent),
@@ -15,7 +16,8 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
     m_engine(new LayoutEngine),
 	m_bookModel(NULL),
 	m_defaultSize(defaultSize),
-	m_bookContents(NULL)
+	m_bookContents(NULL),
+    m_viewManager(new BookViewManager(this))
 {
     m_engine->setDelegate(this);
 #if __APPLE__
@@ -26,6 +28,9 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	m_engine->SetViewTopMargin(60.f / ratio);
 	m_engine->SetViewBottomMargin(60.f / ratio);
 	setFocusPolicy(Qt::ClickFocus);
+    m_viewManager->setUpdateViewCallback([this](){
+        update();
+    });
     connect(this, SIGNAL(showErrorDialog(const QString&)), this, SLOT(showError(const QString&)));
     connect(this, SIGNAL(drawSignal()), this, SLOT(doDraw()));
 }
@@ -36,15 +41,18 @@ PreviewEPUBWindow::~PreviewEPUBWindow()
     if (m_engine) {
         delete m_engine;
     }
+    if (m_viewManager) {
+        delete m_viewManager;
+    }
 }
 
 void PreviewEPUBWindow::doDraw() {
-    m_bookModel->GetTextReader()->GotoFirstPage();
-    m_engine->updateAllView(m_bookModel);
+    m_engine->gotoFirstPage(m_bookModel);
 }
 
 void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
-    m_engine->paintImageByOffset(this, m_bookModel, 0);
+    m_viewManager->onDraw();
+    QApplication::restoreOverrideCursor();
 }
 
 void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
@@ -53,26 +61,25 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
     }
 	switch (event->key()) {
 	case Qt::Key_Right: {
-		m_bookModel->GetTextReader()->GotoNextPage();
+        m_engine->gotoNextPage(m_bookModel);
 		break;
 	}
 	case Qt::Key_Left: {
-		m_bookModel->GetTextReader()->GotoPreviousPage();
+        m_engine->gotoPreviousPage(m_bookModel);
 		break;
 	}
 	case Qt::Key_PageUp: {
-		m_bookModel->GetTextReader()->GotoPreviousChapter();
+        m_engine->gotoPreviousChapter(m_bookModel);
 		break;
 	}
 	case Qt::Key_PageDown: {
-		m_bookModel->GetTextReader()->GotoNextChapter();
+        m_engine->gotoNextChapter(m_bookModel);
 		break;
 	}
 	default:
 		return;
 	}
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    m_engine->updateAllView(m_bookModel);
 }
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
@@ -150,8 +157,9 @@ void PreviewEPUBWindow::engineOpenBook(BookReader* bookModel, QList<BookContents
         closed();
     }
     m_bookModel = bookModel;
+    m_viewManager->setBookReader(bookModel);
     m_engine->setPageSize(m_bookModel, m_defaultSize.width(), m_defaultSize.height(), 1);
-    m_bookModel->GetTextReader()->SetIsNightTime(m_isNightMode);
+    m_engine->setIsNightMode(m_isNightMode);
     generateContentsModel();
     emit drawSignal();
 }
@@ -278,9 +286,9 @@ void PreviewEPUBWindow::closed()
 
 void PreviewEPUBWindow::GoToHtml()
 {
-	int offset = m_bookModel->GetTextReader()->GetCurrentPageOffset();
-	std::string chapterId = m_bookModel->GetTextReader()->GetCurrentChapterId();
-	std::string name = m_bookModel->GetTextReader()->GetChapterFileNameById(chapterId);
+	int offset = m_engine->getCurrentPageOffset(m_bookModel);
+	std::string chapterId = m_engine->getCurrentChapterId(m_bookModel);
+	std::string name = m_engine->getChapterFileNameById(m_bookModel, chapterId);
 	emit gotoHtmlSourceCode(name, offset);
 }
 

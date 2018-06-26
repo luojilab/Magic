@@ -102,16 +102,22 @@ public:
     void closeEpub(BookReader *bookModel);
     void repaint(BookReader *bookModel);
     void setNightModeForBook(bool isNight);
-    // HTML utils
-    void openHtml(QWidget *view,const std::string& htmlPath, const std::string& uniqueKey);
-    void paintHtml(BookChapter *html, unsigned int pageIndex);
-    void closeHtml(BookChapter *html);
     void setIsNightMode(bool);
     void setDelegate(LayoutEngineDelegate *delegate);
     QList<std::shared_ptr<BookContents>>getContentList(BookReader *bookModel);
     void setFontScale(BookReader *bookModel, float scaleFactor);
-    // Paint
-    void paintImageByOffset(QWidget *view, BookReader *bookModel, qint32 offset);
+    void gotoFirstPage(BookReader* bookModel);
+    void gotoNextPage(BookReader *bookModel);
+    void gotoPreviousPage(BookReader *bookModel);
+    void gotoPreviousChapter(BookReader *bookModel);
+    void gotoNextChapter(BookReader *bookModel);
+    int getCurrentPageOffset(BookReader* bookModel);
+    std::string getCurrentChapterId(BookReader* bookModel);
+    std::string getChapterFileNameById(BookReader* bookModel, const std::string& charpterId);
+    // HTML utils
+    void openHtml(QWidget *view,const std::string& htmlPath, const std::string& uniqueKey);
+    void paintHtml(BookChapter *html, unsigned int pageIndex);
+    void closeHtml(BookChapter *html);
     
 private:
     void openEpubFailCallback(BookReader *, int e);

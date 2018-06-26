@@ -15,7 +15,7 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
 	m_htmlPageIndex(0),
 	m_standardSize(standardSize)
 {
-	m_engine->delegate = this;
+    m_engine->setDelegate(this);
 	m_innerHtmlPath = tempFilePath(htmlPath);
 	QFile f(htmlPath.c_str());
 	if (f.exists()) {
@@ -23,7 +23,7 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
 	}
 	// Must initial engine at last!
 	// in case the width and height value get wrong
-	m_engine->InitLayoutEngine("");
+    m_engine->initLayoutEngine("");
 	std::string bgPrefix("background-color:");
 	std::string bgColorStyle = bgPrefix + m_supportBGColor[0];
 	setStyleSheet(QString(bgColorStyle.c_str()));
@@ -32,14 +32,11 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
 PreviewHTMLWindow::~PreviewHTMLWindow()
 {
 	cleanResource();
-#ifdef WIN32
-	m_engine->ReleaseLayoutEngine();
-#endif
 	delete m_engine;
 }
 
 // engine epub delegate function
-void PreviewHTMLWindow::engineOpenBook(BookReader* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) {}
+void PreviewHTMLWindow::engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error) {}
 void PreviewHTMLWindow::engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset) {}
 void PreviewHTMLWindow::engineUpdateTotalCount(const qint32& totolPageCount) {}
 void PreviewHTMLWindow::enginUpdateAllViewPage() {}
@@ -52,8 +49,6 @@ QStringList PreviewHTMLWindow::engineNeedNoteData(const QString& charpterId) { r
 void PreviewHTMLWindow::enginePaintHighlightRect(const QRect& rect, const QColor& color) {}
 
 void PreviewHTMLWindow::engineInitFinish() {
-	int w = width();
-	int h = height();
 	m_engine->setPageSize(NULL, m_standardSize.width(), m_standardSize.height(), 1);
 #if __APPLE__
     float ratio = 1;
@@ -117,7 +112,9 @@ void PreviewHTMLWindow::resizeEvent(QResizeEvent *event)
 }
 // mouse click event
 void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event) {
-	if (!m_htmlModel) return;
+    if (!m_htmlModel) {
+        return;
+    }
 	if (event->button() == Qt::LeftButton) {
 		this->setFocus();
 	} else if (event->button() == Qt::RightButton) {
@@ -175,8 +172,8 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
 		QFile f(htmlPath.c_str());
 		m_htmlPath = htmlPath;
 		m_innerHtmlPath = tempFilePath(m_htmlPath);
-		if ( !QFile(tempFilePath(htmlPath).c_str()).exists() ) {
-		f.copy(tempFilePath(m_htmlPath).c_str());
+		if ( !QFile(tempFilePath(m_htmlPath).c_str()).exists() ) {
+            f.copy(tempFilePath(m_htmlPath).c_str());
 		}
 		m_htmlPageIndex = 0;
 		m_engine->setPageSize(NULL, m_standardSize.width(), m_standardSize.height(), 1);

@@ -19,7 +19,7 @@ public:
 
 protected:
 	virtual void engineInitFinish();
-	virtual void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
+	virtual void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error);
 	virtual void engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset);
 	virtual void engineUpdateTotalCount(const qint32& totolPageCount);
 	virtual void enginUpdateAllViewPage();
@@ -71,8 +71,10 @@ private:
 	bool m_isNightMode{ false };
 
 private:
+    // TODO inline impl
 	inline void safeSetRenderStatus(bool);
 	inline bool safeGetRenderStatus();
+    // TODO 高内聚
 	inline bool isRendering() { return safeGetRenderStatus(); };
 	inline void setHtmlModel(BookChapter *);
 	inline BookChapter* getHtmlModel();

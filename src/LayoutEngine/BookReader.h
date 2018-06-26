@@ -2,6 +2,7 @@
 #define BookReader_DEF
 #include <QWidget>
 #include <functional>
+#include "BookChapter.h"
 typedef QWidget* PlatformWidget;
 namespace future_core {
 	// forward class
@@ -33,6 +34,7 @@ namespace future_core {
 		const std::string &GetCurrentChapterId();
 		const std::string GetChapterNameById(std::string &chapterId);
 		const std::string GetChapterFileNameById(const std::string& chapterId);
+        void SetAllViewUpdateCallBack(std::function<void(void)> callBack);
 	};
 
 	/*
