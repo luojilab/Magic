@@ -35,18 +35,11 @@ PreviewHTMLWindow::~PreviewHTMLWindow()
 	delete m_engine;
 }
 
-// engine epub delegate function
+/*
+ * engine epub delegate function
+ */
 void PreviewHTMLWindow::engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error) {}
-void PreviewHTMLWindow::engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset) {}
-void PreviewHTMLWindow::engineUpdateTotalCount(const qint32& totolPageCount) {}
 void PreviewHTMLWindow::enginUpdateAllViewPage() {}
-void PreviewHTMLWindow::engineUpdateVisibleViewPage(EngineHighlightInfo* info){}
-void PreviewHTMLWindow::engineShowSelectionMenu(const qint32& x, const qint32& y, const qint32& x2, const qint32& y2){}
-void PreviewHTMLWindow::engineOpenUrl(QString urlString){}
-void PreviewHTMLWindow::engineClickImage(QImage* image, const qint32& originX, const qint32& originY, const qint32& width, const qint32& height){}
-QList<BookUnderlineData *> PreviewHTMLWindow::engineNeedUnderlineData(const QString& charpterId) { return QList<BookUnderlineData *>(); }
-QStringList PreviewHTMLWindow::engineNeedNoteData(const QString& charpterId) { return QStringList(); }
-void PreviewHTMLWindow::enginePaintHighlightRect(const QRect& rect, const QColor& color) {}
 
 void PreviewHTMLWindow::engineInitFinish() {
 	m_engine->setPageSize(NULL, m_standardSize.width(), m_standardSize.height(), 1);

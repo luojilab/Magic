@@ -20,16 +20,7 @@ public:
 protected:
 	virtual void engineInitFinish();
 	virtual void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error);
-	virtual void engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset);
-	virtual void engineUpdateTotalCount(const qint32& totolPageCount);
 	virtual void enginUpdateAllViewPage();
-	virtual void engineUpdateVisibleViewPage(EngineHighlightInfo* info);
-	virtual void engineShowSelectionMenu(const qint32& x, const qint32& y, const qint32& x2, const qint32& y2);
-	virtual void engineOpenUrl(QString urlString);
-	virtual void engineClickImage(QImage* image, const qint32& originX, const qint32& originY, const qint32& width, const qint32& height);
-	virtual QList<BookUnderlineData *> engineNeedUnderlineData(const QString& charpterId);
-	virtual QStringList engineNeedNoteData(const QString& charpterId);
-	virtual void enginePaintHighlightRect(const QRect& rect, const QColor& color);
 	// only open html file
 	virtual void engineOpenHTML(BookChapter *html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
 	virtual void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic);

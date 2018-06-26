@@ -23,16 +23,7 @@ public:
 private:
 	void engineInitFinish() override;
 	void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error) override;
-	void engineClickResponse(const qint32& originX, const qint32& originY, const QString& chapterId, const qint32& htmlOffset) override;
-	void engineUpdateTotalCount(const qint32& totolPageCount) override;
-	void enginUpdateAllViewPage() override;
-    void engineUpdateVisibleViewPage(EngineHighlightInfo* info) override;
-	void engineShowSelectionMenu(const qint32& x, const qint32& y, const qint32& x2, const qint32& y2) override;
-	void engineOpenUrl(QString urlString) override;
-	void engineClickImage(QImage* image, const qint32& originX, const qint32& originY, const qint32& width, const qint32& height) override;
-	QList<BookUnderlineData *> engineNeedUnderlineData(const QString& charpterId) override;
-	QStringList engineNeedNoteData(const QString& charpterId) override;
-	void enginePaintHighlightRect(const QRect& rect, const QColor& color) override;
+    void enginUpdateAllViewPage() override;
 
 	void engineOpenHTML(BookChapter * html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) override;
     void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic) override;

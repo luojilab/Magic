@@ -175,48 +175,10 @@ void PreviewEPUBWindow::mousePressEvent(QMouseEvent *event) {
 	}
 }
 
-void PreviewEPUBWindow::engineClickResponse(const qint32 & originX, const qint32 & originY, const QString & chapterId, const qint32 & htmlOffset)
-{
-}
-
-void PreviewEPUBWindow::engineUpdateTotalCount(const qint32 & totolPageCount)
-{
-}
-
 void PreviewEPUBWindow::enginUpdateAllViewPage()
 {
     QApplication::restoreOverrideCursor();
 	update();
-}
-
-void PreviewEPUBWindow::engineUpdateVisibleViewPage(EngineHighlightInfo * info)
-{
-}
-
-void PreviewEPUBWindow::engineShowSelectionMenu(const qint32 & x, const qint32 & y, const qint32 & x2, const qint32 & y2)
-{
-}
-
-void PreviewEPUBWindow::engineOpenUrl(QString urlString)
-{
-}
-
-void PreviewEPUBWindow::engineClickImage(QImage* image, const qint32 & originX, const qint32 & originY, const qint32 & width, const qint32 & height)
-{
-}
-
-QList<BookUnderlineData*> PreviewEPUBWindow::engineNeedUnderlineData(const QString & charpterId)
-{
-	return QList<BookUnderlineData*>();
-}
-
-QStringList PreviewEPUBWindow::engineNeedNoteData(const QString & charpterId)
-{
-	return QStringList();
-}
-
-void PreviewEPUBWindow::enginePaintHighlightRect(const QRect & rect, const QColor & color)
-{
 }
 
 void PreviewEPUBWindow::engineOpenHTML(BookChapter *html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) {}
