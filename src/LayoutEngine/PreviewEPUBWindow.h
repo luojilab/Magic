@@ -7,7 +7,11 @@
 
 class QStandardItemModel;
 class QStandardItem;
-class BookViewCore;
+
+namespace future_core {
+    class HTMLReader;
+    class BookViewQt;
+}
 
 class PreviewEPUBWindow : public QWidget, public LayoutEngineDelegate {
 
@@ -16,7 +20,6 @@ class PreviewEPUBWindow : public QWidget, public LayoutEngineDelegate {
 public:
 	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize);
 	~PreviewEPUBWindow();
-    // TODO default value
 	void updateEngine(const std::string& bundlePath = "", const std::string& epubPath = "", const QSize& defaultSize = QSize(0, 0));
 	QStandardItemModel *getBookContentList() { return m_bookContents; };
 
@@ -24,9 +27,7 @@ private:
 	void engineInitFinish() override;
 	void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error) override;
     void enginUpdateAllViewPage() override;
-
-	void engineOpenHTML(BookChapter * html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) override;
-    void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic) override;
+	void engineOpenHTML(HTMLReader* html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) override;
 
 public slots:
 	void gotoChapterByIndex(const QModelIndex);
@@ -38,11 +39,11 @@ public slots:
 private:
 	std::string m_epubPath;
 	LayoutEngine * m_engine;
-	BookReader* m_bookModel;
+	BookReader* m_bookReader;
 	QSize m_defaultSize;
 	QStandardItemModel *m_bookContents;
 	std::vector<QStandardItem *>m_bookItems;
-    BookViewCore *m_viewCore{ NULL };
+    future_core::BookViewQt *m_viewCore{ NULL };
 	std::map<int, std::string> m_supportBGColor {
 		{ 0,"rgb(255,255,255)" },
 		{ 1,"rgb(244,240,221)" },
@@ -54,6 +55,7 @@ private:
 private:
 	void generateContentsModel();
 	void changeBGColor(int color, bool isNightMode = false);
+    void bookViewCoreInitial();
 
 private slots:
     // TODO renaming

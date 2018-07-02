@@ -5,6 +5,11 @@
 #include <QDockWidget>
 #include <memory>
 
+namespace future_core {
+    class HTMLReader;
+    class HTMLViewQt;
+}
+
 class PreviewHTMLWindow : public QDockWidget, public LayoutEngineDelegate
 {
 	Q_OBJECT
@@ -18,20 +23,19 @@ public:
 	void cleanTempFile();
 
 protected:
-	virtual void engineInitFinish();
-	virtual void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error);
-	virtual void enginUpdateAllViewPage();
+	void engineInitFinish() override;
+	void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error) override;
+	void enginUpdateAllViewPage() override;
 	// only open html file
-	virtual void engineOpenHTML(BookChapter *html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error);
-	virtual void htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic);
+    void engineOpenHTML(HTMLReader* html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) override;
 
-	void paintEvent(QPaintEvent *);
-	void resizeEvent(QResizeEvent * event);
-	void mousePressEvent(QMouseEvent *);
-	void closeEvent(QCloseEvent *);
-	QSize sizeHint();
-	QSize minimumSizeHint();
-	void keyPressEvent(QKeyEvent *);
+	void paintEvent(QPaintEvent *) override;
+	void resizeEvent(QResizeEvent * event) override;
+	void mousePressEvent(QMouseEvent *) override;
+	void closeEvent(QCloseEvent *) override;
+	virtual QSize sizeHint();
+	virtual QSize minimumSizeHint();
+	void keyPressEvent(QKeyEvent *) override;
 
 
 signals:
@@ -43,32 +47,22 @@ public slots:
 	void bgColorToGreen() { bgColorChange(2); };
 	void bgColorToNight() { bgColorChange(3, true); };
 	void bgColorChange(int idx, bool isNightMode = false);
+    
 private slots:
 	void closed();
 	void gobackToHTMLOffset();
 
 private:
 	LayoutEngine *m_engine{ NULL };
-	BookChapter* m_htmlModel{ NULL };
-	unsigned int m_htmlPageIndex{ 0 };
-	unsigned int m_old_htmlPageIndex{ 0 };
 	std::string m_htmlPath{ "" };
 	std::string m_innerHtmlPath{ "" };
-	std::shared_ptr<QImage> m_pic;
-	bool m_isRendering{ false };
-	QReadWriteLock m_locker;
-	QReadWriteLock m_ModelLocker;
 	QSize m_standardSize;
+    unsigned int m_currentPageIndex{ 0 };
 	bool m_isNightMode{ false };
+    future_core::HTMLReader* m_htmlReader{ NULL };
+    future_core::HTMLViewQt* m_viewCore{ NULL };
 
 private:
-    // TODO inline impl
-	inline void safeSetRenderStatus(bool);
-	inline bool safeGetRenderStatus();
-    // TODO 高内聚
-	inline bool isRendering() { return safeGetRenderStatus(); };
-	inline void setHtmlModel(BookChapter *);
-	inline BookChapter* getHtmlModel();
 	void cleanResource();
 	void refreshView() const;
 	std::string tempFilePath(const std::string& fileName);
@@ -79,4 +73,7 @@ private:
 		{3,"rgb(52,55,59);"}
 	};
 	const int m_supportedBGColorCnt = m_supportBGColor.size();
+    
+private:
+    void initialCoreView();
 };

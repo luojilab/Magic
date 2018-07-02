@@ -7,13 +7,16 @@
 #include <QSettings>
 #include <QMenu>
 #include <QAction>
+#include "HTMLViewQt.h"
+
+using future_core::HTMLViewQt;
 
 PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPath, const QSize& standardSize)
 	:QDockWidget(parent),
-	m_htmlPath(htmlPath),
-	m_engine(new LayoutEngine), 
-	m_htmlPageIndex(0),
-	m_standardSize(standardSize)
+	m_engine(new LayoutEngine),
+    m_htmlPath(htmlPath),
+	m_standardSize(standardSize),
+    m_viewCore(new HTMLViewQt(this))
 {
     m_engine->setDelegate(this);
 	m_innerHtmlPath = tempFilePath(htmlPath);
@@ -21,6 +24,9 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
 	if (f.exists()) {
 		f.copy(m_innerHtmlPath.c_str());
 	}
+    m_viewCore->setUpdateViewCallback([this]() {
+        update();
+    });
 	// Must initial engine at last!
 	// in case the width and height value get wrong
     m_engine->initLayoutEngine("");
@@ -57,24 +63,17 @@ void PreviewHTMLWindow::engineInitFinish() {
  */
 
 // html open success 
-void PreviewHTMLWindow::engineOpenHTML(BookChapter *html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) {
+void PreviewHTMLWindow::engineOpenHTML(HTMLReader *html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) {
 	if (error == OPEN_EPUB_SUCCESS) {
-		if (getHtmlModel() != NULL) {
+		if (m_htmlReader) {
 			cleanResource();
 		}
-		setHtmlModel(html);
-		m_engine->paintHtml(getHtmlModel(), m_htmlPageIndex);
-	}
-}
-// html pic render finish
-void PreviewHTMLWindow::htmlImageRenderFinish(BookChapter *html, std::shared_ptr<QImage>& pic) {
-	safeSetRenderStatus(false);
-	if (pic.get() != nullptr) {
-		m_pic = pic;
-		m_old_htmlPageIndex = m_htmlPageIndex;
-		update();
-	} else {
-		m_htmlPageIndex = m_old_htmlPageIndex;
+        if ( !m_viewCore ) {
+            initialCoreView();
+        }
+        m_htmlReader = html;
+        m_viewCore->setHTMLReader(html);
+        m_engine->gotoPageByIndex(m_htmlReader, m_currentPageIndex);
 	}
 }
 
@@ -83,18 +82,14 @@ void PreviewHTMLWindow::htmlImageRenderFinish(BookChapter *html, std::shared_ptr
  */
 
 // paint event
-void PreviewHTMLWindow::paintEvent(QPaintEvent *) {
-	if ( m_pic.get() != nullptr && !(*m_pic).isNull() ) {
-		QPainter p(this);
-		if (p.isActive()) {
-			int w = width();
-			int h = height();
-			p.eraseRect(QRect(0, 0, width(), height()));
-			p.drawImage(QRect(0, 0, width(), height()), m_pic->scaled(width(), height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-			p.end();
-		}
-	}
+void PreviewHTMLWindow::paintEvent(QPaintEvent *)
+{
+    if ( !m_viewCore ) {
+        return;
+    }
+    m_viewCore->onDraw();
 }
+
 // resize
 void PreviewHTMLWindow::resizeEvent(QResizeEvent *event) 
 {
@@ -104,8 +99,9 @@ void PreviewHTMLWindow::resizeEvent(QResizeEvent *event)
 	}
 }
 // mouse click event
-void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event) {
-    if (!m_htmlModel) {
+void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (!m_htmlReader) {
         return;
     }
 	if (event->button() == Qt::LeftButton) {
@@ -119,24 +115,34 @@ void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event) {
 		delete menu;
 	}
 }
+
 // close event
-void PreviewHTMLWindow::closeEvent(QCloseEvent *) {
+void PreviewHTMLWindow::closeEvent(QCloseEvent *)
+{
 	cleanResource();
-	delete m_htmlModel;
 }
+
 // keyboard press
-void PreviewHTMLWindow::keyPressEvent(QKeyEvent *event) {
-	if (isRendering()) return;
-	if (!m_htmlModel) return;
+void PreviewHTMLWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (!m_htmlReader) {
+        return;
+    }
 	if (event->key() == Qt::Key_Left) {
-		if (m_htmlPageIndex == 0) return;
-		--m_htmlPageIndex;
+        if (m_currentPageIndex == 0) {
+            return;
+        }
+        m_engine->gotoPreviousPage(m_htmlReader);
+        m_currentPageIndex -= 1;
 	} else if (event->key() == Qt::Key_Right) {
-		if (m_htmlPageIndex + 1 >= getHtmlModel()->GetPageCount()) return;
-		++m_htmlPageIndex;
+        if (m_currentPageIndex == m_engine->getPageCount(m_htmlReader)) {
+            return;
+        }
+        m_engine->gotoNextPage(m_htmlReader);
+        m_currentPageIndex += 1;
 	}
-	this->refreshView();
 }
+
 void PreviewHTMLWindow::closed()
 {
 	closeEvent(nullptr);
@@ -155,7 +161,7 @@ QSize PreviewHTMLWindow::minimumSizeHint()
 
 void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSize& standardSize)
 {
-	if (getHtmlModel() || reload) {
+	if (m_htmlReader || reload) {
 		cleanResource();
 		m_htmlPath = htmlPath;
 		if (standardSize.width() != 0 || standardSize.height() != 0) {
@@ -168,7 +174,6 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
 		if ( !QFile(tempFilePath(m_htmlPath).c_str()).exists() ) {
             f.copy(tempFilePath(m_htmlPath).c_str());
 		}
-		m_htmlPageIndex = 0;
 		m_engine->setPageSize(NULL, m_standardSize.width(), m_standardSize.height(), 1);
 #if __APPLE__
         float ratio = 1;
@@ -183,22 +188,21 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
 
 void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts)
 {
-	//if (getHtmlModel()) {
-		cleanResource();
-		QFile f(m_innerHtmlPath.c_str());
-		if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
-		f.write(contentTexts.toUtf8());
-		f.close();
-		}
-		m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
-	//}
+    cleanResource();
+    QFile f(m_innerHtmlPath.c_str());
+    if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        f.write(contentTexts.toUtf8());
+        f.close();
+    }
+    m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
 }
 
 void PreviewHTMLWindow::updateForOffset(unsigned int htmlOffset)
 {
-	if (!m_htmlModel) return;
-	int idx = m_htmlModel->GetPageIndex(htmlOffset);
-	m_htmlPageIndex = idx >= 0 ? idx : m_htmlPageIndex;
+    if ( !m_htmlReader ) {
+        return;
+    }
+    int idx = m_engine->getPageIndexForHTMLOffset(m_htmlReader, htmlOffset);
 	refreshView();
 }
 
@@ -213,54 +217,25 @@ void PreviewHTMLWindow::cleanTempFile()
     }
 }
 
-void PreviewHTMLWindow::safeSetRenderStatus(bool status)
-{
-	m_locker.lockForRead();
-	m_isRendering = status;
-	m_locker.unlock();
-}
-
-inline bool PreviewHTMLWindow::safeGetRenderStatus()
-{
-	m_locker.lockForRead();
-	bool status = m_isRendering;
-	m_locker.unlock();
-	return status;
-}
-
-inline void PreviewHTMLWindow::setHtmlModel(BookChapter *html)
-{
-	m_ModelLocker.lockForWrite();
-	m_htmlModel = html;
-	m_ModelLocker.unlock();
-}
-
-inline BookChapter * PreviewHTMLWindow::getHtmlModel()
-{
-	BookChapter *model;
-	m_ModelLocker.lockForRead();
-	model = m_htmlModel;
-	m_ModelLocker.unlock();
-	return model;
-}
-
 void PreviewHTMLWindow::cleanResource()
 {
-	if (m_pic) {
-		m_pic.reset();
+	if (m_htmlReader) {
+		m_engine->closeHtml(m_htmlReader);
+        m_htmlReader = 0;
 	}
-	if (getHtmlModel()) {
-		m_engine->closeHtml(getHtmlModel());
-		setHtmlModel(NULL);
-	}
+    if (m_viewCore) {
+        delete m_viewCore;
+        m_viewCore = 0;
+    }
+    m_currentPageIndex = 0;
+    m_isNightMode = false;
 }
 
 void PreviewHTMLWindow::refreshView() const
 {
-	if (!m_engine && !m_htmlModel) {
+	if (!m_engine && !m_htmlReader) {
 		return;
 	}
-	m_engine->paintHtml(m_htmlModel, m_htmlPageIndex);
 }
 
 std::string PreviewHTMLWindow::tempFilePath(const std::string & ofilePath)
@@ -279,10 +254,8 @@ std::string PreviewHTMLWindow::tempFilePath(const std::string & ofilePath)
 }
 
 void PreviewHTMLWindow::gobackToHTMLOffset() {
-	if (!m_htmlModel) return;
-	std::string text = "";
-	size_t offsite = 0;
-	int offset = m_htmlModel->GetBeginHtmlOffset(m_htmlPageIndex, text, offsite);
+	if (!m_htmlReader) return;
+    int offset = m_engine->getStartHTMLOffsetForPageIndex(m_htmlReader, m_currentPageIndex);
 	if (offset < 0) return;
 	// emit signal
 	emit mapbackToHtml(offset);
@@ -299,10 +272,20 @@ void PreviewHTMLWindow::bgColorChange(int idx, bool isNightMode)
 	}
 	if (m_isNightMode != isNightMode) {
 		m_isNightMode = isNightMode;
-		m_pic.reset();
 		m_engine->setIsNightMode(isNightMode);
-        m_engine->paintHtml(m_htmlModel, m_htmlPageIndex);
+        m_engine->repaint(m_htmlReader);
 	}
 	std::string prop = "background-color:";
 	setStyleSheet((prop + color).c_str());
+}
+
+void PreviewHTMLWindow::initialCoreView()
+{
+    if (m_viewCore) {
+        return;
+    }
+    m_viewCore = new HTMLViewQt(this);
+    m_viewCore->setUpdateViewCallback([this]() {
+        update();
+    });
 }
