@@ -507,6 +507,9 @@ QList<GumboWellFormedError> GumboInterface::error_check()
         m_output = gumbo_parse_with_options(&myoptions, m_utf8src.data(), m_utf8src.length());
     }
     // qDebug() << QString::fromStdString(m_utf8src);
+    if ( !m_output ) {
+        return errlist;
+    }
     const GumboVector* errors  = &m_output->errors;
     for (unsigned int i=0; i< errors->length; ++i) {
         GumboError* er = static_cast<GumboError*>(errors->data[i]);
