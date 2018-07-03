@@ -4301,6 +4301,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 		/* table of contents view */
 		m_bookContentView = new QTreeView();
 		m_bookContentView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        m_bookContentView->setExpandsOnDoubleClick(false);
         /* container view */
         m_previewerToEpubContainer = new HorizonLayoutView(QSize(width, height), tocMinWidth);
         QList<QWidget *>ws;

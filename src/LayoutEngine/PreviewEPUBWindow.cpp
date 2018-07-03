@@ -128,7 +128,14 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 	std::vector<QStandardItem *>::iterator it = m_bookItems.begin();
 	// get click index
 	if ( !index.parent().isValid() ) {
-        idx = index.row();
+        auto s = index.data().toString();
+        while (it != m_bookItems.end()) {
+            if (s == (*it++)->text()) {
+                break;
+            }
+            idx += 1;
+        }
+        idx += 1;
 	} else {
         // only have level0 content item
         while (it != m_bookItems.end()) {
