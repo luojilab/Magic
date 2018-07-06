@@ -51,6 +51,7 @@ private:
 		{ 3,"rgb(52,55,59);" }
 	};
 	bool m_isNightMode{ false };
+	bool m_canChangeTOC{ true };
 
 private:
 	void generateContentsModel();

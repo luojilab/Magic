@@ -32,6 +32,9 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	setFocusPolicy(Qt::ClickFocus);
     m_viewCore->setUpdateViewCallback([this](){
         update();
+		if (!m_canChangeTOC) {
+			m_canChangeTOC = true;
+		}
     });
     connect(this, SIGNAL(showErrorDialog(const QString&)), this, SLOT(showError(const QString&)));
     connect(this, SIGNAL(drawSignal()), this, SLOT(doDraw()));
@@ -121,8 +124,10 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
 
 void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 {
+	if (!m_canChangeTOC) { return; }
 	if (!m_bookContents) { return; }
 	if (!isVisible()) { return; }
+	m_canChangeTOC = false;
 	QStandardItem *selectItem = static_cast<QStandardItem *>(index.internalPointer());
 	int idx{-1};
 	std::vector<QStandardItem *>::iterator it = m_bookItems.begin();
@@ -303,5 +308,8 @@ void PreviewEPUBWindow::bookViewCoreInitial()
     m_viewCore = new BookViewQt(this);
     m_viewCore->setUpdateViewCallback([this]() {
         update();
+		if (!m_canChangeTOC) {
+			m_canChangeTOC = true;
+		}
     });
 }

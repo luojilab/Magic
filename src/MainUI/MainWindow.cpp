@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 **
 **  Copyright (C) 2016 Kevin B. Hendricks, Stratford, Ontario Canada
 **  Copyright (C) 2012-2015 John Schember <john@nachtimwald.com>
@@ -4330,7 +4330,12 @@ void MainWindow::layout(PreviewPhoneType type) {
     m_previewerToEpubContainer->setMinimumSize(QSize(width + tocMinWidth, height));
     m_previewerToEpubContainer->setMaximumSize(QSize(width * 2, height));
     //update content
-    this->previewer->updateEngine("", m_CurrentFilePath.toStdString(), QSize(width, height));
+	std::string emptyStr = "";
+    this->previewer->updateEngine(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
+	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+		m_previewerToHTML->close();
+	}
+	m_previewerToEpubContainer->resize(width, height);
 	this->m_previewEPUBDock->show();
 	this->previewer->setFocus();
 }
@@ -5341,6 +5346,9 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
     m_previewerToHTML->setMaximumSize(QSize(width, height));
     m_previewerToHTML->setMinimumSize(QSize(width / 2, height / 2));
     // focus
+	if ( m_previewEPUBDock && m_previewEPUBDock->isVisible() ) {
+		m_previewEPUBDock->close();
+	}
 	m_previewerToHTML->show();
 	m_previewerToHTML->setFocus();
 }
