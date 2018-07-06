@@ -27,8 +27,9 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 #else
         float ratio = 0.85;
 #endif
-	m_engine->SetViewTopMargin(60.f / ratio);
-	m_engine->SetViewBottomMargin(60.f / ratio);
+    const float margin = 60.f;
+	m_engine->SetViewTopMargin(margin / ratio);
+	m_engine->SetViewBottomMargin(margin / ratio);
 	setFocusPolicy(Qt::ClickFocus);
     m_viewCore->setUpdateViewCallback([this](){
         update();
@@ -89,7 +90,6 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
 	default:
 		return;
 	}
-    QApplication::setOverrideCursor(Qt::WaitCursor);
 }
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
@@ -154,7 +154,6 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
     QList<std::shared_ptr<BookContents>>items = m_engine->getContentList(m_bookReader);
 	if (idx == -1 || idx > items.count()) { return; }
 	// goto chapter
-	QApplication::setOverrideCursor(Qt::WaitCursor);
 	m_engine->gotoChapterByFileName(m_bookReader, items[idx]->ContentHRef);
 	m_engine->updateAllView(m_bookReader);
 }
