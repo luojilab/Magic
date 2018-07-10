@@ -366,5 +366,6 @@ QString IndexEditorModel::SaveData(QList<IndexEditorModel::indexEntry *> entries
     // Watch the file again
     m_FSWatcher->addPath(m_SettingsPath);
     SetDataModified(false);
+    delete settings;
     return message;
 }

@@ -8,6 +8,7 @@
 #include <QStandardItem>
 #include <QApplication>
 #include <QMenu>
+#include <sstream>
 #include "BookViewQt.h"
 
 using future_core::BookViewQt;
@@ -27,8 +28,9 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 #else
         float ratio = 0.85;
 #endif
-	m_engine->SetViewTopMargin(60.f / ratio);
-	m_engine->SetViewBottomMargin(60.f / ratio);
+    const float margin = 60.f;
+	m_engine->SetViewTopMargin(margin / ratio);
+	m_engine->SetViewBottomMargin(margin / ratio);
 	setFocusPolicy(Qt::ClickFocus);
     m_viewCore->setUpdateViewCallback([this](){
         update();
@@ -89,7 +91,6 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
 	default:
 		return;
 	}
-    QApplication::setOverrideCursor(Qt::WaitCursor);
 }
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
@@ -154,7 +155,6 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
     QList<std::shared_ptr<BookContents>>items = m_engine->getContentList(m_bookReader);
 	if (idx == -1 || idx > items.count()) { return; }
 	// goto chapter
-	QApplication::setOverrideCursor(Qt::WaitCursor);
 	m_engine->gotoChapterByFileName(m_bookReader, items[idx]->ContentHRef);
 	m_engine->updateAllView(m_bookReader);
 }
@@ -169,7 +169,9 @@ void PreviewEPUBWindow::engineInitFinish() {
 void PreviewEPUBWindow::engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error)
 {
 	if (error != 0) {
-        showError("Opne Epub failed");
+        std::stringstream str;
+        str << error;
+        showError(("Opne Epub failed" + str.str() + " " + m_epubPath).c_str());
         return;
 	}
     if (m_bookReader) {
@@ -273,7 +275,12 @@ void PreviewEPUBWindow::GoToHtml()
 {
 	int offset = m_engine->getCurrentPageOffset(m_bookReader);
 	std::string chapterId = m_engine->getCurrentChapterId(m_bookReader);
-	std::string name = m_engine->getChapterFileNameById(m_bookReader, chapterId);
+	std::string filePath = m_engine->getChapterFileNameById(m_bookReader, chapterId);
+    size_t pos = filePath.rfind('/');
+    if ( pos == std::string::npos || pos == filePath.length() - 1 ) {
+        return;
+    }
+    std::string name = filePath.substr(pos + 1, filePath.length() - pos);
 	emit gotoHtmlSourceCode(name, offset);
 }
 
