@@ -22,8 +22,9 @@ public:
     void setDefaultMainSize(QSize);
     
 protected:
-    void resizeEvent(QResizeEvent *);
-    QSize sizeHint();
+    void resizeEvent(QResizeEvent *) override;
+    QSize sizeHint() const override;
+    void showEvent(QShowEvent *) override;
     
 private:
     QList<QWidget *>m_widgets;

@@ -18,7 +18,6 @@ HorizonLayoutView::HorizonLayoutView(QSize size, int miniWidth):
 
 HorizonLayoutView::~HorizonLayoutView()
 {
-    m_widgets.clear();
 }
 
 void HorizonLayoutView::resizeEvent(QResizeEvent *event)
@@ -45,9 +44,14 @@ void HorizonLayoutView::addWidgets(QList<QWidget *>ws)
     reLayoutWidgets();
 }
 
-QSize HorizonLayoutView::sizeHint()
+QSize HorizonLayoutView::sizeHint() const
 {
     return m_mainWidgetSize * 2;
+}
+
+void HorizonLayoutView::showEvent(QShowEvent *)
+{
+    reLayoutWidgets();
 }
 
 void HorizonLayoutView::setDefaultMainSize(QSize size)
@@ -62,8 +66,6 @@ void HorizonLayoutView::reLayoutWidgets()
     }
     QWidget* mainW = m_widgets[0];
     QWidget* tableOfContent = m_widgets[1];
-    if ( size().width() > m_mainWidgetSize.width() + m_subWidgetMiniWidth ) {
-        mainW->setGeometry(0, 0, m_mainWidgetSize.width(), m_mainWidgetSize.height());
-        tableOfContent->setGeometry(m_mainWidgetSize.width(), 0, size().width() - m_mainWidgetSize.width(), m_mainWidgetSize.height());
-    }
+    mainW->setGeometry(0, 0, m_mainWidgetSize.width(), m_mainWidgetSize.height());
+    tableOfContent->setGeometry(m_mainWidgetSize.width(), 0, size().width() - m_mainWidgetSize.width(), m_mainWidgetSize.height());
 }

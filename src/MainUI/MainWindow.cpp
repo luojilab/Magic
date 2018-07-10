@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 **
 **  Copyright (C) 2016 Kevin B. Hendricks, Stratford, Ontario Canada
 **  Copyright (C) 2012-2015 John Schember <john@nachtimwald.com>
@@ -4273,7 +4273,7 @@ void MainWindow::PlatformSpecificTweaks()
 }
 
 void MainWindow::layout(PreviewPhoneType type) {
-    if (this->previewer && this->previewer->isVisible()) {
+    if (m_epubPreviewer && m_epubPreviewer->isVisible()) {
         QMessageBox::information(this, "", u8"请先关闭当前预览窗口", QMessageBox::Ok);
         return;
     }
@@ -4291,13 +4291,13 @@ void MainWindow::layout(PreviewPhoneType type) {
     float height = d_size.height() / ratio > screenHeight ? screenHeight - 100 : d_size.height() / ratio;
     float width = (float(d_size.width()) / d_size.height()) * height / ratio;
     int tocMinWidth = 100;
-	if ( !this->previewer ) {
+	if ( !m_epubPreviewer ) {
         /* dock */
         m_previewEPUBDock = new CustomDockWidget();
         addDockWidget(Qt::RightDockWidgetArea, m_previewEPUBDock);
         /* preview view */
-		this->previewer = new PreviewEPUBWindow(nullptr, "", std::string(m_CurrentFilePath.toUtf8().data()), QSize(width, height));
-		this->previewer->setContextMenuPolicy(Qt::PreventContextMenu);
+		m_epubPreviewer = new PreviewEPUBWindow(nullptr, "", std::string(m_CurrentFilePath.toUtf8().data()), QSize(width, height));
+		m_epubPreviewer->setContextMenuPolicy(Qt::PreventContextMenu);
 		/* table of contents view */
 		m_bookContentView = new QTreeView();
 		m_bookContentView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -4305,39 +4305,40 @@ void MainWindow::layout(PreviewPhoneType type) {
         /* container view */
         m_previewerToEpubContainer = new HorizonLayoutView(QSize(width, height), tocMinWidth);
         QList<QWidget *>ws;
-        ws.push_back(this->previewer);
+        ws.push_back(m_epubPreviewer);
         ws.push_back(m_bookContentView);
         m_previewerToEpubContainer->addWidgets(ws);
         m_previewEPUBDock->setWidget(m_previewerToEpubContainer);
 		/* connect */
-		connect(this->previewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
-		connect(this->previewer, SIGNAL(gotoHtmlSourceCode(const std::string&, size_t)), this, SLOT(gotoHtmlSourceCodeForBookPreview(const std::string&, size_t)));
-        connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this->previewer, SLOT(closed()));
+		connect(m_epubPreviewer, SIGNAL(bookContentReady()), this, SLOT(updateBookContentView()));
+		connect(m_epubPreviewer, SIGNAL(gotoHtmlSourceCode(const std::string&, size_t)), this, SLOT(gotoHtmlSourceCodeForBookPreview(const std::string&, size_t)));
+        connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), m_epubPreviewer, SLOT(closed()));
         connect(m_previewEPUBDock, SIGNAL(DockCloseSig()), this, SLOT(closeBookContentDock()));
-		connect(m_bookContentView, SIGNAL(doubleClicked(const QModelIndex)), previewer, SLOT(gotoChapterByIndex(const QModelIndex)));
-		connect(ui.actionNormalColor, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorNormal()));
-		connect(ui.actionYellow, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorYellow()));
-		connect(ui.actionGreen, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorGreen()));
-		connect(ui.actionNight, SIGNAL(triggered()), this->previewer, SLOT(changeBGColorNight()));
+		connect(m_bookContentView, SIGNAL(doubleClicked(const QModelIndex)), m_epubPreviewer, SLOT(gotoChapterByIndex(const QModelIndex)));
+		connect(ui.actionNormalColor, SIGNAL(triggered()), m_epubPreviewer, SLOT(changeBGColorNormal()));
+		connect(ui.actionYellow, SIGNAL(triggered()), m_epubPreviewer, SLOT(changeBGColorYellow()));
+		connect(ui.actionGreen, SIGNAL(triggered()), m_epubPreviewer, SLOT(changeBGColorGreen()));
+		connect(ui.actionNight, SIGNAL(triggered()), m_epubPreviewer, SLOT(changeBGColorNight()));
 		/* initial style */
-		this->previewer->setStyleSheet("background-color:white;");
+		m_epubPreviewer->setStyleSheet("background-color:white;");
 	}
     //size hint
-    this->previewer->setMaximumSize(width, height);
-    this->previewer->setMinimumSize(width / 2, height / 2);
+    m_epubPreviewer->setMaximumSize(width, height);
+    m_epubPreviewer->setMinimumSize(width / 2, height / 2);
     m_bookContentView->setMaximumSize(width,height);
     m_previewerToEpubContainer->setDefaultMainSize(QSize(width, height));
     m_previewerToEpubContainer->setMinimumSize(QSize(width + tocMinWidth, height));
     m_previewerToEpubContainer->setMaximumSize(QSize(width * 2, height));
+    m_previewerToEpubContainer->resize(width, height);
+    m_previewEPUBDock->resize(width * 1.5, height * 1.5);
     //update content
 	std::string emptyStr = "";
-    this->previewer->updateEngine(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
+    m_epubPreviewer->updateEngine(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
 	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
 		m_previewerToHTML->close();
 	}
-	m_previewerToEpubContainer->resize(width, height);
-	this->m_previewEPUBDock->show();
-	this->previewer->setFocus();
+	m_previewEPUBDock->show();
+	m_epubPreviewer->setFocus();
 }
 
 void MainWindow::ExtendUI()
@@ -5455,14 +5456,14 @@ void MainWindow::gotoHtmlSourceCodeForBookPreview(const std::string& chapterFile
 }
 
 void MainWindow::updateBookContentView() {
-	QStandardItemModel* model = previewer->getBookContentList();
+	QStandardItemModel* model = m_epubPreviewer->getBookContentList();
     model->setHorizontalHeaderLabels(QStringList() << "目录");
 	if (!model) { return; }
 	m_bookContentView->setModel(model);
 }
 
 void MainWindow::showBookContentList() {
-	if (!this->previewer || !m_bookContentsDock) {
+	if (!m_epubPreviewer || !m_bookContentsDock) {
 		return;
 	}
 	m_bookContentsDock->show();

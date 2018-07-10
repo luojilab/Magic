@@ -1076,7 +1076,7 @@ private:
 	 * and
 	 * preview for single html
 	 */
-	PreviewEPUBWindow* previewer{ NULL };
+	PreviewEPUBWindow* m_epubPreviewer{ NULL };
 	PreviewHTMLWindow* m_previewerToHTML{ NULL };
 	CustomDockWidget *m_previewEPUBDock{ NULL };
 	CustomDockWidget *m_bookContentsDock{ NULL };
