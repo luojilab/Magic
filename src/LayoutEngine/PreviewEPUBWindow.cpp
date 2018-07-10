@@ -8,6 +8,7 @@
 #include <QStandardItem>
 #include <QApplication>
 #include <QMenu>
+#include <sstream>
 #include "BookViewQt.h"
 
 using future_core::BookViewQt;
@@ -168,7 +169,9 @@ void PreviewEPUBWindow::engineInitFinish() {
 void PreviewEPUBWindow::engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error)
 {
 	if (error != 0) {
-        showError("Opne Epub failed");
+        std::stringstream str;
+        str << error;
+        showError(("Opne Epub failed" + str.str() + " " + m_epubPath).c_str());
         return;
 	}
     if (m_bookReader) {
@@ -272,7 +275,12 @@ void PreviewEPUBWindow::GoToHtml()
 {
 	int offset = m_engine->getCurrentPageOffset(m_bookReader);
 	std::string chapterId = m_engine->getCurrentChapterId(m_bookReader);
-	std::string name = m_engine->getChapterFileNameById(m_bookReader, chapterId);
+	std::string filePath = m_engine->getChapterFileNameById(m_bookReader, chapterId);
+    size_t pos = filePath.rfind('/');
+    if ( pos == std::string::npos || pos == filePath.length() - 1 ) {
+        return;
+    }
+    std::string name = filePath.substr(pos + 1, filePath.length() - pos);
 	emit gotoHtmlSourceCode(name, offset);
 }
 
