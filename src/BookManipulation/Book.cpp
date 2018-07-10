@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 **
 **  Copyright (C) 2015, 2016, 2017, 2018  Kevin B. Hendricks Stratford, ON, Canada 
 **  Copyright (C) 2009, 2010, 2011  Strahinja Markovic  <strahinja.markovic@gmail.com>
@@ -266,7 +266,8 @@ const QString HTML_COPYRIGHT_TEMPLATE =
         <br/>出版时间：xxxx年x月\n\
         <br/>ISBN：xxx\n\
         <br/>本书由XXXX授权得到APP电子版制作与发行\n\
-        <br/>版权所有·侵权必究</p>\n\
+        <br/>版权所有·侵权必究\
+		</p>\n\
 </body>\n\
 </html>";
 
