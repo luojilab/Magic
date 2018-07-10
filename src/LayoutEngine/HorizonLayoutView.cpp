@@ -10,7 +10,6 @@
 #include <QResizeEvent>
 
 HorizonLayoutView::HorizonLayoutView(QSize size, int miniWidth):
-    m_widgets(QList<QWidget *>()),
     m_mainWidgetSize(size),
     m_subWidgetMiniWidth(miniWidth)
 {
