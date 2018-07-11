@@ -5422,19 +5422,25 @@ void MainWindow::updateHtmlOffsetForInstancePreview(unsigned int offset)
 void MainWindow::gobackToHtmlOffset(unsigned int offset) {
 	FlowTab*tab = GetCurrentFlowTab();
 	if (!tab) { return; }
-	if (tab->GetViewState() == ViewState_BookView) {
-		CodeView();
-	}
-	CodeViewEditor* codeView = dynamic_cast<CodeViewEditor *>(tab->GetSearchableContent());
-	codeView->setFocus();
-	QByteArray fullBytes = codeView->document()->toPlainText().toUtf8();
-	if (fullBytes.length() < offset) { return; }
-	QString leftString = QString(fullBytes.left(offset));
-	int length = leftString.length();
-	QTextCursor cursor = codeView->textCursor();
-	cursor.setPosition(length == 0 ? 0 : length - 1);
-	codeView->setTextCursor(cursor);
-	codeView->ensureCursorVisible();
+    QTimer::singleShot(500, [this, offset, tab](){
+        if (tab->GetViewState() == ViewState_BookView) {
+            CodeView();
+        }
+        FlowTab*tab = GetCurrentFlowTab();
+        CodeViewEditor* codeView = dynamic_cast<CodeViewEditor *>(tab->GetSearchableContent());
+        if ( !codeView ) {
+            return ;
+        }
+        codeView->setFocus();
+        QByteArray fullBytes = codeView->document()->toPlainText().toUtf8();
+        if (fullBytes.length() < offset) { return; }
+        QString leftString = QString(fullBytes.left(offset));
+        int length = leftString.length();
+        QTextCursor cursor = codeView->textCursor();
+        cursor.setPosition(length == 0 ? 0 : length - 1);
+        codeView->setTextCursor(cursor);
+        codeView->ensureCursorVisible();
+    });
 }
 
 void MainWindow::gotoHtmlSourceCodeForBookPreview(const std::string& chapterFileName, size_t offsite) 
@@ -5457,7 +5463,7 @@ void MainWindow::gotoHtmlSourceCodeForBookPreview(const std::string& chapterFile
 
 void MainWindow::updateBookContentView() {
 	QStandardItemModel* model = m_epubPreviewer->getBookContentList();
-    model->setHorizontalHeaderLabels(QStringList() << "目录");
+    model->setHorizontalHeaderLabels(QStringList() << u8"目录");
 	if (!model) { return; }
 	m_bookContentView->setModel(model);
 }

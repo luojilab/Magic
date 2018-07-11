@@ -38,8 +38,6 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 			m_canChangeTOC = true;
 		}
     });
-    connect(this, SIGNAL(showErrorDialog(const QString&)), this, SLOT(showError(const QString&)));
-    connect(this, SIGNAL(drawSignal()), this, SLOT(doDraw()));
 }
 
 PreviewEPUBWindow::~PreviewEPUBWindow()
