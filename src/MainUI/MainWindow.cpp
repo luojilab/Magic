@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 **
 **  Copyright (C) 2016 Kevin B. Hendricks, Stratford, Ontario Canada
 **  Copyright (C) 2012-2015 John Schember <john@nachtimwald.com>
@@ -3747,6 +3747,22 @@ void MainWindow::SetNewBook(QSharedPointer<Book> new_book)
     connect(m_BookBrowser,     SIGNAL(ShowStatusMessageRequest(const QString &, int)), this, SLOT(ShowMessageOnStatusBar(const QString &, int)));
     connect(m_BookBrowser,     SIGNAL(ResourcesDeleted()), this, SLOT(ResourcesAddedOrDeleted()));
     connect(m_BookBrowser,     SIGNAL(ResourcesAdded()), this, SLOT(ResourcesAddedOrDeleted()));
+#ifdef WIN32
+    changePreviewContent();
+#endif
+}
+
+void MainWindow::changePreviewContent()
+{
+    std::string s = m_CurrentFilePath.toStdString();
+    if (m_previewEPUBDock && m_previewEPUBDock->isVisible()) {
+		m_previewEPUBDock->close();
+		layout(iPhone5);
+    }
+    if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+		m_previewerToHTML->close();
+		previewForCurrentHTML(iPhone5);
+    }
 }
 
 void MainWindow::ResourcesAddedOrDeleted()
