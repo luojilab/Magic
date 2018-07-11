@@ -107,17 +107,20 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
         m_engine->initLayoutEngine(bundlePath);
 		m_epubPath = epubPath;
 	} else {
+        if (epubPath.empty()) {
+            return;
+        }
         if (m_bookReader != NULL) {
             m_engine->closeEpub(m_bookReader);
         }
-        if (epubPath.length()) {
-			if (defaultSize != m_defaultSize) {
-				m_defaultSize = defaultSize;
-				m_engine->setPageSize(m_bookReader, m_defaultSize.width(), m_defaultSize.height(), 1);
-			}
-			m_epubPath = epubPath;
-			m_engine->openEpub(this, m_epubPath, "", "");
-		}
+        if (defaultSize != m_defaultSize) {
+            m_defaultSize = defaultSize;
+            if (m_bookReader) {
+                m_engine->setPageSize(m_bookReader, m_defaultSize.width(), m_defaultSize.height(), 1);
+            }
+        }
+        m_epubPath = epubPath;
+        m_engine->openEpub(this, m_epubPath, "", "");
 	}
 }
 
