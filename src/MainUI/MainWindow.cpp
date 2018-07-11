@@ -135,6 +135,7 @@ static const QString TAB_STYLE_SHEET              = "#managerframe {border-top: 
 static const QString HTML_TOC_FILE = "TOC.xhtml";
 static const QString HTML_INDEX_FILE = "Index.xhtml";
 const QString HTML_COVER_FILENAME = "cover.xhtml";
+static bool fromNew = false;
 
 // External constant (sigil_contants.h) used to consolidate the upper clipboard history limit.
 const int CLIPBOARD_HISTORY_MAX = 20;
@@ -724,6 +725,7 @@ void MainWindow::New()
     // The nasty IFDEFs are here to enable the multi-document
     // interface on the Mac; Lin and Win just use multiple
     // instances of the Sigil application
+	fromNew = true;
 #ifndef Q_OS_MAC
     if (MaybeSaveDialogSaysProceed())
 #endif
@@ -3754,7 +3756,16 @@ void MainWindow::SetNewBook(QSharedPointer<Book> new_book)
 
 void MainWindow::changePreviewContent()
 {
-    std::string s = m_CurrentFilePath.toStdString();
+	if (fromNew) {
+		fromNew = false;
+		if (m_previewEPUBDock && m_previewEPUBDock->isVisible()) {
+			m_previewEPUBDock->close();
+		}
+		if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+			m_previewerToHTML->close();
+		}
+		return;
+	}
     if (m_previewEPUBDock && m_previewEPUBDock->isVisible()) {
 		m_previewEPUBDock->close();
 		layout(iPhone5);
