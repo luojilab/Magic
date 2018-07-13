@@ -41,7 +41,7 @@ private:
 	LayoutEngine * m_engine;
 	BookReader* m_bookReader;
 	QSize m_defaultSize;
-	QStandardItemModel *m_bookContents;
+    QStandardItemModel *m_bookContents{ NULL };
 	std::vector<QStandardItem *>m_bookItems;
     future_core::BookViewQt *m_viewCore{ NULL };
 	std::map<int, std::string> m_supportBGColor {

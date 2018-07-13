@@ -1,7 +1,6 @@
 #pragma once
 #include <QWidget>
 #include "LayoutEngin.h"
-#include "BookChapter.h"
 #include <QDockWidget>
 #include <memory>
 
@@ -33,8 +32,8 @@ protected:
 	void resizeEvent(QResizeEvent * event) override;
 	void mousePressEvent(QMouseEvent *) override;
 	void closeEvent(QCloseEvent *) override;
-	virtual QSize sizeHint();
-	virtual QSize minimumSizeHint();
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 	void keyPressEvent(QKeyEvent *) override;
 
 

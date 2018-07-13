@@ -56,7 +56,7 @@ void PreviewHTMLWindow::engineInitFinish() {
 #endif
 	m_engine->SetViewTopMargin(60.f / ratio);
 	m_engine->SetViewBottomMargin(60.f / ratio);
-	m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
+	m_engine->openHtml(m_viewCore, m_innerHtmlPath, "html_id_key");
 }
 /*
  * engine html delegate function 
@@ -149,12 +149,12 @@ void PreviewHTMLWindow::closed()
 	cleanTempFile();
 }
 
-QSize PreviewHTMLWindow::sizeHint() 
+QSize PreviewHTMLWindow::sizeHint() const
 {
 	return m_standardSize;
 }
 
-QSize PreviewHTMLWindow::minimumSizeHint() 
+QSize PreviewHTMLWindow::minimumSizeHint() const
 {
 	return QSize(m_standardSize.width() * 0.75, m_standardSize.height() * 0.75);
 }
@@ -182,7 +182,7 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
 #endif
 		m_engine->SetViewTopMargin(60.f / ratio);
 		m_engine->SetViewBottomMargin(60.f / ratio);
-		m_engine->openHtml(this, m_htmlPath, "html_id_key");
+		m_engine->openHtml(m_viewCore, m_htmlPath, "html_id_key");
 	}
 }
 
@@ -194,7 +194,7 @@ void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts)
         f.write(contentTexts.toUtf8());
         f.close();
     }
-    m_engine->openHtml(this, m_innerHtmlPath, "html_id_key");
+    m_engine->openHtml(m_viewCore, m_innerHtmlPath, "html_id_key");
 }
 
 void PreviewHTMLWindow::updateForOffset(unsigned int htmlOffset)
@@ -202,7 +202,6 @@ void PreviewHTMLWindow::updateForOffset(unsigned int htmlOffset)
     if ( !m_htmlReader ) {
         return;
     }
-    int idx = m_engine->getPageIndexForHTMLOffset(m_htmlReader, htmlOffset);
 	refreshView();
 }
 

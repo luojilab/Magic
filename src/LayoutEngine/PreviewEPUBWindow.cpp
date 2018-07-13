@@ -12,7 +12,7 @@
 #include "BookViewQt.h"
 
 using future_core::BookViewQt;
-
+const int UPDATE_VIEW_CODE = 0;
 PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize):
 	QWidget(parent),
 	m_epubPath(epubPath),
@@ -55,6 +55,7 @@ PreviewEPUBWindow::~PreviewEPUBWindow()
 
 void PreviewEPUBWindow::doDraw() {
     m_engine->gotoFirstPage(m_bookReader);
+    m_viewCore->AllViewUpdated(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
@@ -89,6 +90,7 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
 	default:
 		return;
 	}
+    m_viewCore->AllViewUpdated(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
@@ -116,11 +118,11 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
         if (defaultSize != m_defaultSize) {
             m_defaultSize = defaultSize;
             if (m_bookReader) {
-                m_engine->setPageSize(m_bookReader, m_defaultSize.width(), m_defaultSize.height(), 1);
+                m_viewCore->SetPaintSize(m_defaultSize.width(), m_defaultSize.height());
             }
         }
         m_epubPath = epubPath;
-        m_engine->openEpub(this, m_epubPath, "", "");
+        m_engine->openEpub(m_viewCore, m_epubPath, "", "");
 	}
 }
 
@@ -157,13 +159,13 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 	if (idx == -1 || idx > items.count()) { return; }
 	// goto chapter
 	m_engine->gotoChapterByFileName(m_bookReader, items[idx]->ContentHRef);
-	m_engine->updateAllView(m_bookReader);
+    m_viewCore->AllViewUpdated(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::engineInitFinish() {
     if ( m_engine->isEngineReady() && !m_epubPath.empty() ) {
-		m_engine->setPageSize(m_bookReader, m_defaultSize.width(), m_defaultSize.height(), 1);
-        m_engine->openEpub(this, m_epubPath, "", "");
+		m_viewCore->SetPaintSize(m_defaultSize.width(), m_defaultSize.height());
+        m_engine->openEpub(m_viewCore, m_epubPath, "", "");
 	}
 }
 
@@ -182,8 +184,8 @@ void PreviewEPUBWindow::engineOpenBook(BookReader* bookModel, QList<BookContents
         bookViewCoreInitial();
     }
     m_bookReader = bookModel;
-    m_viewCore->setBookReader(bookModel);
-    m_engine->setPageSize(m_bookReader, m_defaultSize.width(), m_defaultSize.height(), 1);
+    m_viewCore->SetBookReader(bookModel);
+    m_viewCore->SetPaintSize(m_defaultSize.width(), m_defaultSize.height());
     m_engine->setIsNightMode(m_isNightMode);
     generateContentsModel();
     doDraw();
@@ -262,14 +264,15 @@ void PreviewEPUBWindow::generateContentsModel()
 
 void PreviewEPUBWindow::closed()
 {
-	if (m_bookReader) {
-		m_engine->closeEpub(m_bookReader);
-		m_bookReader = 0;
-		delete m_bookContents;
-        delete m_viewCore;
-        m_viewCore = 0;
-		m_bookContents = 0;
-	}
+    if ( !m_bookReader ) {
+        return;
+    }
+    m_engine->closeEpub(m_bookReader);
+    m_bookReader = 0;
+    delete m_bookContents;
+    delete m_viewCore;
+    m_viewCore = 0;
+    m_bookContents = 0;
 }
 
 void PreviewEPUBWindow::GoToHtml()
