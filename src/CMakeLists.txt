@@ -495,7 +495,7 @@ set( QRC_FILES
 
 file (GLOB LAYOUT_ENGINE_FILES LayoutEngine/*.h LayoutEngine/*.cpp)
 
-file (GLOB LAYOUT_HEADER_FILES LayoutEngine/PreviewHTMLWindow.h  LayoutEngine/PreviewEPUBWindow.h LayoutEngine/CustomDockWidget.h LayoutEngine/ButtonCollectionView.h )	
+file (GLOB LAYOUT_HEADER_FILES LayoutEngine/*.h)	
 
 file( GLOB TS_FILES Resource_Files/ts/sigil_*.ts )
 
@@ -673,20 +673,27 @@ include_directories( BEFORE
 
 # Layout Engine settings
 
-set ( LAYOUT_ENGINE_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/LayoutEngine )
+set ( LAYOUT_ENGINE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/LayoutEngine )
+include_directories( BEFORE ${LAYOUT_ENGINE_DIR} )
+include_directories( ${CALL_INTERFACE_DIR} )
+include_directories( ${INTERFACE_DIR} )
+
 if ( WIN32 )
 	file(GLOB ICU_LIB_FILES LayoutEngine/icu/qt/lib64/*.lib )
 	file(GLOB ICU_DLL_FILES LayoutEngine/icu/qt/bin64/icu*.dll)
+    file(GLOB LAYOUT_ENGINE_LIBRATY ${LAYOUT_ENGINE_PATH}/Debug/*.lib)
+elseif(APPLE)
+    file(GLOB ICU_LIB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/../lib/icu/mac/lib/*.dylib )
+    file(GLOB LAYOUT_ENGINE_LIBRATY ${LAYOUT_ENGINE_PATH}/Debug/*.a)
 endif()
-include_directories( BEFORE ${LAYOUT_ENGINE_HEADERS} )
-set ( LAYOUT_ENGINE_LIBRATY "C:/Work/looker_core/build/lib/Debug/cored.lib" "C:/Work/looker_core/build/lib/Debug/LayoutEngined.lib" "C:/Work/looker_core/build/lib/Debug/platformd.lib")
+
+
 set ( ICU_LIBRARY ${ICU_LIB_FILES} )
 # We make bundles for Mac OS X
 if ( APPLE )
     add_executable( ${PROJECT_NAME} MACOSX_BUNDLE ${ALL_SOURCES} )
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
     set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_SKIP_BUILD_RPATH  TRUE)
-# ...and a normal executable for everything else.
 else()
     add_executable( ${PROJECT_NAME} WIN32 ${ALL_SOURCES} )
 endif()
@@ -767,7 +774,15 @@ if( APPLE )
     endif()
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/examples/* ${WORK_DIR}/Sigil.app/Contents/examples )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../lib/*.dylib ${WORK_DIR}/Sigil.app/Contents/lib/ )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -rpath ${CMAKE_BINARY_DIR}/lib "@executable_path/../lib" ${WORK_DIR}/Sigil.app/Contents/MacOS/Sigil )
+    #add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -rpath ${CMAKE_BINARY_DIR}/lib "@executable_path/../lib" ${WORK_DIR}/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libiculx.52.dylib @rpath/libiculx.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuuc.52.dylib @rpath/libicuuc.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicui18n.52.dylib @rpath/libicui18n.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicule.52.dylib @rpath/libicule.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicutu.52.dylib @rpath/libicutu.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuio.52.dylib @rpath/libicuio.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
+
  
 # For Linux and Windows, provide binary installers.
 # For this to work on Windows, Inno Setup's iscc compiler needs to be installed and on the system path.
