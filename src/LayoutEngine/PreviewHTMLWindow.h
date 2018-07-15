@@ -9,7 +9,7 @@ namespace future_core {
     class HTMLViewQt;
 }
 
-class PreviewHTMLWindow : public QDockWidget, public LayoutEngineDelegate
+class PreviewHTMLWindow : public QDockWidget
 {
 	Q_OBJECT
 
@@ -22,11 +22,8 @@ public:
 	void cleanTempFile();
 
 protected:
-	void engineInitFinish() override;
-	void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error) override;
-	void enginUpdateAllViewPage() override;
-	// only open html file
-    void engineOpenHTML(HTMLReader* html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) override;
+	void engineInitFinish();
+    void engineOpenHTMLFinish(HTMLReader* html, int error);
 
 	void paintEvent(QPaintEvent *) override;
 	void resizeEvent(QResizeEvent * event) override;
@@ -52,7 +49,6 @@ private slots:
 	void gobackToHTMLOffset();
 
 private:
-	LayoutEngine *m_engine{ NULL };
 	std::string m_htmlPath{ "" };
 	std::string m_innerHtmlPath{ "" };
 	QSize m_standardSize;

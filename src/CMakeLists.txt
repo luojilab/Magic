@@ -782,6 +782,14 @@ if( APPLE )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicule.52.dylib @rpath/libicule.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicutu.52.dylib @rpath/libicutu.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuio.52.dylib @rpath/libicuio.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
+    #for release
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libiculx.52.dylib @rpath/libiculx.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuuc.52.dylib @rpath/libicuuc.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicui18n.52.dylib @rpath/libicui18n.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicule.52.dylib @rpath/libicule.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicutu.52.dylib @rpath/libicutu.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuio.52.dylib @rpath/libicuio.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
 
  
 # For Linux and Windows, provide binary installers.

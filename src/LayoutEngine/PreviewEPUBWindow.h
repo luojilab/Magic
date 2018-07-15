@@ -13,21 +13,19 @@ namespace future_core {
     class BookViewQt;
 }
 
-class PreviewEPUBWindow : public QWidget, public LayoutEngineDelegate {
+class PreviewEPUBWindow : public QWidget {
 
 	Q_OBJECT
     
 public:
 	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize);
 	~PreviewEPUBWindow();
-	void updateEngine(const std::string& bundlePath = "", const std::string& epubPath = "", const QSize& defaultSize = QSize(0, 0));
+	void reloadEPUB(const std::string& bundlePath = "", const std::string& epubPath = "", const QSize& defaultSize = QSize(0, 0));
 	QStandardItemModel *getBookContentList() { return m_bookContents; };
 
 private:
-	void engineInitFinish() override;
-	void engineOpenBook(BookReader* bookModel, QList<BookContents *>list, int error) override;
-    void enginUpdateAllViewPage() override;
-	void engineOpenHTML(HTMLReader* html, LAYOUT_ENGINE_OPEN_EPUB_STATUS error) override;
+	void engineInitFinish();
+	void engineOpenBookFinish(BookReader* bookModel, int error);
 
 public slots:
 	void gotoChapterByIndex(const QModelIndex);
@@ -38,7 +36,6 @@ public slots:
 
 private:
 	std::string m_epubPath;
-	LayoutEngine * m_engine;
 	BookReader* m_bookReader;
 	QSize m_defaultSize;
     QStandardItemModel *m_bookContents{ NULL };
@@ -54,13 +51,11 @@ private:
 	bool m_canChangeTOC{ true };
 
 private:
-	void generateContentsModel();
+	void generateNavigatorTreeModel(QList<std::shared_ptr<BookContents>>);
 	void changeBGColor(int color, bool isNightMode = false);
     void bookViewCoreInitial();
 
 private slots:
-    // TODO renaming
-	void doDraw();
 	void closed();
 	void GoToHtml();
     void showError(const QString&);
