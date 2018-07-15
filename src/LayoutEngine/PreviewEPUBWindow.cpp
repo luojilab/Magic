@@ -55,7 +55,7 @@ PreviewEPUBWindow::~PreviewEPUBWindow()
 
 void PreviewEPUBWindow::doDraw() {
     m_engine->gotoFirstPage(m_bookReader);
-    m_viewCore->AllViewUpdated(UPDATE_VIEW_CODE);
+    m_viewCore->UpdateView(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
@@ -90,7 +90,7 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
 	default:
 		return;
 	}
-    m_viewCore->AllViewUpdated(UPDATE_VIEW_CODE);
+    m_viewCore->UpdateView(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
@@ -113,7 +113,7 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
             return;
         }
         if (m_bookReader != NULL) {
-            m_engine->closeEpub(m_bookReader);
+            closed();
         }
         if (defaultSize != m_defaultSize) {
             m_defaultSize = defaultSize;
@@ -122,16 +122,19 @@ void PreviewEPUBWindow::updateEngine(const std::string& bundlePath, const std::s
             }
         }
         m_epubPath = epubPath;
+        if ( !m_viewCore ) {
+            bookViewCoreInitial();
+        }
         m_engine->openEpub(m_viewCore, m_epubPath, "", "");
 	}
 }
 
 void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 {
-	if (!m_canChangeTOC) { return; }
+    if (!m_canChangeTOC) { return; }
 	if (!m_bookContents) { return; }
 	if (!isVisible()) { return; }
-	m_canChangeTOC = false;
+    m_canChangeTOC = false;
 	QStandardItem *selectItem = static_cast<QStandardItem *>(index.internalPointer());
 	int idx{-1};
 	std::vector<QStandardItem *>::iterator it = m_bookItems.begin();
@@ -159,7 +162,7 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 	if (idx == -1 || idx > items.count()) { return; }
 	// goto chapter
 	m_engine->gotoChapterByFileName(m_bookReader, items[idx]->ContentHRef);
-    m_viewCore->AllViewUpdated(UPDATE_VIEW_CODE);
+    m_viewCore->UpdateView(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::engineInitFinish() {
