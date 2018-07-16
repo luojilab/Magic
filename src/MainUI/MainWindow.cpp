@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 **
 **  Copyright (C) 2016 Kevin B. Hendricks, Stratford, Ontario Canada
 **  Copyright (C) 2012-2015 John Schember <john@nachtimwald.com>
@@ -4304,6 +4304,9 @@ void MainWindow::layout(PreviewPhoneType type) {
         QMessageBox::information(this, "", u8"请先关闭当前预览窗口", QMessageBox::Ok);
         return;
     }
+    if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+        m_previewerToHTML->close();
+    }
 	if ( !this->Save() ) {
         QMessageBox::information(this, "", u8"保存失败，请保存之后再打开");
 		return;
@@ -4360,10 +4363,7 @@ void MainWindow::layout(PreviewPhoneType type) {
     m_previewEPUBDock->resize(width * 1.5, height * 1.5);
     //update content
 	std::string emptyStr = "";
-    m_epubPreviewer->updateEngine(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
-	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
-		m_previewerToHTML->close();
-	}
+    m_epubPreviewer->reloadEPUB(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
 	m_previewEPUBDock->show();
 	m_epubPreviewer->setFocus();
 }
