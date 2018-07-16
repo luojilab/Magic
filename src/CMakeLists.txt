@@ -675,8 +675,8 @@ include_directories( BEFORE
 
 set ( LAYOUT_ENGINE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/LayoutEngine )
 include_directories( BEFORE ${LAYOUT_ENGINE_DIR} )
-include_directories( ${CALL_INTERFACE_DIR} )
-include_directories( ${INTERFACE_DIR} )
+include_directories( ${LAYOUT_ENGINE_DIR}/interface )
+
 
 if ( WIN32 )
 	file(GLOB ICU_LIB_FILES LayoutEngine/icu/qt/lib64/*.lib )
@@ -692,6 +692,7 @@ set ( ICU_LIBRARY ${ICU_LIB_FILES} )
 # We make bundles for Mac OS X
 if ( APPLE )
     add_executable( ${PROJECT_NAME} MACOSX_BUNDLE ${ALL_SOURCES} )
+    SET(CMAKE_INSTALL_RPATH "@executable_path/lib")
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
     set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_SKIP_BUILD_RPATH  TRUE)
 else()
