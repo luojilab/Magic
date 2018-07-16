@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 **
 **  Copyright (C) 2009, 2010, 2011  Strahinja Markovic  <strahinja.markovic@gmail.com>
 **
@@ -1750,10 +1750,6 @@ void BookBrowser::AddCopyrightPage()
 
 void BookBrowser::AddFullScreenPage()
 {
-    if (fileExits("cover")) {
-        Utility::DisplayStdWarningDialog(u8"有重复的全屏页，请删除原有全屏页文件");
-        return;
-    }
     bool allowMultyMedia = false;
     bool allowImage = true;
     QStringList files = AddExisting(allowMultyMedia,allowImage);
@@ -1775,9 +1771,6 @@ void BookBrowser::AddFullScreenPage()
     emit ResourceActivated(new_html_resource);
     emit BookContentModified();
     Refresh();
-    
-    // rename
-    m_OPFModel->RenameResource(new_html_resource, FULL_SCREEN_PAGE_NAME + XHTML_FILE_FORMAT);
 }
 
 bool BookBrowser::fileExits(const QString& fileName)
