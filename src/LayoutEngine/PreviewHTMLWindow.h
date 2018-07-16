@@ -61,6 +61,7 @@ private:
 	void cleanResource();
 	void refreshView() const;
 	std::string tempFilePath(const std::string& fileName);
+    void initialRenderSize();
 	std::map<int, std::string> m_supportBGColor {
 		{0,"rgb(255,255,255)"},
 		{1,"rgb(244,240,221)"},

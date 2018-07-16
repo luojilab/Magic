@@ -25,6 +25,7 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
 	// Must initial engine at last!
 	// in case the width and height value get wrong
     initialCoreView();
+    initialRenderSize();
     if ( !LayoutEngine::GetEngine()->isEngineReady() ) {
         LayoutEngine::GetEngine()->initLayoutEngine("", [this]() {
             engineInitFinish();
@@ -32,14 +33,6 @@ PreviewHTMLWindow::PreviewHTMLWindow(QWidget * parent, const std::string htmlPat
     } else {
         engineInitFinish();
     }
-#if __APPLE__
-    float ratio = 1;
-#else
-    float ratio = 0.85;
-#endif
-    const float margin = 60.f;
-    LayoutEngine::GetEngine()->SetViewTopMargin(margin / ratio);
-    LayoutEngine::GetEngine()->SetViewBottomMargin(margin / ratio);
 	std::string bgPrefix("background-color:");
 	std::string bgColorStyle = bgPrefix + m_supportBGColor[0];
 	setStyleSheet(QString(bgColorStyle.c_str()));
@@ -70,7 +63,7 @@ void PreviewHTMLWindow::engineOpenHTMLFinish(HTMLReader *html, int error) {
     }
     m_htmlReader = html;
     m_viewCore->setHTMLReader(html);
-    m_viewCore->SetPaintSize(m_standardSize.width(), m_standardSize.height());
+    initialRenderSize();
     LayoutEngine::GetEngine()->gotoPageByIndex(m_htmlReader, m_currentPageIndex);
     m_viewCore->updateView();
 }
@@ -163,12 +156,13 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
     if (!reload) {
         return;
     }
-    cleanResource();
-    initialCoreView();
-    m_htmlPath = htmlPath;
-    if (standardSize.width() != 0 || standardSize.height() != 0) {
+    if (standardSize.width() && standardSize.height()) {
         m_standardSize = standardSize;
     }
+    cleanResource();
+    initialCoreView();
+    initialRenderSize();
+    m_htmlPath = htmlPath;
     
     QFile f(htmlPath.c_str());
     m_htmlPath = htmlPath;
@@ -273,6 +267,22 @@ void PreviewHTMLWindow::bgColorChange(int idx, bool isNightMode)
 	}
 	std::string prop = "background-color:";
 	setStyleSheet((prop + color).c_str());
+}
+
+void PreviewHTMLWindow::initialRenderSize()
+{
+    if ( !m_standardSize.width() || !m_standardSize.height() || !m_viewCore ) {
+        return;
+    }
+#if __APPLE__
+    float ratio = 1;
+#else
+    float ratio = 0.85;
+#endif
+    const float margin = 60.f;
+    LayoutEngine::GetEngine()->SetViewTopMargin(margin / ratio);
+    LayoutEngine::GetEngine()->SetViewBottomMargin(margin / ratio);
+    m_viewCore->SetPaintSize(m_standardSize.width(), m_standardSize.height());
 }
 
 void PreviewHTMLWindow::initialCoreView()
