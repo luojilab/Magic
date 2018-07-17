@@ -111,6 +111,7 @@ void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event)
 void PreviewHTMLWindow::closeEvent(QCloseEvent *)
 {
 	cleanResource();
+    cleanTempFile();
 }
 
 // keyboard press
@@ -138,7 +139,6 @@ void PreviewHTMLWindow::keyPressEvent(QKeyEvent *event)
 void PreviewHTMLWindow::closed()
 {
 	closeEvent(nullptr);
-	cleanTempFile();
 }
 
 QSize PreviewHTMLWindow::sizeHint() const
@@ -178,6 +178,7 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
 void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts)
 {
     cleanResource();
+    initialCoreView();
     QFile f(m_innerHtmlPath.c_str());
     if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         f.write(contentTexts.toUtf8());
@@ -209,13 +210,13 @@ void PreviewHTMLWindow::cleanTempFile()
 
 void PreviewHTMLWindow::cleanResource()
 {
+    if (m_viewCore) {
+        m_viewCore->destory();
+        m_viewCore = 0;
+    }
     if (m_htmlReader) {
         LayoutEngine::GetEngine()->closeHtml(m_htmlReader);
         m_htmlReader = 0;
-    }
-    if (m_viewCore) {
-        delete m_viewCore;
-        m_viewCore = 0;
     }
     m_currentPageIndex = 0;
     m_isNightMode = false;

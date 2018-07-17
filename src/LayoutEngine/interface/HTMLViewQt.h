@@ -23,18 +23,24 @@ namespace future_core {
         
     public:
         ENGINE_EXPORT HTMLViewQt(QWidget *hostView);
+        virtual ~HTMLViewQt();
         ENGINE_EXPORT void setHTMLReader(HTMLReader *reader);
         ENGINE_EXPORT void setUpdateViewCallback(const std::function<void()>&);
         ENGINE_EXPORT void onDraw();
         ENGINE_EXPORT void SetPaintSize(int width, int height) override;
         ENGINE_EXPORT void updateView();
         ENGINE_EXPORT float GetDensity() override;
+        ENGINE_EXPORT void destory();
+        
+    protected:
+        void ClearBookReader() override;
         
     /* member variable */
     private:
         QWidget* m_hostView;
         HTMLReader* m_htmlReader;
         std::function<void(void)> m_updateViewCallback;
+        bool m_isCallDestroy;
         
     private:
         void updateViewCallback();
