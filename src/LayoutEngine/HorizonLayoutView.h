@@ -19,18 +19,10 @@ public:
     explicit HorizonLayoutView(QSize, int);
     ~HorizonLayoutView();
     void addWidgets(QList<QWidget *>);
-    void setDefaultMainSize(QSize);
-    
-protected:
-    void resizeEvent(QResizeEvent *) override;
-    QSize sizeHint() const override;
-    void showEvent(QShowEvent *) override;
     
 private:
     QList<QWidget *>m_widgets;
     QSize m_mainWidgetSize;
-    int m_subWidgetMiniWidth;
-    
-    void reLayoutWidgets();
+    QHBoxLayout* m_layout;
 };
 #endif /* HorizonLayoutView_hpp */
