@@ -11,6 +11,7 @@
 #include <sstream>
 #include <QWidgetAction>
 #include <QLabel>
+#include <QScreen>
 #include "BookViewQt.h"
 
 using future_core::BookViewQt;
@@ -23,12 +24,8 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 	m_bookContents(0),
     m_viewCore(0)
 {
-#if __APPLE__
-        float ratio = 1;
-#else
-        float ratio = 0.85;
-#endif
     const float margin = 60.f;
+    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.85;
 	LayoutEngine::GetEngine()->SetViewTopMargin(margin / ratio);
 	LayoutEngine::GetEngine()->SetViewBottomMargin(margin / ratio);
 	setFocusPolicy(Qt::ClickFocus);
@@ -38,10 +35,6 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 PreviewEPUBWindow::~PreviewEPUBWindow()
 {
 	closed();
-    if (m_viewCore) {
-        delete m_viewCore;
-        m_viewCore = NULL;
-    }
 }
 
 void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
@@ -121,33 +114,21 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 	if (!m_bookContents) { return; }
 	if (!isVisible()) { return; }
     m_canChangeTOC = false;
-	QStandardItem *selectItem = static_cast<QStandardItem *>(index.internalPointer());
-	int idx{-1};
-	std::vector<QStandardItem *>::iterator it = m_bookItems.begin();
-	// get click index
-	if ( !index.parent().isValid() ) {
-        auto s = index.data().toString();
-        while (it != m_bookItems.end()) {
-            if (s == (*it++)->text()) {
-                break;
-            }
-            idx += 1;
-        }
-        idx += 1;
-	} else {
-        // only have level0 content item
-        while (it != m_bookItems.end()) {
-            ++idx;
-            if (selectItem == *it++) {
-                break;
-            }
-        }
-        idx += index.row() + 1;
-	}
     QList<std::shared_ptr<BookContents>>items = LayoutEngine::GetEngine()->getContentList(m_bookReader);
-	if (idx == -1 || idx > items.count()) { return; }
+    QString name = index.data().toString();
+    std::shared_ptr<BookContents>selectItem = 0;
+    for ( std::shared_ptr<BookContents> item : items ) {
+        if (name == item->text) {
+            selectItem = item;
+            break;
+        }
+    }
+    if ( !selectItem ) {
+        m_canChangeTOC = true;
+        return;
+    }
 	// goto chapter
-	LayoutEngine::GetEngine()->gotoChapterByFileName(m_bookReader, items[idx]->ContentHRef);
+	LayoutEngine::GetEngine()->gotoChapterByFileName(m_bookReader, selectItem->ContentHRef);
     m_viewCore->UpdateView(UPDATE_VIEW_CODE);
 }
 
