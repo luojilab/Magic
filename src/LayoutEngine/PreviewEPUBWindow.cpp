@@ -9,6 +9,8 @@
 #include <QApplication>
 #include <QMenu>
 #include <sstream>
+#include <QWidgetAction>
+#include <QLabel>
 #include "BookViewQt.h"
 
 using future_core::BookViewQt;
@@ -184,7 +186,9 @@ void PreviewEPUBWindow::engineOpenBookFinish(BookReader* bookreader, int error)
 void PreviewEPUBWindow::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::RightButton) {
 		QMenu* menu = new QMenu(this);
-		QAction* action = new QAction("Go to Html", menu);
+        QLabel* label = new QLabel("Go to Html", 0);
+        QWidgetAction *action = new QWidgetAction(0);
+        action->setDefaultWidget(label);
 		connect(action, SIGNAL(triggered()), this, SLOT(GoToHtml()));
 		menu->addAction(action);
 		menu->exec(event->globalPos());
