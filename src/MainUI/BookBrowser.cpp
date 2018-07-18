@@ -1786,3 +1786,30 @@ bool BookBrowser::fileExits(const QString& fileName)
     }
     return haveSameName;
 }
+
+void BookBrowser::CheckFileWellFormated()
+{
+    QList<Resource *>resources = AllHTMLResources();
+    QList<QString>errorFileName;
+    for (Resource* res : resources) {
+        HTMLResource* htmlRes = dynamic_cast<HTMLResource *>(res);
+        if ( !XhtmlDoc::IsDataWellFormed(htmlRes->GetText()) ) {
+            errorFileName << htmlRes->Filename();
+        }
+    }
+    QStandardItem* htmlModel = m_OPFModel->itemFromIndex(m_OPFModel->GetTextFolderModelIndex());
+    int rowcnt = htmlModel->rowCount();
+    for (int i = 0; i < rowcnt; i ++) {
+        htmlModel->child(i)->setBackground(QColor(0, 0, 0, 0));
+    }
+    for (QString eFile : errorFileName) {
+        for (int i = 0; i < rowcnt; i ++) {
+            QStandardItem* child = htmlModel->child(i);
+            std::string s = eFile.toStdString();
+            std::string ss = child->text().toStdString();
+            if (s == ss) {
+                child->setBackground(QColor("red"));
+            }
+        }
+    }
+}

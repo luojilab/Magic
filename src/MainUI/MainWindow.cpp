@@ -5413,6 +5413,9 @@ void MainWindow::contentTxetChangedAction() {
 		m_previewerToHTML->updateCurrentPage(res->GetText());
 		m_contentChanged = false;
 	}
+    if (m_contentChanged) {
+        m_BookBrowser->CheckFileWellFormated();
+    }
 }
 
 void MainWindow::fileWillSavedAction() {
