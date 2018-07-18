@@ -46,6 +46,7 @@
 #include <QFontMetrics>
 #include <QTimer>
 #include <QDesktopWidget>
+#include <QScreen>
 
 #include "BookManipulation/CleanSource.h"
 #include "BookManipulation/Index.h"
@@ -4311,11 +4312,8 @@ void MainWindow::layout(PreviewPhoneType type) {
         QMessageBox::information(this, "", u8"保存失败，请保存之后再打开");
 		return;
 	}
-#ifdef __APPLE__
-    float ratio = 1;
-#else
-    float ratio = 0.85;
-#endif
+    
+    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
 	QSize d_size = m_previewPhoneSizeMap[type];
     int screenHeight = QApplication::desktop()->screenGeometry().size().height();
     float height = d_size.height() / ratio > screenHeight ? screenHeight - 100 : d_size.height() / ratio;
@@ -4353,14 +4351,14 @@ void MainWindow::layout(PreviewPhoneType type) {
 		m_epubPreviewer->setStyleSheet("background-color:white;");
 	}
     //size hint
-    m_epubPreviewer->setMaximumSize(width, height);
-    m_epubPreviewer->setMinimumSize(width / 2, height / 2);
+    m_epubPreviewer->setFixedSize(width, height);
     m_bookContentView->setMaximumSize(width,height);
-    m_previewerToEpubContainer->setDefaultMainSize(QSize(width, height));
     m_previewerToEpubContainer->setMinimumSize(QSize(width + tocMinWidth, height));
     m_previewerToEpubContainer->setMaximumSize(QSize(width * 2, height));
     m_previewerToEpubContainer->resize(width, height);
-    m_previewEPUBDock->resize(width * 1.5, height * 1.5);
+    m_bookContentView->resize(width * 0.5, height);
+    m_previewEPUBDock->resize(width * 1.5, height);
+    m_previewerToEpubContainer->setStyleSheet("background-color:;"); // used for relayout the view;
     //update content
 	std::string emptyStr = "";
     m_epubPreviewer->reloadEPUB(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
@@ -5346,11 +5344,8 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		return;
 	}
 	QSize d_size = m_previewPhoneSizeMap[type];
-#ifdef __APPLE__
-    float ratio = 1;
-#else
-    float ratio = 0.85;
-#endif
+
+    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
 	float width = (d_size.width()) / ratio;
 	float height = (d_size.height()) / ratio;
 	if (!m_previewerToHTML) {

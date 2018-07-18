@@ -19,6 +19,7 @@ HorizonLayoutView::HorizonLayoutView(QSize size, int miniWidth):
 
 HorizonLayoutView::~HorizonLayoutView()
 {
+    m_widgets.clear();
     delete m_layout;
 }
 
@@ -27,6 +28,7 @@ void HorizonLayoutView::addWidgets(QList<QWidget *>ws)
     for( QWidget *w : ws ) {
         if ( w && !m_widgets.contains(w) ) {
             m_layout->addWidget(w);
+            m_widgets << w;
         }
     }
     setLayout(m_layout);

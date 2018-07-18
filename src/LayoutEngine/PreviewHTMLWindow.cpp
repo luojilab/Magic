@@ -7,6 +7,8 @@
 #include <QSettings>
 #include <QMenu>
 #include <QAction>
+#include <QScreen>
+#include <QApplication>
 #include "HTMLViewQt.h"
 
 using future_core::HTMLViewQt;
@@ -275,12 +277,8 @@ void PreviewHTMLWindow::initialRenderSize()
     if ( !m_standardSize.width() || !m_standardSize.height() || !m_viewCore ) {
         return;
     }
-#if __APPLE__
-    float ratio = 1;
-#else
-    float ratio = 0.85;
-#endif
     const float margin = 60.f;
+    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
     LayoutEngine::GetEngine()->SetViewTopMargin(margin / ratio);
     LayoutEngine::GetEngine()->SetViewBottomMargin(margin / ratio);
     m_viewCore->SetPaintSize(m_standardSize.width(), m_standardSize.height());

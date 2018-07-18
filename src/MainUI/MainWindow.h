@@ -1093,11 +1093,11 @@ private:
 
 	std::map<PreviewPhoneType, PreviewEPUBWindow *>m_preViewWindowsMap;
 	std::map<PreviewPhoneType, QSize> m_previewPhoneSizeMap = {
-		{ PreviewPhoneType::iPhone5, QSize(320, 568)},
+		{ PreviewPhoneType::iPhone5, QSize(320, 568) },
 		{ PreviewPhoneType::iPhone6 ,QSize(375, 667) },
 		{ PreviewPhoneType::iPhone6P ,QSize(414, 736) },
 		{ PreviewPhoneType::iPhoneX ,QSize(375, 812) },
-		{ PreviewPhoneType::XiaoMi ,QSize(375, 568) },
+		{ PreviewPhoneType::XiaoMi ,QSize(414, 736) },
 		{ PreviewPhoneType::iPad,QSize(768, 1024) }
 	};
 	std::map<PreviewPhoneType, std::vector<int>> m_previewPhoneSimulatorFix = {

@@ -25,7 +25,7 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
     m_viewCore(0)
 {
     const float margin = 60.f;
-    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.85;
+    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
 	LayoutEngine::GetEngine()->SetViewTopMargin(margin / ratio);
 	LayoutEngine::GetEngine()->SetViewBottomMargin(margin / ratio);
 	setFocusPolicy(Qt::ClickFocus);
