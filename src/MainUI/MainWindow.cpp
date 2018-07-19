@@ -5000,6 +5000,7 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(ui.actionIPad_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIpad()));
     connect(ui.actionPreviewForIphoneXQuick, SIGNAL(triggered()), this, SLOT(previewForIphoneX()));
     connect(ui.actionXiaomiQuick, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
+    connect(ui.actionStandard_html_name, SIGNAL(triggered()), m_BookBrowser, SLOT(standardizedHtmlFileNames()));
     // Change case
     connect(ui.actionCasingLowercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
     connect(ui.actionCasingUppercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));

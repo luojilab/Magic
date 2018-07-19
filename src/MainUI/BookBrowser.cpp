@@ -59,6 +59,7 @@ static const int COLUMN_INDENTATION = 10;
 const QString FULL_SCREEN_PAGE_NAME = "cover";
 const QString COPYRIGHT_PAEG_NAME = "Copyright";
 const QString XHTML_FILE_FORMAT = ".xhtml";
+const QString HTML_FILE_FORMAT = ".html";
 
 BookBrowser::BookBrowser(QWidget *parent)
     :
@@ -1811,5 +1812,23 @@ void BookBrowser::CheckFileWellFormated()
                 child->setBackground(QColor("red"));
             }
         }
+    }
+}
+
+
+void BookBrowser::standardizedHtmlFileNames()
+{
+    QList<Resource *>resources = AllHTMLResources();
+    for (Resource *res : resources ) {
+        if ( !res->Filename().endsWith(HTML_FILE_FORMAT) ) {
+            continue;
+        }
+        std::string fileNameWithExtension = res->Filename().toStdString();
+        size_t dotPos = fileNameWithExtension.rfind(".");
+        if (dotPos == 0) {
+            continue;
+        }
+        std::string fileName = fileNameWithExtension.substr(0, dotPos);
+        m_OPFModel->RenameResource(res, (fileName + XHTML_FILE_FORMAT.toStdString()).c_str());
     }
 }

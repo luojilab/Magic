@@ -369,6 +369,8 @@
     <addaction name="separator"/>
     <addaction name="menuPreview"/>
     <addaction name="menu"/>
+    <addaction name="separator"/>
+    <addaction name="actionStandard_html_name"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
     <property name="title">
@@ -2468,6 +2470,11 @@
   <action name="actionAddFullScreenPage">
    <property name="text">
     <string>添加全屏页</string>
+   </property>
+  </action>
+  <action name="actionStandard_html_name">
+   <property name="text">
+    <string>标准化HTML文件名</string>
    </property>
   </action>
  </widget>

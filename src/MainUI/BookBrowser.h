@@ -167,6 +167,7 @@ public slots:
     void CreateIndexCSSFile();
     void AddCopyrightPage();
     void AddFullScreenPage();
+    void standardizedHtmlFileNames();
     
     /**
      * Implements the Add Existing context menu action functionality.
