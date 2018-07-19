@@ -131,6 +131,8 @@ private slots:
      * the UI can now be updated.
      */
     void RefreshEnd();
+    
+    void changeEpubVersion(QString newVersion);
 
 private:
 

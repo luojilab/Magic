@@ -1240,6 +1240,7 @@ QString OPFResource::ValidatePackageVersion(const QString& source)
             GetLock().lockForWrite();
             SetEpubVersion(new_version);
             GetLock().unlock();
+            emit EPUBVersionHasChanged(new_version);
         } else {
             newsource.replace(mo.capturedStart(1), mo.capturedLength(1), orig_version);
         }

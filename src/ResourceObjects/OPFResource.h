@@ -122,6 +122,9 @@ public:
 
     void SetNavResource(HTMLResource* nav);
     HTMLResource* GetNavResource() const;
+    
+signals:
+    void EPUBVersionHasChanged(QString newVersion);
 
 public slots:
 

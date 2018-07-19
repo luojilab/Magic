@@ -31,6 +31,7 @@
 #include "ResourceObjects/OPFResource.h"
 #include "ResourceObjects/NavProcessor.h"
 #include "BookManipulation/CleanSource.h"
+#include "BookManipulation/FolderKeeper.h"
 
 TOCModel::TOCModel(QObject *parent)
     :
@@ -45,12 +46,16 @@ TOCModel::TOCModel(QObject *parent)
 
 void TOCModel::SetBook(QSharedPointer<Book> book)
 {
+    if (m_Book) {
+        disconnect(m_Book->GetFolderKeeper()->GetOPF(), SIGNAL(EPUBVersionHasChanged(QString)), this, SLOT(changeEpubVersion(QString)));
+    }
     {
         // We need to make sure we don't step on the toes of GetNCXText
         QMutexLocker book_lock(&m_UsingBookMutex);
         m_Book = book;
         m_EpubVersion = m_Book->GetConstOPF()->GetEpubVersion();
     }
+    connect(m_Book->GetFolderKeeper()->GetOPF(), SIGNAL(EPUBVersionHasChanged(QString)), this, SLOT(changeEpubVersion(QString)));
     Refresh();
 }
 
@@ -203,4 +208,13 @@ void TOCModel::AddEntryToParentItem(const TOCEntry &entry, QStandardItem *parent
     foreach(const TOCModel::TOCEntry & child_entry, entry.children) {
         AddEntryToParentItem(child_entry, item);
     }
+}
+
+
+void TOCModel::changeEpubVersion(QString newVersion)
+{
+    if (newVersion.isEmpty() || newVersion.toDouble() < 2 || newVersion.toDouble() > 3) {
+        return;
+    }
+    m_EpubVersion = newVersion;
 }
