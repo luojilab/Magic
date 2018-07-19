@@ -791,6 +791,13 @@ if( APPLE )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicule.52.dylib @rpath/libicule.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicutu.52.dylib @rpath/libicutu.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuio.52.dylib @rpath/libicuio.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  /Library/Frameworks/Python.framework/Versions/3.5/Python @rpath/Python.framework/Versions/3.5/Python /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND mkdir -p ${WORK_DIR}/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -rf ${WORK_DIR}/Sigil.app ${WORK_DIR}/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND hdiutil create -volname Sigil -srcfolder ${WORK_DIR}/Sigil -ov -format UDZO Sigil.dmg )
+
+
 
  
 # For Linux and Windows, provide binary installers.
