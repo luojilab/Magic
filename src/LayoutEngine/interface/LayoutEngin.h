@@ -45,14 +45,9 @@ public:
     ENGINE_EXPORT ~LayoutEngine();
     ENGINE_EXPORT void initLayoutEngine(const std::string& bundlePath, std::function<void(void)>callback);
     
-	ENGINE_EXPORT void setPageSize(BookReader *bookModel, qint32 width, qint32 height, float scale);
-    
     ENGINE_EXPORT void openEpub(future_core::BookView* view, const std::string& filePath, const std::string& tokenStd, const std::string& uidStd, std::function<void(BookReader*, int)>callback);
     
 	ENGINE_EXPORT void gotoChapterByFileName(BookReader *bookModel, const QString& fileName);
-    
-	ENGINE_EXPORT void updateAllView(BookReader *bookModel);
-    ENGINE_EXPORT void updateAllView(HTMLReader *bookModel);
     
 	ENGINE_EXPORT void closeEpub(BookReader *bookModel);
     
@@ -86,6 +81,9 @@ public:
     ENGINE_EXPORT std::string getCurrentChapterId(BookReader* bookModel);
     
     ENGINE_EXPORT std::string getChapterFileNameById(BookReader* bookModel, const std::string& charpterId);
+    
+    ENGINE_EXPORT void mouseClick(BookReader* reader, int x, int y);
+    ENGINE_EXPORT void mouseClick(HTMLReader* reader, int x, int y);
     
     ENGINE_EXPORT void
     openHtml(future_core::HTMLViewQt *view, const std::string& htmlPath, const std::string& uniqueKey, std::function<void(HTMLReader*, int code)>callback);

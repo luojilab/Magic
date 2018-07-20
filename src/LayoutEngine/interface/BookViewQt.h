@@ -33,6 +33,7 @@ namespace future_core {
         
     protected:
         void AllViewUpdated(int code) override;
+        void ViewOnClicked(int x, int y, const std::string &id, int offset) override;
         
     private:
         QWidget *m_hostView{ NULL };

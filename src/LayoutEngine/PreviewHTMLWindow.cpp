@@ -98,6 +98,8 @@ void PreviewHTMLWindow::mousePressEvent(QMouseEvent *event)
         return;
     }
 	if (event->button() == Qt::LeftButton) {
+        QPoint pos = event->pos();
+        LayoutEngine::GetEngine()->mouseClick(m_htmlReader, pos.x(), pos.y());
 		this->setFocus();
 	} else if (event->button() == Qt::RightButton) {
 		QMenu *menu = new QMenu(this);
@@ -292,5 +294,8 @@ void PreviewHTMLWindow::initialCoreView()
     m_viewCore = new HTMLViewQt(this);
     m_viewCore->setUpdateViewCallback([this]() {
         update();
+    });
+    m_viewCore->setMouseClickCallback([this](int, int, std::string, int pageIndex) {
+        m_currentPageIndex = pageIndex;
     });
 }

@@ -26,6 +26,7 @@ namespace future_core {
         virtual ~HTMLViewQt();
         ENGINE_EXPORT void setHTMLReader(HTMLReader *reader);
         ENGINE_EXPORT void setUpdateViewCallback(const std::function<void()>&);
+        ENGINE_EXPORT void setMouseClickCallback(std::function<void(int x, int y, std::string chaId, int pageIndex)>);
         ENGINE_EXPORT void onDraw();
         ENGINE_EXPORT void SetPaintSize(int width, int height) override;
         ENGINE_EXPORT void updateView();
@@ -40,6 +41,7 @@ namespace future_core {
         QWidget* m_hostView;
         HTMLReader* m_htmlReader;
         std::function<void(void)> m_updateViewCallback;
+        std::function<void(int x, int y, std::string chaId, int pageIndex)> m_mouseClickCallback;
         bool m_isCallDestroy;
         
     private:

@@ -174,7 +174,14 @@ void PreviewEPUBWindow::mousePressEvent(QMouseEvent *event) {
 		menu->addAction(action);
 		menu->exec(event->globalPos());
 		delete menu;
+        return;
 	}
+    if (event->button() == Qt::LeftButton) {
+        QPoint pos = event->pos();
+        LayoutEngine::GetEngine()->mouseClick(m_bookReader, pos.x(), pos.y());
+        setFocus(Qt::MouseFocusReason);
+        return;
+    }
 }
 
 void PreviewEPUBWindow::generateNavigatorTreeModel(QList<std::shared_ptr<BookContents>> contents)
