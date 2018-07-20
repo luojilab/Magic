@@ -1097,7 +1097,7 @@ private:
 		{ PreviewPhoneType::iPhone6 ,QSize(375, 667) },
 		{ PreviewPhoneType::iPhone6P ,QSize(414, 736) },
 		{ PreviewPhoneType::iPhoneX ,QSize(375, 812) },
-		{ PreviewPhoneType::XiaoMi ,QSize(414, 736) },
+		{ PreviewPhoneType::XiaoMi ,QSize(360, 749) },
 		{ PreviewPhoneType::iPad,QSize(768, 1024) }
 	};
 	std::map<PreviewPhoneType, std::vector<int>> m_previewPhoneSimulatorFix = {
