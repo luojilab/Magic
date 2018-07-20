@@ -28,6 +28,7 @@
 #include <QtWidgets/QProgressDialog>
 #include <QtWidgets/QScrollBar>
 #include <QtCore/QStringList>
+#include "Dialogs/SelectFiles.h"
 
 #include "BookManipulation/Book.h"
 #include "BookManipulation/FolderKeeper.h"
@@ -1753,13 +1754,27 @@ void BookBrowser::AddFullScreenPage()
 {
     bool allowMultyMedia = false;
     bool allowImage = true;
-    QStringList files = AddExisting(allowMultyMedia,allowImage);
-    if (files.isEmpty()) {
+    QString fileName("");
+    QString title = tr(u8"添加全屏页");
+    QList<Resource *> image_resources = m_Book->GetFolderKeeper()->GetResourceListByType(Resource::ImageResourceType);
+    SelectFiles select_files(title, image_resources, m_LastFolderOpen, this);
+    if ( !(select_files.exec() == QDialog::Accepted) ) {
         return;
     }
-    const QChar fileDelimiter = '/';
-    QString filePath = files[0];
-    QString fileName = filePath.right(filePath.length() - filePath.lastIndexOf(fileDelimiter) - 1);
+    if (select_files.IsInsertFromDisk()) {
+        QStringList files = AddExisting(allowMultyMedia,allowImage);
+        if ( !files.count() ) {
+            return;
+        }
+        QString filePath = files.first();
+        fileName = filePath.right(filePath.length() - filePath.lastIndexOf("/") - 1);
+    } else {
+        QStringList imgs = select_files.SelectedImages();
+        if (!imgs.count()) {
+            return;
+        }
+        fileName = imgs.first();
+    }
     Resource *current_resource = GetCurrentResource();
     HTMLResource *current_html_resource = qobject_cast<HTMLResource *>(current_resource);
     HTMLResource *new_html_resource = m_Book->CreateFullScreenHtmlFile(current_html_resource, "../Images/" + fileName);
