@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 **
 **  Copyright (C) 2016 Kevin B. Hendricks, Stratford, Ontario Canada
 **  Copyright (C) 2012-2015 John Schember <john@nachtimwald.com>
@@ -5158,7 +5158,9 @@ void MainWindow::ConnectSignalsToSlots()
 
 void MainWindow::fileSavedSuccessAction() {
 	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
-		m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true, QSize(0,0));
+        if (dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource())) {
+            m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true, QSize(0,0));
+        }
 	}
 }
 
@@ -5411,6 +5413,9 @@ void MainWindow::updateIntimePreviewContent() {
 void MainWindow::contentTxetChangedAction() {
 	if (m_contentChanged && m_previewerToHTML && m_previewerToHTML->isVisible()) {
 		HTMLResource* res = dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource());
+        if (res == NULL) {
+            return;
+        }
 		m_previewerToHTML->updateCurrentPage(res->GetText());
 		m_contentChanged = false;
 	}
