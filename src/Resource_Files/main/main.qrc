@@ -192,5 +192,11 @@
         <file>widget-close-22.png</file>
         <file>widget-close-48.png</file>
         <file>wrapindicator.png</file>
+        <file>mi-preview_48px.png</file>
+        <file>yellow-bk_48px.png</file>
+        <file>black-bk_48px.png</file>
+        <file>green-bk_48px.png</file>
+        <file>normal-bk_48px.png</file>
+        <file>ipad-preview_48px.png</file>
     </qresource>
 </RCC>

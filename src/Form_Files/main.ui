@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
+    <width>1436</width>
     <height>700</height>
    </rect>
   </property>
@@ -49,7 +49,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1000</width>
+     <width>1436</width>
      <height>22</height>
     </rect>
    </property>
@@ -2430,21 +2430,40 @@
    </property>
   </action>
   <action name="actionYellow">
+   <property name="icon">
+    <iconset resource="../Resource_Files/main/main.qrc">
+     <normaloff>:/main/yellow-bk_48px.png</normaloff>
+     <normalon>../Resource_Files/main/yellow-bk_48px.png</normalon>:/main/yellow-bk_48px.png</iconset>
+   </property>
    <property name="text">
     <string>黄色</string>
    </property>
   </action>
   <action name="actionGreen">
+   <property name="icon">
+    <iconset resource="../Resource_Files/main/main.qrc">
+     <normaloff>:/main/green-bk_48px.png</normaloff>
+     <normalon>../Resource_Files/main/green-bk_48px.png</normalon>:/main/green-bk_48px.png</iconset>
+   </property>
    <property name="text">
     <string>绿色</string>
    </property>
   </action>
   <action name="actionNormalColor">
+   <property name="icon">
+    <iconset resource="../Resource_Files/main/main.qrc">
+     <normaloff>:/main/normal-bk_48px.png</normaloff>:/main/normal-bk_48px.png</iconset>
+   </property>
    <property name="text">
     <string>正常</string>
    </property>
   </action>
   <action name="actionNight">
+   <property name="icon">
+    <iconset resource="../Resource_Files/main/main.qrc">
+     <normaloff>:/main/black-bk_48px.png</normaloff>
+     <normalon>../Resource_Files/main/black-bk_48px.png</normalon>:/main/black-bk_48px.png</iconset>
+   </property>
    <property name="text">
     <string>夜间模式</string>
    </property>
@@ -2455,6 +2474,10 @@
    </property>
   </action>
   <action name="actionPreviewForIphoneXQuick">
+   <property name="icon">
+    <iconset>
+     <normaloff>../Resource_Files/main/ipad-preview_48px.png</normaloff>../Resource_Files/main/ipad-preview_48px.png</iconset>
+   </property>
    <property name="text">
     <string>iPhoneX预览</string>
    </property>
@@ -2463,6 +2486,11 @@
    </property>
   </action>
   <action name="actionXiaomiQuick">
+   <property name="icon">
+    <iconset resource="../Resource_Files/main/main.qrc">
+     <normaloff>:/main/mi-preview_48px.png</normaloff>
+     <normalon>../Resource_Files/main/mi-preview_48px.png</normalon>:/main/mi-preview_48px.png</iconset>
+   </property>
    <property name="text">
     <string>小米预览</string>
    </property>
