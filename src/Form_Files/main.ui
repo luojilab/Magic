@@ -2469,6 +2469,10 @@
    </property>
   </action>
   <action name="actionAddCopyrightPage">
+   <property name="icon">
+    <iconset resource="../Resource_Files/main/main.qrc">
+     <normaloff>:/main/copyright@3.png</normaloff>:/main/copyright@3.png</iconset>
+   </property>
    <property name="text">
     <string>添加版权页</string>
    </property>
@@ -2496,6 +2500,10 @@
    </property>
   </action>
   <action name="actionAddFullScreenPage">
+   <property name="icon">
+    <iconset resource="../Resource_Files/main/main.qrc">
+     <normaloff>:/main/full-screen@3.png</normaloff>:/main/full-screen@3.png</iconset>
+   </property>
    <property name="text">
     <string>添加全屏页</string>
    </property>

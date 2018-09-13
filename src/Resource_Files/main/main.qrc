@@ -198,5 +198,7 @@
         <file>green-bk_48px.png</file>
         <file>normal-bk_48px.png</file>
         <file>ipad-preview_48px.png</file>
+        <file>copyright@3.png</file>
+        <file>full-screen@3.png</file>
     </qresource>
 </RCC>
