@@ -56,13 +56,11 @@ qrc_*
 
 # Misc files
 *.svn
-*.a
 *.o
 *.obj
 *.lib
 *.exe
 *.dll
-*.a
 *.app
 *.xcodeproj
 *.pbxbtree

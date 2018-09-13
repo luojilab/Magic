@@ -684,7 +684,7 @@ if ( WIN32 )
     file(GLOB LAYOUT_ENGINE_LIBRATY ${LAYOUT_ENGINE_PATH}/Debug/*.lib)
 elseif(APPLE)
     file(GLOB ICU_LIB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/../lib/icu/mac/lib/*.dylib )
-    file(GLOB LAYOUT_ENGINE_LIBRATY ${LAYOUT_ENGINE_PATH}/Debug/*.a)
+    file(GLOB LAYOUT_ENGINE_LIBRATY ${LAYOUT_ENGINE_PATH}/*.a)
 endif()
 
 

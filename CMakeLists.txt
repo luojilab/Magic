@@ -91,6 +91,12 @@ else()
     find_package (PythonLibs 3.4)
 endif()
 
+if (APPLE)
+    set(LAYOUT_ENGINE_PATH lib/DDLayoutEngine/macos)
+elif(WIN32)
+    set(LAYOUT_ENGINE_PATH lib/DDLayoutEngine/windows)
+endif()
+
 # gumbo-parser it is our main xhtml/html5 parser.
 # We have an internal version because it diverges from Google's and GitHub's
 # versions and neither want's our epub specific changes.
