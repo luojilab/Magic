@@ -92,9 +92,9 @@ else()
 endif()
 
 if (APPLE)
-    set(LAYOUT_ENGINE_PATH lib/DDLayoutEngine/macos)
-elif(WIN32)
-    set(LAYOUT_ENGINE_PATH lib/DDLayoutEngine/windows)
+    set(LAYOUT_ENGINE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/DDLayoutEngine/macos)
+elseif(WIN32)
+    set(LAYOUT_ENGINE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/DDLayoutEngine/windows)
 endif()
 
 # gumbo-parser it is our main xhtml/html5 parser.
