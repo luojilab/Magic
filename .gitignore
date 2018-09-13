@@ -58,9 +58,7 @@ qrc_*
 *.svn
 *.o
 *.obj
-*.lib
 *.exe
-*.dll
 *.app
 *.xcodeproj
 *.pbxbtree
