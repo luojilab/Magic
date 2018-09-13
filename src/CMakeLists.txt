@@ -678,6 +678,7 @@ include_directories( BEFORE ${LAYOUT_ENGINE_DIR} )
 include_directories( ${LAYOUT_ENGINE_DIR}/interface )
 
 
+set (LAYOUT_ENGINE_PATH "C:/Work/looker_core/build/lib")
 if ( WIN32 )
 	file(GLOB ICU_LIB_FILES LayoutEngine/icu/qt/lib64/*.lib )
 	file(GLOB ICU_DLL_FILES LayoutEngine/icu/qt/bin64/icu*.dll)
@@ -874,6 +875,10 @@ elseif (MSVC)
     set( LIBXSLT ${QT_INSTALL_BINS}/libxslt.dll )
     if ( EXISTS ${LIBXSLT} )
         add_custom_command( TARGET ${TARGET_FOR_COPY} POST_BUILD COMMAND cmake -E copy ${LIBXSLT} ${MAIN_PACKAGE_DIR} )
+    endif()
+
+    if ( EXISTS ${LIBLAYOUTENGINE_BIN} )
+        add_custom_command( TARGET ${TARGET_FOR_COPY} POST_BUILD COMMAND cmake -E copy ${LIBLAYOUTENGINE_BIN} ${MAIN_PACKAGE_DIR} )
     endif()
 
     # Copy the translation qm files

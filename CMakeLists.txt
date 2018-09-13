@@ -95,6 +95,7 @@ if (APPLE)
     set(LAYOUT_ENGINE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/DDLayoutEngine/macos)
 elseif(WIN32)
     set(LAYOUT_ENGINE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/DDLayoutEngine/windows)
+	set(LIBLAYOUTENGINE_BIN ${LAYOUT_ENGINE_PATH}/LayoutEngine.dll)
 endif()
 
 # gumbo-parser it is our main xhtml/html5 parser.
