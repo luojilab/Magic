@@ -609,21 +609,22 @@ if( APPLE )
     # TODO: put these in some sort of add_custom_command( TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ...)
     # also delete the Sigil.app folder as PRE_BUILD of Sigil executable
 
+    message("${RUNTIME_OUTPUT_DIRECTORY_Debug}")
     if( CMAKE_GENERATOR STREQUAL Xcode )
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/polyfills")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/Resources")
         # Create translation directory.
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/translations")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/hunspell_dictionaries")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/plugin_launchers")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/plugin_launchers/python")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/python3lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/examples")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/translations")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/hunspell_dictionaries")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/plugin_launchers")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/plugin_launchers/python")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/python3lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/examples")
     else()
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/Resources")
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/polyfills")
@@ -677,8 +678,6 @@ set ( LAYOUT_ENGINE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/LayoutEngine )
 include_directories( BEFORE ${LAYOUT_ENGINE_DIR} )
 include_directories( ${LAYOUT_ENGINE_DIR}/interface )
 
-
-set (LAYOUT_ENGINE_PATH "C:/Work/looker_core/build/lib")
 if ( WIN32 )
 	file(GLOB ICU_LIB_FILES LayoutEngine/icu/qt/lib64/*.lib )
 	file(GLOB ICU_DLL_FILES LayoutEngine/icu/qt/bin64/icu*.dll)
@@ -693,7 +692,10 @@ set ( ICU_LIBRARY ${ICU_LIB_FILES} )
 # We make bundles for Mac OS X
 if ( APPLE )
     add_executable( ${PROJECT_NAME} MACOSX_BUNDLE ${ALL_SOURCES} )
-    SET(CMAKE_INSTALL_RPATH "@executable_path/lib")
+    set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+    SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    set(CMAKE_INSTALL_RPATH $<<CONFIG:Debug>:"@executable_path/../lib">)
+    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
     set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_SKIP_BUILD_RPATH  TRUE)
 else()
@@ -767,36 +769,40 @@ if( APPLE )
                         COMMAND macdeployqt Sigil.app -dmg
                         WORKING_DIRECTORY ${WORK_DIR})
 
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp ${PROJECT_BINARY_DIR}/*.qm ${WORK_DIR}/Sigil.app/Contents/translations/ )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/dictionaries/* ${WORK_DIR}/Sigil.app/Contents/hunspell_dictionaries )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/plugin_launchers/python/* ${WORK_DIR}/Sigil.app/Contents/plugin_launchers/python )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/python3lib/* ${WORK_DIR}/Sigil.app/Contents/python3lib )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
+        COMMAND mkdir -p ${SIGIL_APP}/Contents/translations/
+        COMMAND cp ${PROJECT_BINARY_DIR}/*.qm ${SIGIL_APP}/Contents/translations/ )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND mkdir -p ${SIGIL_APP}/Contents/hunspell_dictionaries
+        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/dictionaries/* ${SIGIL_APP}/Contents/hunspell_dictionaries )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
+        COMMAND mkdir -p ${SIGIL_APP}/Contents/plugin_launchers/python
+        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/plugin_launchers/python/* ${SIGIL_APP}/Contents/plugin_launchers/python ) 
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND mkdir -p ${SIGIL_APP}/Contents/python3lib
+        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/python3lib/* ${SIGIL_APP}/Contents/python3lib )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
+        COMMAND mkdir -p ${SIGIL_APP}/Contents/examples
+        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/examples/* ${SIGIL_APP}/Contents/examples )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
+        COMMAND mkdir -p ${SIGIL_APP}/Contents/lib/
+        COMMAND cp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../lib/*.dylib ${SIGIL_APP}/Contents/lib/ )
+
     if ( PKG_SYSTEM_PYTHON )
         add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${PYTHON_EXECUTABLE} ARGS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/osx_add_python_framework.py )
     endif()
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/examples/* ${WORK_DIR}/Sigil.app/Contents/examples )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../lib/*.dylib ${WORK_DIR}/Sigil.app/Contents/lib/ )
-    #add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -rpath ${CMAKE_BINARY_DIR}/lib "@executable_path/../lib" ${WORK_DIR}/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libiculx.52.dylib @rpath/libiculx.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuuc.52.dylib @rpath/libicuuc.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicui18n.52.dylib @rpath/libicui18n.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicule.52.dylib @rpath/libicule.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicutu.52.dylib @rpath/libicutu.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuio.52.dylib @rpath/libicuio.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Debug/Sigil.app/Contents/MacOS/Sigil )
-    #for release
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libiculx.52.dylib @rpath/libiculx.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuuc.52.dylib @rpath/libicuuc.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicui18n.52.dylib @rpath/libicui18n.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicule.52.dylib @rpath/libicule.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicutu.52.dylib @rpath/libicutu.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuio.52.dylib @rpath/libicuio.52.dylib /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  /Library/Frameworks/Python.framework/Versions/3.5/Python @rpath/Python.framework/Versions/3.5/Python /Users/lmonster/Work/Sigil/Build/bin/Release/Sigil.app/Contents/MacOS/Sigil )
+    
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libiculx.52.dylib @rpath/libiculx.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuuc.52.dylib @rpath/libicuuc.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicui18n.52.dylib @rpath/libicui18n.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicule.52.dylib @rpath/libicule.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicutu.52.dylib @rpath/libicutu.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuio.52.dylib @rpath/libicuio.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
 
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND mkdir -p ${WORK_DIR}/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -rf ${WORK_DIR}/Sigil.app ${WORK_DIR}/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND hdiutil create -volname Sigil -srcfolder ${WORK_DIR}/Sigil -ov -format UDZO Sigil.dmg )
+    #add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND mkdir -p ${WORK_DIR}/Sigil )
+    #add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -rf ${SIGIL_APP} ${WORK_DIR}/Sigil )
+    #add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND hdiutil create -volname Sigil -srcfolder ${WORK_DIR}/Sigil -ov -format UDZO Sigil.dmg )
 
 
 
