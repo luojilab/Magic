@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 **
 **  Copyright (C) 2015, 2016, 2017, 2018  Kevin B. Hendricks Stratford, ON, Canada 
 **  Copyright (C) 2009, 2010, 2011  Strahinja Markovic  <strahinja.markovic@gmail.com>
@@ -46,7 +46,6 @@
 
 static const QString FIRST_CSS_NAME   = "Style0001.css";
 static const QString FIRST_SVG_NAME   = "Image0001.svg";
-static const QString PLACEHOLDER_TEXT = "PLACEHOLDER";
 static const QString EMPTY_HTML_FILE  = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                                         "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n"
                                         "  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n\n"
@@ -62,7 +61,7 @@ static const QString EMPTY_HTML_FILE  = "<?xml version=\"1.0\" encoding=\"utf-8\
                                         "<p>&nbsp;</p>\n"
                                         "</body>\n"
                                         "</html>";
-
+static const QString PLACEHOLDER_TEXT = EMPTY_HTML_FILE;
 static const QString EMPTY_HTML5_FILE  = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                                         "<!DOCTYPE html>\n\n"
                                         "<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:epub=\"http://www.idpf.org/2007/ops\">\n"
