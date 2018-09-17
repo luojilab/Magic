@@ -694,7 +694,7 @@ if ( APPLE )
     add_executable( ${PROJECT_NAME} MACOSX_BUNDLE ${ALL_SOURCES} )
     set(CMAKE_SKIP_BUILD_RPATH  FALSE)
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set(CMAKE_INSTALL_RPATH $<<CONFIG:Debug>:"@executable_path/../lib">)
+    set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
     set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_SKIP_BUILD_RPATH  TRUE)
@@ -706,6 +706,8 @@ endif()
 target_link_libraries( ${PROJECT_NAME} ${HUNSPELL_LIBRARIES} ${PCRE_LIBRARIES} ${GUMBO_LIBRARIES} ${MINIZIP_LIBRARIES} ${PYTHON_LIBRARIES}
     Qt5::Widgets  Qt5::Xml  Qt5::XmlPatterns  Qt5::PrintSupport  Qt5::Svg  Qt5::WebKit  Qt5::WebKitWidgets  Qt5::Network  Qt5::Concurrent 
 	${LAYOUT_ENGINE_LIBRATY} ${ICU_LIBRARY} )
+
+message(${PYTHON_LIBRARIES})
 
 #############################################################################
 
@@ -769,6 +771,18 @@ if( APPLE )
                         COMMAND macdeployqt Sigil.app -dmg
                         WORKING_DIRECTORY ${WORK_DIR})
 
+    add_custom_command( TARGET ${PROJECT_NAME} COMMAND macdeployqt ${SIGIL_APP} -dmg)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rpath @executable_path/../lib" )
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rpath @executable_path/../Frameworks" )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libiculx.52.dylib @rpath/libiculx.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuuc.52.dylib @rpath/libicuuc.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicui18n.52.dylib @rpath/libicui18n.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicule.52.dylib @rpath/libicule.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicutu.52.dylib @rpath/libicutu.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
         COMMAND mkdir -p ${SIGIL_APP}/Contents/translations/
         COMMAND cp ${PROJECT_BINARY_DIR}/*.qm ${SIGIL_APP}/Contents/translations/ )
@@ -791,20 +805,6 @@ if( APPLE )
     if ( PKG_SYSTEM_PYTHON )
         add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${PYTHON_EXECUTABLE} ARGS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/osx_add_python_framework.py )
     endif()
-    
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libiculx.52.dylib @rpath/libiculx.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuuc.52.dylib @rpath/libicuuc.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicui18n.52.dylib @rpath/libicui18n.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicule.52.dylib @rpath/libicule.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicutu.52.dylib @rpath/libicutu.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  libicuio.52.dylib @rpath/libicuio.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-
-    #add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND mkdir -p ${WORK_DIR}/Sigil )
-    #add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -rf ${SIGIL_APP} ${WORK_DIR}/Sigil )
-    #add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND hdiutil create -volname Sigil -srcfolder ${WORK_DIR}/Sigil -ov -format UDZO Sigil.dmg )
-
-
 
  
 # For Linux and Windows, provide binary installers.
