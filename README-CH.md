@@ -1,14 +1,14 @@
-## Sigil: EPUB编辑器
+# Sigil: EPUB编辑器
 
 [English Document](./README.md)
 
 [TOC]
 
-### 概述
+## 概述
 
 Sigil是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2和Epub3的电子书
 
-### 特性
+## 特性
 
 * 支持Epub2和Epub3
 * 使用得到自研的电子书引擎可以模拟电子书在iPhone和小米手机渲染的效果
@@ -17,9 +17,9 @@ Sigil是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2�
 * 实时预览
 * HTML语法检查
 
-### 编译项目
+## 编译项目
 
-#### 在macOS上编译工程
+### 在macOS上编译工程
 
 * 在目标机器上安装Python3
 * 编译带有webkit build版本的Qt5.5。或直接从[这里]()获取
@@ -32,7 +32,7 @@ Sigil是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2�
 
 生成的安装包放在**${BuildRootPath}/Build/bin/Release**路径下
 
-#### 在Windows上编译工程
+### 在Windows上编译工程
 
 - 在目标机器上安装Python3
 - 编译带有webkit build版本的Qt5.5。或直接从[这里]()获取
@@ -43,13 +43,30 @@ Sigil是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2�
 
 通过运行makeinstaller工程来生成Windows应用安装器
 
-#### 获取二进制文件
+### 获取二进制文件
 
 [macOS]()
 
 [Windows]()
 
-### 依赖文件
+## 代码贡献
+
+当您想要给我们的工程作出贡献的时候，请先通过提issue的方式来与我们一起讨论修改的内容。
+
+我们git log采用的格式的模版在[这里](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit)
+
+## 版权
+
+本工程是基于MIT License - 详见[LICENSE.md](./LICENSE.md)
+
+## 致谢
+
+* 感谢Sigil开发人员。我们在Sigil的基础上进行了二次开发
+
+* 感谢得到精排组的成员给简排提出了很重要的建议以及图标支持
+* 感谢对本工程作出共享的开发人员
+
+## 依赖文件
 
 - Sigil
 
