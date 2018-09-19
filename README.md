@@ -1,16 +1,14 @@
-## Sigil: An Ebook Editor
+# Sigil: An Ebook Editor
 
 [中文文档](./README-CH.md)
 
 [TOC]
 
-### Overview
+# Overview
 
 Sigil based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Editor that can manipulate epub2 and epub3
 
-------
-
-### Feature
+## Feature
 
 * Support for epub2 and epub3
 * A simulator that can simulate rendering on different mobile phone including iPhone and Xiaomi etc. using DeDao self-designed ebook engine.
@@ -21,9 +19,9 @@ Sigil based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Ed
 
 ------
 
-### Build
+## Build
 
-#### Build on macOS
+### Build on macOS
 
 * Install Python3 on your machine
 * Install Qt5.5 with webkit build, or you can get it from [here]() directly
@@ -36,9 +34,7 @@ When you want to build a **release version**, put Python framework in your appli
 
 Mac installer dmg is put on **${BuildRootPath}/Build/bin/Release**
 
-#### Build on Windows
-
-------
+### Build on Windows
 
 - Install Python3 on your machine
 - Install Qt5.5 with webkit build, or you can get it from [here]() directly
@@ -49,17 +45,29 @@ Mac installer dmg is put on **${BuildRootPath}/Build/bin/Release**
 
 Run **makeinstaller** solution to make a windows wizard
 
-------
-
-#### Get the Binary
+### Get the Binary
 
 [macOS]()
 
 [Windows]()
 
-------
+## Contributing
 
-### Dependencies
+When contributing to this project, you need to discuss the change you want to make with us first by issue.
+
+The git log message formate we use is [here](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](./LICENSE.md) file for details
+
+## Acknowledgments
+
+* Sigil developers
+* Dedao Ebook typography staff
+* Developers for those contributed to this project
+
+## Dependencies
 
 * Sigil
 
