@@ -28,6 +28,8 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
     float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
 	LayoutEngine::GetEngine()->SetViewTopMargin(margin / ratio);
 	LayoutEngine::GetEngine()->SetViewBottomMargin(margin / ratio);
+//    LayoutEngine::GetEngine()->setSelectionBackgroundColor(QColor(255,0,0));
+//    LayoutEngine::GetEngine()->setCaretColor(QColor(0,255,0));
 	setFocusPolicy(Qt::ClickFocus);
     bookViewCoreInitial();
 }
@@ -177,11 +179,41 @@ void PreviewEPUBWindow::mousePressEvent(QMouseEvent *event) {
         return;
 	}
     if (event->button() == Qt::LeftButton) {
-        QPoint pos = event->pos();
-        LayoutEngine::GetEngine()->mouseClick(m_bookReader, pos.x(), pos.y());
         setFocus(Qt::MouseFocusReason);
+        if (m_haveSelction) {
+            LayoutEngine::GetEngine()->removeSelection(m_bookReader);
+        }
         return;
     }
+}
+
+void PreviewEPUBWindow::mouseMoveEvent(QMouseEvent * event)
+{
+    int x = event->pos().x();
+    int y = event->pos().y();
+    LayoutEngine* engine = LayoutEngine::GetEngine();
+    if (!m_selectionStart) {
+        engine->mouseStartSelection(m_bookReader, x, y);
+        m_selectionStart = true;
+        m_haveSelction = true;
+    } else {
+        engine->mouseMoveSelection(m_bookReader, x, y);
+    }
+    m_viewCore->UpdateView(UPDATE_VIEW_CODE);
+}
+
+void PreviewEPUBWindow::mouseReleaseEvent(QMouseEvent * event)
+{
+    int x = event->pos().x();
+    int y = event->pos().y();
+    LayoutEngine* engine = LayoutEngine::GetEngine();
+    if (m_selectionStart) {
+        engine->mouseEndSelection(m_bookReader, x, y);
+        m_selectionStart = false;
+    } else {
+        LayoutEngine::GetEngine()->mouseClick(m_bookReader, x, y);
+    }
+    engine->mouseRelease(m_bookReader, x, y);
 }
 
 void PreviewEPUBWindow::generateNavigatorTreeModel(QList<std::shared_ptr<BookContents>> contents)
