@@ -49,6 +49,8 @@ private:
 	};
 	bool m_isNightMode{ false };
 	bool m_canChangeTOC{ true };
+    bool m_selectionStart{ false };
+    bool m_haveSelction{ false };
 
 private:
 	void generateNavigatorTreeModel(QList<std::shared_ptr<BookContents>>);
@@ -67,6 +69,8 @@ signals:
 protected:
     void paintEvent(QPaintEvent *) override;
     void mousePressEvent(QMouseEvent * event) override;
+    void mouseMoveEvent(QMouseEvent * event) override;
+    void mouseReleaseEvent(QMouseEvent * event) override;
 	void keyPressEvent(QKeyEvent *) override;
 	void resizeEvent(QResizeEvent * event) override;
 	void closeEvent(QCloseEvent * event) override;

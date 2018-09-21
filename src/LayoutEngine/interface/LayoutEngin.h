@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QtCore>
+#include <QColor>
 #include <functional>
 #include <memory>
 #include "exportMacro.h"
@@ -85,12 +86,22 @@ public:
     ENGINE_EXPORT void mouseClick(BookReader* reader, int x, int y);
     ENGINE_EXPORT void mouseClick(HTMLReader* reader, int x, int y);
     
+    ENGINE_EXPORT void mouseStartSelection(BookReader* reader, int x, int y);
+    ENGINE_EXPORT void mouseMoveSelection(BookReader* reader, int x, int y);
+    ENGINE_EXPORT void mouseEndSelection(BookReader* reader, int x, int y);
+    ENGINE_EXPORT void removeSelection(BookReader* reader);
+    
+    ENGINE_EXPORT void mouseRelease(BookReader* reader, int x, int y);
+    
     ENGINE_EXPORT void
     openHtml(future_core::HTMLViewQt *view, const std::string& htmlPath, const std::string& uniqueKey, std::function<void(HTMLReader*, int code)>callback);
 	ENGINE_EXPORT void closeHtml(HTMLReader *html);
 	ENGINE_EXPORT void setIsNightMode(bool);
     ENGINE_EXPORT QList<std::shared_ptr<BookContents>>getContentList(BookReader *bookModel);
 	ENGINE_EXPORT void setFontScale(BookReader *bookModel, float scaleFactor);
+    
+    ENGINE_EXPORT void setSelectionBackgroundColor(const QColor &color);
+    ENGINE_EXPORT void setCaretColor(const QColor &color);
 
 private:
     LayoutEngine();
