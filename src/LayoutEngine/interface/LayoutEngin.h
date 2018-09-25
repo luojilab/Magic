@@ -98,7 +98,8 @@ public:
 	ENGINE_EXPORT void closeHtml(HTMLReader *html);
 	ENGINE_EXPORT void setIsNightMode(bool);
     ENGINE_EXPORT QList<std::shared_ptr<BookContents>>getContentList(BookReader *bookModel);
-	ENGINE_EXPORT void setFontScale(BookReader *bookModel, float scaleFactor);
+	ENGINE_EXPORT void setFontScale(BookReader *bookreader, float scaleFactor);
+    ENGINE_EXPORT void getSelectedText(BookReader* reader, std::function<void(const std::string &, const std::string, int, int)>);
     
     ENGINE_EXPORT void setSelectionBackgroundColor(const QColor &color);
     ENGINE_EXPORT void setCaretColor(const QColor &color);

@@ -12,6 +12,7 @@
 #include <QWidgetAction>
 #include <QLabel>
 #include <QScreen>
+#include <QClipboard>
 #include "BookViewQt.h"
 
 using future_core::BookViewQt;
@@ -49,6 +50,10 @@ void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
 
 void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
     if ( !isVisible() ) {
+        return;
+    }
+    if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_C) {
+        copySelectedTextToClipboard();
         return;
     }
 	switch (event->key()) {
@@ -327,5 +332,19 @@ void PreviewEPUBWindow::bookViewCoreInitial()
 		if (!m_canChangeTOC) {
 			m_canChangeTOC = true;
 		}
+    });
+}
+
+void PreviewEPUBWindow::copySelectedTextToClipboard()
+{
+    if (!m_haveSelction) {
+        return;
+    }
+    LayoutEngine::GetEngine()->getSelectedText(m_bookReader, [this](const std::string &htmlFile, const std::string text, int start, int end) {
+        QApplication::clipboard()->setText(QString(text.c_str()));
+        LayoutEngine::GetEngine()->removeSelection(m_bookReader);
+        m_haveSelction = false;
+        m_selectionStart = false;
+        update();
     });
 }
