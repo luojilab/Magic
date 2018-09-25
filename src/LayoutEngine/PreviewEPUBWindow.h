@@ -56,6 +56,7 @@ private:
 	void generateNavigatorTreeModel(QList<std::shared_ptr<BookContents>>);
 	void changeBGColor(int color, bool isNightMode = false);
     void bookViewCoreInitial();
+    void copySelectedTextToClipboard();
 
 private slots:
 	void closed();
