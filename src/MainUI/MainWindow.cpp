@@ -117,7 +117,7 @@ static const int ZOOM_SLIDER_MIN    = 0;
 static const int ZOOM_SLIDER_MAX    = 1000;
 static const int ZOOM_SLIDER_MIDDLE = 500;
 static const int ZOOM_SLIDER_WIDTH  = 140;
-static const QString S_APP_NAME = "E排";
+static const QString S_APP_NAME = "ETypesetting";
 
 static const QString DONATE         = "http://sigil-ebook.com/donate";
 static const QString SIGIL_WEBSITE  = "http://sigil-ebook.com";
