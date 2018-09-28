@@ -38,7 +38,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>Sigil</string>
+	<string>ETypesetting</string>
 	<key>CFBundleIconFile</key>
 	<string>Sigil.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
