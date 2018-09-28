@@ -117,6 +117,7 @@ static const int ZOOM_SLIDER_MIN    = 0;
 static const int ZOOM_SLIDER_MAX    = 1000;
 static const int ZOOM_SLIDER_MIDDLE = 500;
 static const int ZOOM_SLIDER_WIDTH  = 140;
+static const QString S_APP_NAME = "E排";
 
 static const QString DONATE         = "http://sigil-ebook.com/donate";
 static const QString SIGIL_WEBSITE  = "http://sigil-ebook.com";
@@ -4146,7 +4147,7 @@ void MainWindow::UpdateUiWithCurrentFile(const QString &fullfilepath)
     QString epubversion = m_Book->GetConstOPF()->GetEpubVersion();
 
     // Update the titlebar
-    setWindowTitle(tr("%1[*] - epub%2 - %3").arg(m_CurrentFileName).arg(epubversion).arg(tr("Sigil")));
+    setWindowTitle(tr("%1[*] - epub%2 - %3").arg(m_CurrentFileName).arg(epubversion).arg(S_APP_NAME));
 
     if (m_CurrentFilePath.isEmpty()) {
         return;
