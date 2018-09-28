@@ -609,15 +609,10 @@ if( APPLE )
     # TODO: put these in some sort of add_custom_command( TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ...)
     # also delete the Sigil.app folder as PRE_BUILD of Sigil executable
 
-    message("${RUNTIME_OUTPUT_DIRECTORY_Debug}")
     if( CMAKE_GENERATOR STREQUAL Xcode )
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/Resources")
         # Create translation directory.
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/Resources")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/polyfills")
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/translations")
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/hunspell_dictionaries")
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/plugin_launchers")
@@ -625,6 +620,11 @@ if( APPLE )
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/python3lib")
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/lib")
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/examples")
+
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/polyfills")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
     else()
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/Resources")
         exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/polyfills")
@@ -697,6 +697,7 @@ if ( APPLE )
     set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
+    set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "E排")
     set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_SKIP_BUILD_RPATH  TRUE)
 else()
     add_executable( ${PROJECT_NAME} WIN32 ${ALL_SOURCES} )
@@ -706,8 +707,6 @@ endif()
 target_link_libraries( ${PROJECT_NAME} ${HUNSPELL_LIBRARIES} ${PCRE_LIBRARIES} ${GUMBO_LIBRARIES} ${MINIZIP_LIBRARIES} ${PYTHON_LIBRARIES}
     Qt5::Widgets  Qt5::Xml  Qt5::XmlPatterns  Qt5::PrintSupport  Qt5::Svg  Qt5::WebKit  Qt5::WebKitWidgets  Qt5::Network  Qt5::Concurrent 
 	${LAYOUT_ENGINE_LIBRATY} ${ICU_LIBRARY} )
-
-message(${PYTHON_LIBRARIES})
 
 #############################################################################
 
@@ -800,7 +799,7 @@ if( APPLE )
         COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/examples/* ${SIGIL_APP}/Contents/examples )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
         COMMAND mkdir -p ${SIGIL_APP}/Contents/lib/
-        COMMAND cp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/../lib/*.dylib ${SIGIL_APP}/Contents/lib/ )
+        COMMAND cp ${CMAKE_SOURCE_DIR}/lib/icu/mac/lib/*.dylib ${SIGIL_APP}/Contents/lib/ )
 
     if ( PKG_SYSTEM_PYTHON )
         add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${PYTHON_EXECUTABLE} ARGS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/osx_add_python_framework.py )
@@ -1054,3 +1053,9 @@ if( UNIX AND NOT APPLE )
     install( DIRECTORY ${CMAKE_SOURCE_DIR}/src/Resource_Files/python3lib/ DESTINATION ${SIGIL_SHARE_ROOT}/python3lib )
     install( FILES ${EXAMPLE_FILES} DESTINATION ${SIGIL_SHARE_ROOT}/examples/ )
 endif()
+
+if (APPLE)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                       COMMAND rm -rf ${ET_APP} 
+                       COMMAND mv ${SIGIL_APP} ${ET_APP} )
+endif(APPLE)
