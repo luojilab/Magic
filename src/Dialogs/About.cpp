@@ -29,7 +29,7 @@
 
 const QString VERSION_NUMBERS = "(\\d+)\\.(\\d+)\\.(\\d+)";
 const QString SIGIL_VERSION   = QString(SIGIL_FULL_VERSION);
-const QString SIGIL_HOMEPAGE  = "http://sigil-ebook.com";
+const QString SIGIL_HOMEPAGE  = "https://gitlab.luojilab.com/iget-native/sigil-customization";
 const QString GNU_LICENSE     = "http://www.gnu.org/licenses/gpl-3.0-standalone.html";
 
 
@@ -47,28 +47,18 @@ About::About(QWidget *parent)
                            .arg(mo.captured(1).toInt())
                            .arg(mo.captured(2).toInt())
                            .arg(mo.captured(3).toInt());
-    ui.lbVersionDisplay->setText("0.9.23");
+    ui.lbVersionDisplay->setText("0.9.26");
     QString credits = "<h4>" + tr("Maintainer(s)") + "</h4>" +
                       "<ul>" +
-                      "<li>Kevin Hendricks</li>" +
-                      "<li>Doug Massay</li>" +
-                      "</ul>" +
-                      "<h4>" + tr("Previous Maintainer(s)") + "</h4>" +
-                      "<ul>" +
-                      "<li>John Schember</li>" +
+                      "<li>Guoqiang Fu(1m0nster)</li>" +
+                      "<li>Xiaoyu Li</li>"+
                       "</ul>" +
                       "<h4>" + tr("Code Contributors") + "</h4>" +
                       "<ul>" +
-                      "<li>Grant Drake</li>" +
-                      "<li>Dave Heiland</li>" +
-                      "<li>Charles King</li>" +
-                      "<li>Daniel Pavel</li>" +
-                      "<li>Grzegorz Wolszczak</li>" +
+                      "<li>Sigil's Developers</li>" +
                       "</ul>" +
-                      "<h4>" + tr("Translators") + "</h4>" +
-                      "<ul><li><a href=\"https://www.transifex.com/projects/p/sigil/\">https://www.transifex.com/projects/p/sigil/</a></li></ul>" +
-                      "<h4>" + tr("Original Creator") + "</h4>" +
-                      "<ul><li>Strahinja Marković  (" + tr("retired") + ")</li></ul>";
+                      "<h4>" + tr("UI") + "</h4>" +
+                      "<ul><li>Yunya Liao</li></ul>";
     ui.creditsDisplay->setText(credits);
 }
 
