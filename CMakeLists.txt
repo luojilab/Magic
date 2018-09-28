@@ -9,7 +9,7 @@
 
 cmake_minimum_required( VERSION 3.0 ) 
 
-project( Sigil ) 
+project( ETypesetting ) 
 
 set( CMAKE_DEBUG_POSTFIX "d" )
 # Avoid the whole Release/Debug folder creation with Visual Studio

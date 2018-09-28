@@ -27,10 +27,14 @@ endif()
 # We use the lower case name
 # on UNIX systems other than Mac OS X
 if ( WIN32 OR APPLE )
-    project( Sigil )
+    project( ETypesetting )
 else()
-    project( sigil )
+    project( eTypesetting )
 endif()
+
+if (APPLE)
+set(ETypesetting_APP ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/ETypesetting.app)
+endif(APPLE)
 
 #############################################################################
 
@@ -564,8 +568,8 @@ set_property( SOURCE ${QRC_FILES_CPP} PROPERTY SKIP_AUTOMOC ON )
 qt5_add_translation( QM_FILES ${TS_FILES} )
 
 # Define the Sigil version string for use in source files
-set_source_files_properties( Dialogs/About.cpp PROPERTIES COMPILE_DEFINITIONS SIGIL_FULL_VERSION="${SIGIL_FULL_VERSION}" )
-set_source_files_properties( Misc/Utility.cpp PROPERTIES COMPILE_DEFINITIONS SIGIL_FULL_VERSION="${SIGIL_FULL_VERSION}" )
+set_source_files_properties( Dialogs/About.cpp PROPERTIES COMPILE_DEFINITIONS SIGIL_FULL_VERSION="${ETypesetting_FULL_VERSION}" )
+set_source_files_properties( Misc/Utility.cpp PROPERTIES COMPILE_DEFINITIONS SIGIL_FULL_VERSION="${ETypesetting_FULL_VERSION}" )
 
 #############################################################################
 
@@ -611,35 +615,35 @@ if( APPLE )
 
     if( CMAKE_GENERATOR STREQUAL Xcode )
         # Create translation directory.
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/Resources")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/polyfills")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/translations")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/hunspell_dictionaries")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/plugin_launchers")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/plugin_launchers/python")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/python3lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Sigil.app/Contents/examples")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/Resources")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/polyfills")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/translations")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/hunspell_dictionaries")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/plugin_launchers")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/plugin_launchers/python")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/python3lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/examples")
 
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Sigil.app/Contents/Resources")
+        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ETypesetting.app/Contents/polyfills")
+        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ETypesetting.app/Contents/Resources")
+        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ETypesetting.app/Contents/Resources")
+        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ETypesetting.app/Contents/Resources")
     else()
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/Resources")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/Resources")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/Resources")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/polyfills")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/polyfills")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/Resources")
         # Create translation directory.
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/translations")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/hunspell_dictionaries")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/plugin_launchers")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/plugin_launchers/python")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/python3lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sigil.app/Contents/examples")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/translations")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/hunspell_dictionaries")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/plugin_launchers")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/plugin_launchers/python")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/python3lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/examples")
     endif()
 
     if ( PKG_SYSTEM_PYTHON )
@@ -649,8 +653,8 @@ if( APPLE )
     # Copy the PLIST file...
     exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/mac/MacOSXBundleInfo.plist ${PROJECT_BINARY_DIR}")
     
-    # ...and set the Sigil version string
-    exec_program("sed -i -e 's/SGVERSION/${SIGIL_FULL_VERSION}/g' ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist")
+    # ...and set the ETypesetting version string
+    exec_program("sed -i -e 's/SGVERSION/${ETypesetting_FULL_VERSION}/g' ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist")
 endif()
 
 #############################################################################
@@ -696,6 +700,7 @@ if ( APPLE )
     SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
     set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    message(${PROJECT_BINARY_DIR})
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "E排")
     set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_SKIP_BUILD_RPATH  TRUE)
@@ -752,54 +757,62 @@ if( APPLE )
     else()
         set( WORK_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
     endif()
-    set( MAIN_PACKAGE_DIR ${WORK_DIR}/Sigil.app )
+    set( MAIN_PACKAGE_DIR ${WORK_DIR}/ETypesetting.app )
 
     if ("${CODE_SIGN_ID}" STREQUAL "")
         add_custom_target(  addframeworks
-                            COMMAND macdeployqt Sigil.app
+                            COMMAND macdeployqt ${ETypesetting_APP}
                             WORKING_DIRECTORY ${WORK_DIR}
                             DEPENDS ${PROJECT_NAME} )
     ELSE ()
         add_custom_target(  addframeworks
-                            COMMAND macdeployqt  Sigil.app -codesign="${CODE_SIGN_ID}"
+                            COMMAND macdeployqt  ${ETypesetting_APP} -codesign="${CODE_SIGN_ID}"
                             WORKING_DIRECTORY ${WORK_DIR}
                             DEPENDS ${PROJECT_NAME} )
     ENDIF ()
 
     add_custom_target(  makedmg 
-                        COMMAND macdeployqt Sigil.app -dmg
+                        COMMAND macdeployqt ${ETypesetting_APP} -dmg
                         WORKING_DIRECTORY ${WORK_DIR})
 
-    add_custom_command( TARGET ${PROJECT_NAME} COMMAND macdeployqt ${SIGIL_APP} -dmg)
+    add_custom_command( TARGET ${PROJECT_NAME} COMMAND macdeployqt ${ETypesetting_APP} -dmg)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rpath @executable_path/../lib" )
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rpath @executable_path/../Frameworks" )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libiculx.52.dylib @rpath/libiculx.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuuc.52.dylib @rpath/libicuuc.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicui18n.52.dylib @rpath/libicui18n.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicule.52.dylib @rpath/libicule.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicutu.52.dylib @rpath/libicutu.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${SIGIL_APP}/Contents/MacOS/Sigil )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libiculx.52.dylib @rpath/libiculx.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuuc.52.dylib @rpath/libicuuc.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicui18n.52.dylib @rpath/libicui18n.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicule.52.dylib @rpath/libicule.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicutu.52.dylib @rpath/libicutu.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                            COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/polyfills)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/Resources)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/Resources)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD 
+                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/Resources)
 
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
-        COMMAND mkdir -p ${SIGIL_APP}/Contents/translations/
-        COMMAND cp ${PROJECT_BINARY_DIR}/*.qm ${SIGIL_APP}/Contents/translations/ )
+        COMMAND mkdir -p ${ETypesetting_APP}/Contents/translations/
+        COMMAND cp ${PROJECT_BINARY_DIR}/*.qm ${ETypesetting_APP}/Contents/translations/ )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND mkdir -p ${SIGIL_APP}/Contents/hunspell_dictionaries
-        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/dictionaries/* ${SIGIL_APP}/Contents/hunspell_dictionaries )
+        COMMAND mkdir -p ${ETypesetting_APP}/Contents/hunspell_dictionaries
+        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/dictionaries/* ${ETypesetting_APP}/Contents/hunspell_dictionaries )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
-        COMMAND mkdir -p ${SIGIL_APP}/Contents/plugin_launchers/python
-        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/plugin_launchers/python/* ${SIGIL_APP}/Contents/plugin_launchers/python ) 
+        COMMAND mkdir -p ${ETypesetting_APP}/Contents/plugin_launchers/python
+        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/plugin_launchers/python/* ${ETypesetting_APP}/Contents/plugin_launchers/python ) 
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND mkdir -p ${SIGIL_APP}/Contents/python3lib
-        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/python3lib/* ${SIGIL_APP}/Contents/python3lib )
+        COMMAND mkdir -p ${ETypesetting_APP}/Contents/python3lib
+        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/python3lib/* ${ETypesetting_APP}/Contents/python3lib )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
-        COMMAND mkdir -p ${SIGIL_APP}/Contents/examples
-        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/examples/* ${SIGIL_APP}/Contents/examples )
+        COMMAND mkdir -p ${ETypesetting_APP}/Contents/examples
+        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/examples/* ${ETypesetting_APP}/Contents/examples )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
-        COMMAND mkdir -p ${SIGIL_APP}/Contents/lib/
-        COMMAND cp ${CMAKE_SOURCE_DIR}/lib/icu/mac/lib/*.dylib ${SIGIL_APP}/Contents/lib/ )
+        COMMAND mkdir -p ${ETypesetting_APP}/Contents/lib/
+        COMMAND cp ${CMAKE_SOURCE_DIR}/lib/icu/mac/lib/*.dylib ${ETypesetting_APP}/Contents/lib/ )
 
     if ( PKG_SYSTEM_PYTHON )
         add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${PYTHON_EXECUTABLE} ARGS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/osx_add_python_framework.py )
@@ -814,7 +827,7 @@ elseif (MSVC)
     query_qmake(QT_INSTALL_PLUGINS QT_PLUGINS_DIR)
 
     set( TEMP_PACKAGE_DIR ${CMAKE_BINARY_DIR}/temp_folder )
-    set( MAIN_PACKAGE_DIR ${TEMP_PACKAGE_DIR}/Sigil )
+    set( MAIN_PACKAGE_DIR ${TEMP_PACKAGE_DIR}/ETypesetting )
     set( OUTPUT_PACKAGE_DIR ${CMAKE_BINARY_DIR}/installer )
     set( PYTHON_DEST_DIR ${MAIN_PACKAGE_DIR}/python3 )
     
@@ -1055,7 +1068,7 @@ if( UNIX AND NOT APPLE )
 endif()
 
 if (APPLE)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                       COMMAND rm -rf ${ET_APP} 
-                       COMMAND mv ${SIGIL_APP} ${ET_APP} )
+    #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+     #                  COMMAND rm -rf ${ET_APP} 
+      #                 COMMAND mv ${ETypesetting_APP} ${ET_APP} )
 endif(APPLE)
