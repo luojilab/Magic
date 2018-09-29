@@ -62,10 +62,12 @@ private slots:
 	void closed();
 	void GoToHtml();
     void showError(const QString&);
+	void setClipboard(QString);
 
 signals:
 	void bookContentReady();
 	void gotoHtmlSourceCode(const std::string& htmlName, size_t offsite);
+	void putTextIntoClipboard(QString);
 
 protected:
     void paintEvent(QPaintEvent *) override;
