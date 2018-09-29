@@ -33,10 +33,12 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
 //    LayoutEngine::GetEngine()->setCaretColor(QColor(0,255,0));
 	setFocusPolicy(Qt::ClickFocus);
     bookViewCoreInitial();
+	connect(this, SIGNAL(putTextIntoClipboard(QString)), this, SLOT(setClipboard(QString)));
 }
 
 PreviewEPUBWindow::~PreviewEPUBWindow()
 {
+	disconnect(this, SIGNAL(putTextIntoClipboard(QString)), this, SLOT(setClipboard(QString)));
 	closed();
 }
 
@@ -341,10 +343,15 @@ void PreviewEPUBWindow::copySelectedTextToClipboard()
         return;
     }
     LayoutEngine::GetEngine()->getSelectedText(m_bookReader, [this](const std::string &htmlFile, const std::string text, int start, int end) {
-        QApplication::clipboard()->setText(QString(text.c_str()));
+		emit putTextIntoClipboard(QString(text.c_str()));
         LayoutEngine::GetEngine()->removeSelection(m_bookReader);
         m_haveSelction = false;
         m_selectionStart = false;
-        update();
+		update();
     });
+}
+
+void PreviewEPUBWindow::setClipboard(QString text)
+{
+	QApplication::clipboard()->setText(text);
 }
