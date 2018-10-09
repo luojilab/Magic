@@ -160,12 +160,14 @@ void PreviewEPUBWindow::engineOpenBookFinish(BookReader* bookreader, int error)
         closed();
         bookViewCoreInitial();
     }
+    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
     LayoutEngine* engine = LayoutEngine::GetEngine();
     m_bookReader = bookreader;
     m_viewCore->SetBookReader(bookreader);
     m_viewCore->SetPaintSize(m_defaultSize.width(), m_defaultSize.height());
     auto toc = engine->getContentList(m_bookReader);
     engine->setIsNightMode(m_isNightMode);
+    engine->setFontScale(m_bookReader, ratio);
     engine->gotoFirstPage(m_bookReader);
     generateNavigatorTreeModel(toc);
     m_viewCore->UpdateView(UPDATE_VIEW_CODE);
