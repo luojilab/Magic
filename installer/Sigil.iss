@@ -3,13 +3,13 @@
 ; Inno, the ones with the dollar we define with CMake.
 
 [Setup]
-AppName=Sigil
-AppVerName=Sigil ${SIGIL_FULL_VERSION}
+AppName=ETypeSetting
+AppVerName=ETypeSetting ${SIGIL_FULL_VERSION}
 VersionInfoVersion=${SIGIL_FULL_VERSION}
-DefaultDirName={pf}\Sigil
-DefaultGroupName=Sigil
-UninstallDisplayIcon={app}\Sigil.exe
-AppPublisher=Sigil-Ebook
+DefaultDirName={pf}\ETypeSetting
+DefaultGroupName=ETypeSetting
+UninstallDisplayIcon={app}\ETypeSetting.exe
+AppPublisher=ETypeSetting-Ebook
 AppPublisherURL=https://github.com/Sigil-Ebook/Sigil
 WizardImageFile=compiler:wizmodernimage-IS.bmp
 WizardSmallImageFile=compiler:wizmodernsmallimage-IS.bmp
@@ -20,7 +20,7 @@ LicenseFile=${LICENSE_LOCATION}
 ; Win Vista is the lowest supported version
 MinVersion=0,6.0
 PrivilegesRequired=admin
-OutputBaseFilename=Sigil-${SIGIL_FULL_VERSION}-Windows${ISS_SETUP_FILENAME_PLATFORM}-Setup
+OutputBaseFilename=ETypeSetting-${SIGIL_FULL_VERSION}-Windows${ISS_SETUP_FILENAME_PLATFORM}-Setup
 ChangesAssociations=yes
 
 ; "ArchitecturesAllowed=x64" specifies that Setup cannot run on
@@ -34,38 +34,38 @@ ArchitecturesAllowed="${ISS_ARCH}"
 ArchitecturesInstallIn64BitMode="${ISS_ARCH}"
 
 [Files]
-Source: "Sigil\*"; DestDir: "{app}"; Flags: createallsubdirs recursesubdirs ignoreversion
+Source: "ETypesetting\*"; DestDir: "{app}"; Flags: createallsubdirs recursesubdirs ignoreversion
 Source: vendor\vcredist2015.exe; DestDir: {tmp}
 
 [Components]
 ; Main files cannot be unchecked. Doesn't do anything, just here for show
-Name: main; Description: "Sigil"; Types: full compact custom; Flags: fixed
+Name: main; Description: "ETypeSetting"; Types: full compact custom; Flags: fixed
 ; Desktop icon.
 Name: dicon; Description: "Create a desktop icon"; Types: full custom
 Name: dicon\common; Description: "For all users"; Types: full custom; Flags: exclusive
 Name: dicon\user; Description: "For the current user only"; Flags: exclusive
 ; File associations
-Name: afiles; Description: "Associate ebook files with Sigil"
+Name: afiles; Description: "Associate ebook files with ETypeSetting"
 Name: afiles\epub; Description: "EPUB"
 
 [Registry]
-; Add Sigil as a global file handler for EPUB and HTML.
-Root: HKLM; Subkey: "Software\Classes\.epub\OpenWithList\Sigil.exe"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Classes\.htm\OpenWithList\Sigil.exe"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Classes\.html\OpenWithList\Sigil.exe"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Classes\.xhtml\OpenWithList\Sigil.exe"; Flags: uninsdeletekey
+; Add ETypeSetting as a global file handler for EPUB and HTML.
+Root: HKLM; Subkey: "Software\Classes\.epub\OpenWithList\ETypeSetting.exe"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Classes\.htm\OpenWithList\ETypeSetting.exe"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Classes\.html\OpenWithList\ETypeSetting.exe"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Classes\.xhtml\OpenWithList\ETypeSetting.exe"; Flags: uninsdeletekey
 ; Associate EPUB files if requested.
-Components: afiles\epub; Root: HKCR; Subkey: ".epub"; ValueType: string; ValueName: ""; ValueData: "SigilEPUB"; Flags: uninsdeletevalue uninsdeletekeyifempty
-Components: afiles\epub; Root: HKCR; Subkey: "SigilEPUB"; ValueType: string; ValueName: ""; ValueData: "EPUB"; Flags: uninsdeletekey
-Components: afiles\epub; Root: HKCR; Subkey: "SigilEPUB\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Sigil.exe,0"; Flags: uninsdeletekey
-Components: afiles\epub; Root: HKCR; Subkey: "SigilEPUB\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Sigil.exe"" ""%1"""; Flags: uninsdeletekey
+Components: afiles\epub; Root: HKCR; Subkey: ".epub"; ValueType: string; ValueName: ""; ValueData: "ETypeSettingEPUB"; Flags: uninsdeletevalue uninsdeletekeyifempty
+Components: afiles\epub; Root: HKCR; Subkey: "ETypeSettingEPUB"; ValueType: string; ValueName: ""; ValueData: "EPUB"; Flags: uninsdeletekey
+Components: afiles\epub; Root: HKCR; Subkey: "ETypeSettingEPUB\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\ETypeSetting.exe,0"; Flags: uninsdeletekey
+Components: afiles\epub; Root: HKCR; Subkey: "ETypeSettingEPUB\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\ETypeSetting.exe"" ""%1"""; Flags: uninsdeletekey
 
 [Icons]
-Name: "{group}\Sigil"; Filename: "{app}\Sigil.exe"
-Name: "{group}\Uninstall Sigil"; Filename: "{uninstallexe}"
+Name: "{group}\ETypeSetting"; Filename: "{app}\ETypeSetting.exe"
+Name: "{group}\Uninstall ETypeSetting"; Filename: "{uninstallexe}"
 ; Optional desktop icon.
-Components: dicon\common; Name: "{commondesktop}\Sigil"; Filename: "{app}\Sigil.exe"
-Components: dicon\user; Name: "{userdesktop}\Sigil"; Filename: "{app}\Sigil.exe"
+Components: dicon\common; Name: "{commondesktop}\ETypeSetting"; Filename: "{app}\ETypeSetting.exe"
+Components: dicon\user; Name: "{userdesktop}\ETypeSetting"; Filename: "{app}\ETypeSetting.exe"
 
 [InstallDelete]
 ; Restructuring done in 0.9.8 makes this folder residual.
