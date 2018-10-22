@@ -78,7 +78,6 @@ void PreviewEPUBWindow::keyPressEvent(QKeyEvent *event) {
 	default:
 		return;
 	}
-    m_viewCore->UpdateView(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::resizeEvent(QResizeEvent *event) 
@@ -138,7 +137,6 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
     }
 	// goto chapter
 	LayoutEngine::GetEngine()->gotoChapterByFileName(m_bookReader, selectItem->ContentHRef);
-    m_viewCore->UpdateView(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::engineInitFinish() {
@@ -172,7 +170,6 @@ void PreviewEPUBWindow::engineOpenBookFinish(BookReader* bookreader, int error)
     engine->setFontScale(m_bookReader, ratio);
     engine->gotoFirstPage(m_bookReader);
     generateNavigatorTreeModel(toc);
-    m_viewCore->UpdateView(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::mousePressEvent(QMouseEvent *event) {
@@ -208,7 +205,6 @@ void PreviewEPUBWindow::mouseMoveEvent(QMouseEvent * event)
     } else {
         engine->mouseMoveSelection(m_bookReader, x, y);
     }
-    m_viewCore->UpdateView(UPDATE_VIEW_CODE);
 }
 
 void PreviewEPUBWindow::mouseReleaseEvent(QMouseEvent * event)
