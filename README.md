@@ -2,7 +2,7 @@
 
 # ETypesetting: An Ebook Editor
 
-[![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md)![version](https://img.shields.io/badge/version-0.9.27-green.svg)
+[![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md) ![version](https://img.shields.io/badge/version-0.9.27-green.svg)
 [中文文档](./README-CH.md)
 
 [TOC]
