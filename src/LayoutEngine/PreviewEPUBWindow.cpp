@@ -162,7 +162,7 @@ void PreviewEPUBWindow::engineOpenBookFinish(BookReader* bookreader, int error)
         closed();
         bookViewCoreInitial();
     }
-    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
+    float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.85;
     LayoutEngine* engine = LayoutEngine::GetEngine();
     m_bookReader = bookreader;
     m_viewCore->SetBookReader(bookreader);
