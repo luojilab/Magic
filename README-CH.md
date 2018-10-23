@@ -1,4 +1,4 @@
-# Sigil: EPUB编辑器
+# ETypesetting: EPUB编辑器
 
 [English Document](./README.md)
 
@@ -6,7 +6,7 @@
 
 ## 概述
 
-Sigil是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2和Epub3的电子书
+ETypesetting是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2和Epub3的电子书
 
 ## 特性
 
@@ -17,6 +17,10 @@ Sigil是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2�
 * 实时预览
 * HTML语法检查
 
+## 获取二进制文件
+
+[Get the binary](https://github.com/luojilab/ETypeSetting/releases)
+
 ## 编译项目
 
 ### 在macOS上编译工程
@@ -24,6 +28,7 @@ Sigil是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2�
 * 在目标机器上安装Python3
 * 编译带有webkit build版本的Qt5.5。或直接从[这里]()获取
 * 下载CMake3.11+
+* 下载引擎库到本地，并且链接。引擎库在[这里]()获取
 * 将Qt的路径设置到CMAKE_PREFIX_PATH
 * 生成Xcode工程文件
 * 编译安装
@@ -37,17 +42,12 @@ Sigil是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2�
 - 在目标机器上安装Python3
 - 编译带有webkit build版本的Qt5.5。或直接从[这里]()获取
 - 下载CMake3.11+
+- 下载引擎库到本地，并且链接。引擎库在[这里]()获取
 - 将Qt的路径设置到CMAKE_PREFIX_PATH
 - 生成Xcode工程文件
 - 编译安装
 
 通过运行makeinstaller工程来生成Windows应用安装器
-
-### 获取二进制文件
-
-[macOS]()
-
-[Windows]()
 
 ## 代码贡献
 
