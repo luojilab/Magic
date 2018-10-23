@@ -1,4 +1,8 @@
+![](./src/Resource_Files/icon/app_icon_128.png)
+
 # ETypesetting: EPUB编辑器
+
+[![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md)![version](https://img.shields.io/badge/version-0.9.27-green.svg)
 
 [English Document](./README.md)
 
