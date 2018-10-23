@@ -1,4 +1,4 @@
-# Sigil: An Ebook Editor
+# ETypesetting: An Ebook Editor
 
 [中文文档](./README-CH.md)
 
@@ -6,7 +6,7 @@
 
 # Overview
 
-Sigil based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Editor that can manipulate epub2 and epub3
+ETypesetting based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Editor that can manipulate epub2 and epub3
 
 ## Feature
 
@@ -16,8 +16,6 @@ Sigil based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Ed
 * Math formula edit
 * Rendering just in time when editing HTML file
 * HTML syntax check
-
-------
 
 ## Build
 
@@ -47,9 +45,7 @@ Run **makeinstaller** solution to make a windows wizard
 
 ### Get the Binary
 
-[macOS]()
-
-[Windows]()
+[Get the binary](https://github.com/luojilab/ETypeSetting/releases)
 
 ## Contributing
 
@@ -79,7 +75,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](./LICENSE.
 - jQuery.ScrollTo-2.1.2 (src/Resource_Files/javascript/jquery.scrollTo-2.1.2.min.js)
 - MathJax.js single file version: (src/Resource_Files/polyfills)
 
-In addtion, Sigil uses the following other packages that have been specifically modified for use inside Sigil:
+In addtion, ETypesetting uses the following other packages that have been specifically modified for use inside ETypesetting:
 
 - Beautiful Soup 4 (src/Resource_Files/plugin_launchers/sigil_bs4)
 - Google's Gumbo Parser (internal/gumbo)
