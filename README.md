@@ -1,4 +1,4 @@
-![](./src/Resource_Files/icon/app_icon_128.png)
+<img src="./src/Resource_Files/icon/app_icon_512.png" width=128/>
 
 # ETypesetting: An Ebook Editor
 
