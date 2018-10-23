@@ -4,7 +4,7 @@
 
 [TOC]
 
-# Overview
+## Overview
 
 ETypesetting based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Editor that can manipulate epub2 and epub3
 
@@ -17,6 +17,10 @@ ETypesetting based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub e
 * Rendering just in time when editing HTML file
 * HTML syntax check
 
+## Get the Binary
+
+[Get the binary](https://github.com/luojilab/ETypeSetting/releases)
+
 ## Build
 
 ### Build on macOS
@@ -24,6 +28,7 @@ ETypesetting based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub e
 * Install Python3 on your machine
 * Install Qt5.5 with webkit build, or you can get it from [here]() directly
 * Download [CMake](https://cmake.org/)
+* Download engine library from [here]() and link them
 * Set Qt path to CMAKE_PREFIX_PATH in CMake
 * Create an Xcode project
 * Build and run
@@ -37,15 +42,12 @@ Mac installer dmg is put on **${BuildRootPath}/Build/bin/Release**
 - Install Python3 on your machine
 - Install Qt5.5 with webkit build, or you can get it from [here]() directly
 - Download [CMake](https://cmake.org/)
+- Download engine library from [here]() and link them
 - Set Qt path to CMAKE_PREFIX_PATH in CMake
 - Create an VS project
 - Build and run
 
 Run **makeinstaller** solution to make a windows wizard
-
-### Get the Binary
-
-[Get the binary](https://github.com/luojilab/ETypeSetting/releases)
 
 ## Contributing
 
