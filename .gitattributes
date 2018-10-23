@@ -4,3 +4,4 @@
 version.xml export-ignore
 lib/DDLayoutEngine/* filter=lfs diff=lfs merge=lfs -text
 lib/DDLayoutEngine/windows/* filter=lfs diff=lfs merge=lfs -text
+lib/DDLayoutEngine/macos/* filter=lfs diff=lfs merge=lfs -text
