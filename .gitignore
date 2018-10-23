@@ -71,6 +71,9 @@ qrc_*
 *.orig
 *.bak
 *.rar
+*.a
+*.lib
+*.o
 OpenCandy
 tags
 build
