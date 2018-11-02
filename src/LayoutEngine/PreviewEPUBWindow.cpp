@@ -29,8 +29,6 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
     float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
 	LayoutEngine::GetEngine()->SetViewTopMargin(margin / ratio);
 	LayoutEngine::GetEngine()->SetViewBottomMargin(margin / ratio);
-//    LayoutEngine::GetEngine()->setSelectionBackgroundColor(QColor(255,0,0));
-//    LayoutEngine::GetEngine()->setCaretColor(QColor(0,255,0));
 	setFocusPolicy(Qt::ClickFocus);
     bookViewCoreInitial();
 	connect(this, SIGNAL(putTextIntoClipboard(QString)), this, SLOT(setClipboard(QString)));
