@@ -19,7 +19,7 @@ namespace future_core {
     public:
         BookView();
 
-        virtual ~BookView();
+        static void Destroy(BookView *bookView);
 
         virtual void SetBookReader(future_core::BookReader *bookReader);
 
@@ -36,6 +36,8 @@ namespace future_core {
         virtual float GetDensity() = 0;
 
     protected:
+        virtual ~BookView();
+
         virtual void UrlOpened(const std::string &);
 
         virtual void ViewOnClicked(int x, int y,
