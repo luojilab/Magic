@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 **
 **  Copyright (C) 2009, 2010, 2011  Strahinja Markovic  <strahinja.markovic@gmail.com>
 **
@@ -28,6 +28,7 @@
 #include <QtWidgets/QProgressDialog>
 #include <QtWidgets/QScrollBar>
 #include <QtCore/QStringList>
+#include <iostream>
 #include "Dialogs/SelectFiles.h"
 
 #include "BookManipulation/Book.h"
@@ -270,7 +271,7 @@ void BookBrowser::OpenContextMenu(const QPoint &point)
     if (!SuccessfullySetupContextMenu(point)) {
         return;
     }
-
+    
     m_ContextMenu->exec(m_TreeView->viewport()->mapToGlobal(point));
     m_ContextMenu->clear();
     // Ensure any actions with keyboard shortcuts that might have temporarily been
@@ -278,6 +279,9 @@ void BookBrowser::OpenContextMenu(const QPoint &point)
     m_Delete->setEnabled(true);
     m_Merge->setEnabled(true);
     m_Rename->setEnabled(true);
+    m_ChangeItemBGColorNormal->setEnabled(true);
+    m_ChangeItemBGColor30Gray->setEnabled(true);
+    m_ChangeItemBGColor60Gray->setEnabled(true);
 }
 
 QList <Resource *> BookBrowser::ValidSelectedHTMLResources()
@@ -1478,6 +1482,9 @@ void BookBrowser::CreateContextMenuActions()
     m_OpenWith                = new QAction(tr("Open With") + "...",     this);
     m_SaveAs                  = new QAction(tr("Save As") + "...",       this);
     m_OpenWithEditor          = new QAction("",                            this);
+    m_ChangeItemBGColor30Gray = new QAction(tr("Change Color 30% gray"), this);
+    m_ChangeItemBGColor60Gray = new QAction(tr("Change Color 60% gray"), this);
+    m_ChangeItemBGColorNormal = new QAction(tr("Change Color Normal"), this);
     m_CoverImage             ->setCheckable(true);
     m_NoObfuscationMethod    ->setCheckable(true);
     m_AdobesObfuscationMethod->setCheckable(true);
@@ -1503,6 +1510,9 @@ void BookBrowser::CreateContextMenuActions()
     addAction(m_Rename);
     addAction(m_LinkStylesheets);
     addAction(m_AddSemantics);
+    addAction(m_ChangeItemBGColor30Gray);
+    addAction(m_ChangeItemBGColor60Gray);
+    addAction(m_ChangeItemBGColorNormal);
 }
 
 
@@ -1618,6 +1628,12 @@ bool BookBrowser::SuccessfullySetupContextMenu(const QPoint &point)
         m_ContextMenu->addAction(m_SelectAll);
         m_SelectAll->setEnabled(item_count > 0 || (!resource && resources.count() > 0));
     }
+    
+    // change item background color
+    m_ContextMenu->addSeparator();
+    m_ContextMenu->addAction(m_ChangeItemBGColor30Gray);
+    m_ContextMenu->addAction(m_ChangeItemBGColor60Gray);
+    m_ContextMenu->addAction(m_ChangeItemBGColorNormal);
 
     return true;
 }
@@ -1704,7 +1720,35 @@ void BookBrowser::ConnectSignalsToSlots()
     connect(m_AdobesObfuscationMethod, SIGNAL(triggered()), this, SLOT(AdobesObfuscationMethod()));
     connect(m_IdpfsObfuscationMethod,  SIGNAL(triggered()), this, SLOT(IdpfsObfuscationMethod()));
     connect(m_NoObfuscationMethod,     SIGNAL(triggered()), this, SLOT(NoObfuscationMethod()));
+    connect(m_ChangeItemBGColor30Gray, SIGNAL(triggered()), this, SLOT(ChangeItemBGColor()));
+    connect(m_ChangeItemBGColor60Gray, SIGNAL(triggered()), this, SLOT(ChangeItemBGColor()));
+    connect(m_ChangeItemBGColorNormal, SIGNAL(triggered()), this, SLOT(ChangeItemBGColor()));
+}
 
+#define GrayColor30 QColor(77, 77, 77)
+#define GrayColor60 QColor(153, 153, 153)
+#define WhiteColor QColor(255, 255, 255)
+#define BlackColor QColor(0, 0, 0)
+void BookBrowser::ChangeItemBGColor()
+{
+    QAction* ac = dynamic_cast<QAction *>(sender());
+    QColor bgColor = WhiteColor;;
+    QColor textColor = BlackColor;
+    if (ac == m_ChangeItemBGColor30Gray) {
+        bgColor = GrayColor30;
+        textColor = WhiteColor;
+    } else if (ac == m_ChangeItemBGColor60Gray) {
+        bgColor = GrayColor60;
+        textColor = WhiteColor;
+    }
+    QList<QModelIndex>indexes = m_TreeView->selectionModel()->selectedIndexes();
+    foreach(QModelIndex index, indexes) {
+        QStandardItem* item = m_OPFModel->itemFromIndex(index);
+        if (item) {
+            item->setBackground(bgColor);
+            item->setForeground(textColor);
+        }
+    }
 }
 
 
