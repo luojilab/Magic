@@ -321,6 +321,8 @@ private slots:
     void IdpfsObfuscationMethod();
 
     void ValidateStylesheetWithW3C();
+    
+    void ChangeItemBGColor();
 
 protected:
     virtual void showEvent(QShowEvent *event);
@@ -475,6 +477,9 @@ private:
     QAction *m_AddSemantics;
     QAction *m_SaveAs;
     QAction *m_ValidateWithW3C;
+    QAction *m_ChangeItemBGColor30Gray;
+    QAction *m_ChangeItemBGColor60Gray;
+    QAction *m_ChangeItemBGColorNormal;
 
     QMenu *m_OpenWithContextMenu;
     QAction *m_OpenWith;
