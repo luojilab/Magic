@@ -145,6 +145,7 @@ const int CLIPBOARD_HISTORY_MAX = 20;
 static const QStringList SUPPORTED_SAVE_TYPE = QStringList() << "epub";
 
 static const QString DEFAULT_FILENAME = "untitled.epub";
+static const QString CUSTOM_PREVIEW_STYLE_FILENAME = "custom_preview_style.css";
 
 static const int supportPreviewPhoneTypeCount = 4;
 
@@ -1070,7 +1071,7 @@ void MainWindow::GoToLinkedStyleDefinition(const QString &element_name, const QS
             if (style_class_name.isEmpty()) {
                 display_name = element_name;
             } else {
-                display_name = QString("\".%1\" or \"%2.%1\"").arg(style_class_name).arg(element_name);
+                display_name = QString("\".%1\" " + tr("or") + " \"%2.%1\"").arg(style_class_name).arg(element_name);
             }
 
             // Open the first linked stylesheet if any
@@ -1078,7 +1079,7 @@ void MainWindow::GoToLinkedStyleDefinition(const QString &element_name, const QS
                 OpenResource(first_css_resource, 1);
             }
 
-            ShowMessageOnStatusBar(QString(tr("No CSS styles named") +  " " + display_name + " found, " + "or stylesheet not linked."), 7000);
+            ShowMessageOnStatusBar(QString(tr("No CSS styles named") +  " " + display_name + " " + tr("found, or stylesheet not linked.")), 7000);
 
         }
     }
@@ -3674,6 +3675,11 @@ void MainWindow::ReadSettings()
     web_settings->setFontFamily(QWebSettings::StandardFont, bookViewAppearance.font_family_standard);
     web_settings->setFontFamily(QWebSettings::SerifFont, bookViewAppearance.font_family_serif);
     web_settings->setFontFamily(QWebSettings::SansSerifFont, bookViewAppearance.font_family_sans_serif);
+    // Check for existing custom Preview/Book View stylesheet in Prefs dir and load it if present
+    QFileInfo CustomPreviewStylesheetInfo(QDir(Utility::DefinePrefsDir()).filePath(CUSTOM_PREVIEW_STYLE_FILENAME));
+    if (CustomPreviewStylesheetInfo.exists() && CustomPreviewStylesheetInfo.isFile() && CustomPreviewStylesheetInfo.isReadable()) {
+        web_settings->setUserStyleSheetUrl(QUrl::fromLocalFile(CustomPreviewStylesheetInfo.absoluteFilePath()));
+    }
 }
 
 
@@ -4894,7 +4900,7 @@ void MainWindow::ExtendIconSizes()
 void MainWindow::LoadInitialFile(const QString &openfilepath, bool is_internal)
 {
     if (!openfilepath.isEmpty()) {
-        LoadFile(openfilepath, is_internal);
+        LoadFile(QFileInfo(openfilepath).absoluteFilePath(), is_internal);
     } else {
         CreateNewBook();
     }
@@ -4906,6 +4912,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(m_PreviewWindow, SIGNAL(Shown()), this, SLOT(UpdatePreview()));
     connect(m_PreviewWindow, SIGNAL(ZoomFactorChanged(float)),     this, SLOT(UpdateZoomLabel(float)));
     connect(m_PreviewWindow, SIGNAL(ZoomFactorChanged(float)),     this, SLOT(UpdateZoomSlider(float)));
+    connect(m_PreviewWindow, SIGNAL(GoToPreviewLocationRequest()), this, SLOT(GoToPreviewLocation()));
     connect(m_PreviewWindow, SIGNAL(OpenUrlRequest(const QUrl &)), this, SLOT(OpenUrl(const QUrl &)));
     connect(qApp, SIGNAL(focusChanged(QWidget *, QWidget *)), this, SLOT(ApplicationFocusChanged(QWidget *, QWidget *)));
     // Setup signal mapping for heading actions.

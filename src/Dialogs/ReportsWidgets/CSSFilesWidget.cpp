@@ -1,5 +1,6 @@
 /************************************************************************
 **
+**  Copyright (C) 2018 Kevin B. Hendricks, Stratford, ON
 **  Copyright (C) 2012 Dave Heiland
 **  Copyright (C) 2012 John Schember <john@nachtimwald.com>
 **
@@ -56,13 +57,14 @@ CSSFilesWidget::CSSFilesWidget()
 void CSSFilesWidget::CreateReport(QSharedPointer<Book> book)
 {
     m_Book = book;
-    m_HTMLResources = m_Book->GetFolderKeeper()->GetResourceTypeList<HTMLResource>(false);
-    m_CSSResources = m_Book->GetFolderKeeper()->GetResourceTypeList<CSSResource>(false);
     SetupTable();
 }
 
 void CSSFilesWidget::SetupTable(int sort_column, Qt::SortOrder sort_order)
 {
+    // Need to rebuild m_HTMLResources and m_CSSResources  since deletes can happen behind the scenes
+    m_HTMLResources = m_Book->GetFolderKeeper()->GetResourceTypeList<HTMLResource>(false);
+    m_CSSResources = m_Book->GetFolderKeeper()->GetResourceTypeList<CSSResource>(false);
     m_ItemModel->clear();
     QStringList header;
     header.append(tr("Name"));
@@ -132,7 +134,7 @@ void CSSFilesWidget::SetupTable(int sort_column, Qt::SortOrder sort_order)
     QList<QStandardItem *> rowItems;
     // Files
     nitem = new NumericItem();
-    nitem->setText(QString::number(m_CSSResources.count()) % tr(" files"));
+    nitem->setText(QString(tr("%n file(s)", "", m_CSSResources.count())));
     rowItems << nitem;
     // File size
     nitem = new NumericItem();
@@ -213,6 +215,7 @@ void CSSFilesWidget::Delete()
     }
 
     emit DeleteFilesRequest(files_to_delete);
+    SetupTable();
 }
 
 void CSSFilesWidget::Save()
