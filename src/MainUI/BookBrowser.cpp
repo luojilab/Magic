@@ -126,13 +126,7 @@ void BookBrowser::RefreshCounts()
     for (int i = 0; i < m_OPFModel->invisibleRootItem()->rowCount(); i++) {
         QStandardItem *folder = m_OPFModel->invisibleRootItem()->child(i);
         int count = folder->rowCount();
-        QString tooltip = QString("%1 ").arg(count);
-
-        if (count == 1) {
-            tooltip.append(tr("file"));
-        } else {
-            tooltip.append(tr("files"));
-        }
+        QString tooltip = QString(tr("%n file(s)","", count));
 
         folder->setToolTip(tooltip);
     }
@@ -624,7 +618,7 @@ QStringList BookBrowser::AddExisting(bool only_multimedia, bool only_images)
 
         QString filename = QFileInfo(filepath).fileName();
 
-        if (current_filenames.contains(filename)) {
+        if (current_filenames.contains(filename, Qt::CaseInsensitive )) {
             // If this is an image prompt to replace it.
             if (IMAGE_EXTENSIONS.contains(QFileInfo(filepath).suffix().toLower()) ||
                 SVG_EXTENSIONS.contains(QFileInfo(filepath).suffix().toLower()) ||
