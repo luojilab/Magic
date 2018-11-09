@@ -1,5 +1,5 @@
 # <center>Building Sigil on Linux</center>
-## <center>Systems like Ubuntu 16.04 (and its derivitives) or newer</center>
+## <center>Systems like Ubuntu 16.04 (and its derivatives) or newer</center>
 
 If you're looking for instructions on how to build on systems older than Ubuntu 16.04 (systems whose repo version of Qt5 is less than 5.4.2), you should look at the [Building_on_older_Linux](./Building_on_older_Linux.md) documentation.
 
@@ -36,11 +36,12 @@ to get pretty-much everything you need to configure/compile/install C++ projects
 Once again: `sudo apt-get install cmake` will get you what you need on Ubuntu-type systems.
 
 ## <a name="qt5"/>Getting Qt5
-<center>**If your repos don't provide at lease Qt5.4.2, use the [Building_on_Linux](./Building_on_Linux.md) documentation**</center>
+<center>**If your repos don't provide at lease Qt5.4.2, use the [Building_on_older_Linux](./Building_on_older_Linux.md) documentation**</center>
 
 To get Sigil's Qt5 requirements, `sudo apt-get install` the following packages:
 
 + qtbase5-dev
++ qttools5-dev
 + qttools5-dev-tools
 + libqt5webkit5-dev
 + libqt5svg5-dev
@@ -48,7 +49,7 @@ To get Sigil's Qt5 requirements, `sudo apt-get install` the following packages:
 
 The folllowing command can be copied and pasted for convenience:
 
-`sudo apt-get install qtbase5-dev qttools5-dev-tools libqt5webkit5-dev libqt5svg5-dev libqt5xmlpatterns5-dev`
+`sudo apt-get install qtbase5-dev qttools5-dev qttools5-dev-tools libqt5webkit5-dev libqt5svg5-dev libqt5xmlpatterns5-dev`
 
 ## <a name="thirdparty"/>3rd-Party Dependencies (optional step)
 Sigil will provide the extra third-party libs if you do nothing, but most (if not all) of Sigil's third-party dependencies should be avialable in your software repos. If you want to make use of them, `sudo apt-get install` the following packages.
@@ -68,27 +69,27 @@ On Ubuntu/Debian `sudo apt-get install` (at a minimum) the following packages:
 
 + python3-dev
 + python3-pip
-+ python3-tk
-+ python3-pyqt5
 + python3-lxml
 + python3-six
 
 The folllowing command can be copied and pasted for convenience:
 
-`sudo apt-get install python3-dev python3-pip python3-tk python3-pyqt5 python3-lxml python3-six`
+`sudo apt-get install python3-dev python3-pip python3-lxml python3-six`
 
 That's all the Python 3.4 (or higher) stuff you will need to get Sigil "up and running", but if you want to make use of Sigil plugins that people are developing, you will also want to install the "standard" modules that ship with the binary version of Sigil on Windows and OS X. These should all be able to be installed with `sudo apt-get install`.
 
++ python3-tk
++ python3-pyqt5
 + python3-html5lib
 + python3-regex
-+ python3-pillow
++ python3-pillow (could be python3-pil)
 + python3-cssselect
 + python3-cssutils
 + python3-chardet
 
 The folllowing command can be copied and pasted for convenience:
 
-`sudo apt-get install python3-html5lib python3-regex python3-pillow python3-cssselect python3-cssutils python3-chardet`
+`sudo apt-get install python3-tk python3-pyqt5 python3-html5lib python3-regex python3-pillow python3-cssselect python3-cssutils python3-chardet`
 
 If you run into any that won't install with `sudo apt-get install` you can still use pip3 to install them.
 
