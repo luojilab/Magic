@@ -204,6 +204,14 @@ void BookViewPreview::UpdateDisplay()
     }
 }
 
+void BookViewPreview::mousePressEvent(QMouseEvent *event)
+{
+    // Now Propagate to base class
+    QWebView::mousePressEvent(event);
+
+    emit GoToPreviewLocationRequest();
+}
+
 void BookViewPreview::ScrollToTop()
 {
     QString caret_location = "var elementList = document.getElementsByTagName(\"body\");"
@@ -525,10 +533,14 @@ QString BookViewPreview::GetElementSelectingJS_NoTextNodes(const QList<ViewEdito
     return element_selector;
 }
 
-QList<ViewEditor::ElementIndex> BookViewPreview::GetCaretLocation()
+QList<ViewEditor::ElementIndex> BookViewPreview::GetCaretLocation(bool normalize)
 {
     // The location element hierarchy encoded in a string
-    QString location_string = EvaluateJavascript(c_GetCaretLocation).toString();
+    QString normalize_tree = "";
+    if (normalize) {
+        normalize_tree = "document.normalize();";
+    }
+    QString location_string = EvaluateJavascript(normalize_tree % c_GetCaretLocation).toString();
     return ConvertQWebPathToHierarchy(location_string);
 }
 

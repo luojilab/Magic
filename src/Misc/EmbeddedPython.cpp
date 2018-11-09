@@ -158,6 +158,7 @@
  *     return tme
  */
 
+
 QMutex EmbeddedPython::m_mutex;
 
 EmbeddedPython* EmbeddedPython::m_instance = 0;
@@ -519,8 +520,10 @@ PyObject* EmbeddedPython::QVariantToPyObject(const QVariant &v)
             value = Py_BuildValue("K", v.toULongLong(&ok));
             break;
         case QMetaType::QString:
-            value = PyUnicode_FromKindAndData(PyUnicode_2BYTE_KIND, v.toString().utf16(), v.toString().size());
-            // value = Py_BuildValue("s", v.toString().toUtf8().constData());
+            // since QString's utf-16 may contain surrogates or may only be pure ascii we have no easy
+            // to know the proper string storage type to use internal to python (latin1, ucs2, ucs4)
+            // so punt and create utf-8 and let python handle the conversion internally via its c-api
+            value = Py_BuildValue("s", v.toString().toUtf8().constData());
             break;
         case QMetaType::QByteArray:
             value = Py_BuildValue("y", v.toByteArray().constData());
@@ -531,7 +534,10 @@ PyObject* EmbeddedPython::QVariantToPyObject(const QVariant &v)
               value = PyList_New(vlist.size());
               int pos = 0;
               foreach(QString av, vlist) {
-                  PyObject* strval = PyUnicode_FromKindAndData(PyUnicode_2BYTE_KIND, av.utf16(), av.size());
+                  // since QString's utf-16 may contain surrogates or may only be pure ascii we have no easy
+                  // to know the proper string storage type to use internal to python (latin1, ucs2, ucs4)
+                  // so punt and create utf-8 and let python handle the conversion internally via its c-api
+                  PyObject* strval = Py_BuildValue("s", av.toUtf8().constData());
                   PyList_SetItem(value, pos, strval);
                   pos++;
                }

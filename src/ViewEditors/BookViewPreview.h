@@ -96,7 +96,7 @@ public:
     void GrabFocus();
 
     // inherited
-    QList<ViewEditor::ElementIndex> GetCaretLocation();
+    QList<ViewEditor::ElementIndex> GetCaretLocation(bool normalize=false);
 
     // methods for working with and converting QWebPaths to ViewEditor::ElementIndex Lists 
     QList<ViewEditor::ElementIndex> ConvertQWebPathToHierarchy(const QString & webpath) const;
@@ -146,8 +146,12 @@ signals:
 
     void DocumentLoaded();
 
+    void GoToPreviewLocationRequest();
 
 protected:
+
+    void mousePressEvent(QMouseEvent *event);
+
     /**
      * Evaluates the provided javascript source code
      * and returns the result.
