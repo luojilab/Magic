@@ -17,8 +17,8 @@ Compression=lzma2/ultra
 SolidCompression=yes
 OutputDir=..\installer
 LicenseFile=${LICENSE_LOCATION}
-; Win Vista is the lowest supported version
-MinVersion=0,6.0
+; Win 7sp1 is the lowest supported version
+MinVersion=0,6.1.7601
 PrivilegesRequired=admin
 OutputBaseFilename=ETypeSetting-${SIGIL_FULL_VERSION}-Windows${ISS_SETUP_FILENAME_PLATFORM}-Setup
 ChangesAssociations=yes
@@ -87,134 +87,23 @@ Filename: {tmp}\vcredist2015.exe; Check: NeedsVC2015RedistInstall; Parameters: "
 
 [Code]
 
-function IsWindowsVersion(Major, Minor: Integer): Boolean;
-// Check the major and minor versions of Windows version numbers
-var
-  Version: TWindowsVersion;
-begin
-  GetWindowsVersionEx(Version);
-  Result := ((Version.Major = Major) and (Version.Minor = Minor));
-end;
-
-function IsSPLevelOrMore(SPMajor: Integer): Boolean;
-// Version agnostic Service Pack check
-var
-  Version: TWindowsVersion;
-begin
-  GetWindowsVersionEx(Version);
-  Result := (Version.ServicePackMajor >= SPMajor);
-end;
-
-
-// Windows version checks
-function IsWindows7: Boolean;
-begin
-  Result := IsWindowsVersion(6, 1);
-end;
-
-function IsWindowsVista: Boolean;
-begin
-  Result := IsWindowsVersion(6, 0);
-end;
-
-
-function CompareVersion(V1, V2: string): Integer;
-// Compare version strings
-// Returns 0, if the versions are equal.
-// Returns -1, if the V1 is older than the V2.
-// Returns 1, if the V1 is newer than the V2.
-var
-  P, N1, N2: Integer;
-begin
-  Result := 0;
-  while (Result = 0) and ((V1 <> '') or (V2 <> '')) do
-  begin
-    P := Pos('.', V1);
-    if P > 0 then
-    begin
-      N1 := StrToInt(Copy(V1, 1, P - 1));
-      Delete(V1, 1, P);
-    end
-      else
-    if V1 <> '' then
-    begin
-      N1 := StrToInt(V1);
-      V1 := '';
-    end
-      else
-    begin
-      N1 := 0;
-    end;
-
-    P := Pos('.', V2);
-    if P > 0 then
-    begin
-      N2 := StrToInt(Copy(V2, 1, P - 1));
-      Delete(V2, 1, P);
-    end
-      else
-    if V2 <> '' then
-    begin
-      N2 := StrToInt(V2);
-      V2 := '';
-    end
-      else
-    begin
-      N2 := 0;
-    end;
-
-    if N1 < N2 then Result := -1
-      else
-    if N1 > N2 then Result := 1;
-  end;
-end;
-
-
 function NeedsVC2015RedistInstall: Boolean;
-// Return True if VC 2015 redist included
-// with Sigil Installer needs to be run.
+// Return True if VS 2015 redist included with Sigil Installer needs to be run.
 var
-  reg_key, installed_ver, sigil_ver: String;
-  R: Integer;
+  reg_key, installed_ver: String;
 begin
   Result := True;
-  // version of the VC++ Redistributable included with Sigil Installer
-  sigil_ver := '14.0.24210';
+
   if IsWin64 and not Is64BitInstallMode then
     // 32-bit version being installed on 64-bit machine
     reg_key := 'SOFTWARE\WoW6432Node\Microsoft\DevDiv\vc\servicing\14.0\RuntimeMinimum'
   else
     reg_key := 'SOFTWARE\Microsoft\DevDiv\vc\servicing\14.0\RuntimeMinimum';
 
+  // If there's a VS2015 compatible version of the runtime already installed; use it.
   if RegQueryStringValue(HKEY_LOCAL_MACHINE, reg_key, 'Version', installed_ver) then
-  begin
-     //MsgBox('Registry key: ' + reg_key, mbInformation, MB_OK);
-     //MsgBox('Version: ' + installed_ver, mbInformation, MB_OK);
-     R := CompareVersion(installed_ver, sigil_ver);
-     // If installed VC++ 2015 runtime version is equal or newer than
-     // the one included with the Sigil installer, then skip
-     // executing the VC++ redistributable installer
-     if R >= 0 then
-       Result := False;
-  end
-end;
-
-
-function InitializeSetup(): Boolean;
-// Make sure Windows 7 is at least at SP1 and that
-// Vista is at least at SP2 before setup starts.
-begin
-  Result := True;
-
-  if IsWindowsVista and not IsSPLevelOrMore(2) then
-  begin
-    MsgBox('The Sigil installer requires SP2 on this version of Windows.', mbCriticalError, MB_OK);
-    Result := False;
-  end;
-
-  if IsWindows7 and not IsSPLevelOrMore(1) then
-  begin
-      MsgBox('The Sigil installer requires SP1 on this version of Windows.', mbCriticalError, MB_OK);
+    begin
+      //MsgBox('Installed version: ' + installed_ver, mbInformation, MB_OK);
       Result := False;
-  end;
-end;
+    end
+ end;
