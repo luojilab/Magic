@@ -439,6 +439,8 @@ private:
     bool m_suspendTabReloading;
 
     bool m_defaultCaretLocationToTop;
+
+    int m_LastPosition;
 };
 
 #endif // FLOWTAB_H
