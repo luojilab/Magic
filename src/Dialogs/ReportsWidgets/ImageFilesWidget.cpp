@@ -1,5 +1,6 @@
 /************************************************************************
 **
+**  Copyright (C) 2018 Kevin Hendricks, Statford, ON 
 **  Copyright (C) 2012 Dave Heiland
 **  Copyright (C) 2012 John Schember <john@nachtimwald.com>
 **
@@ -59,6 +60,13 @@ ImageFilesWidget::ImageFilesWidget()
 void ImageFilesWidget::CreateReport(QSharedPointer<Book> book)
 {
     m_Book = book;
+    SetupTable();
+}
+
+void ImageFilesWidget::SetupTable(int sort_column, Qt::SortOrder sort_order)
+{
+    // m_AllImageResources must always be rebuilt on the fly because 
+    // files can be deleted and added behind the back of this Reports Widget resulting in crashes
     m_AllImageResources.clear();
     QList<ImageResource *> image_resources = m_Book->GetFolderKeeper()->GetResourceTypeList<ImageResource>(false);
     QList<SVGResource *> svg_resources = m_Book->GetFolderKeeper()->GetResourceTypeList<SVGResource>(false);
@@ -69,11 +77,7 @@ void ImageFilesWidget::CreateReport(QSharedPointer<Book> book)
     foreach(SVGResource * svg_resource, svg_resources) {
         m_AllImageResources.append(svg_resource);
     }
-    SetupTable();
-}
 
-void ImageFilesWidget::SetupTable(int sort_column, Qt::SortOrder sort_order)
-{
     m_ItemModel->clear();
     QStringList header;
     header.append(tr("Name"));
@@ -172,7 +176,7 @@ void ImageFilesWidget::SetupTable(int sort_column, Qt::SortOrder sort_order)
     QList<QStandardItem *> rowItems;
     // Files
     nitem = new NumericItem();
-    nitem->setText(QString::number(m_AllImageResources.count()) % tr(" files"));
+    nitem->setText(QString(tr("%n file(s)", "", m_AllImageResources.count())));
     rowItems << nitem;
     // File size
     nitem = new NumericItem();
@@ -397,14 +401,6 @@ void ImageFilesWidget::Delete()
         foreach(QModelIndex index, ui.fileTree->selectionModel()->selectedRows(0)) {
             files_to_delete.append(m_ItemModel->itemFromIndex(index)->text());
         }
-    }
-    // remove the to be deleted resourcs from the list of all image resources
-    if (files_to_delete.count() <= 0) {
-      return;
-    }
-    foreach(QString filename, files_to_delete) {
-        Resource *resource = m_Book->GetFolderKeeper()->GetResourceByFilename(filename);
-        if (resource) m_AllImageResources.removeOne(resource);
     }
     emit DeleteFilesRequest(files_to_delete);
     SetupTable();

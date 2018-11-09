@@ -1,6 +1,6 @@
 /************************************************************************
 **
-**  Copyright (C) 2017 Kevin B. Hendricks, Stratford, Ontario
+**  Copyright (C) 2017, 2018 Kevin B. Hendricks, Stratford, Ontario
 **  Copyright (C) 2012 John Schember <john@nachtimwald.com>
 **  Copyright (C) 2012, 2013 Dave Heiland
 **
@@ -55,12 +55,13 @@ AllFilesWidget::AllFilesWidget()
 void AllFilesWidget::CreateReport(QSharedPointer<Book> book)
 {
     m_Book = book;
-    m_AllResources = m_Book->GetAllResources();
     SetupTable();
 }
 
 void AllFilesWidget::SetupTable(int sort_column, Qt::SortOrder sort_order)
 {
+    // Need to rebuild m_AllResources since deletes can happen behind the scenes
+    m_AllResources = m_Book->GetAllResources();
     QString version = m_Book->GetOPF()->GetEpubVersion();
     m_ItemModel->clear();
     QStringList header;
@@ -139,7 +140,7 @@ void AllFilesWidget::SetupTable(int sort_column, Qt::SortOrder sort_order)
     rowItems << nitem;
     // Files
     nitem = new NumericItem();
-    nitem->setText(QString::number(m_AllResources.count()) % tr(" files"));
+    nitem->setText(QString(tr("%n file(s)", "", m_AllResources.count())));
     rowItems << nitem;
     // File size
     nitem = new NumericItem();

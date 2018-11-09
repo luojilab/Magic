@@ -1,4 +1,25 @@
-Sigil-pre0.9.10
+pre-0.9.11
+   Bug Fixes
+    - after mend and prettify - put cursor at enclosing tag if possible
+    - allow both links in Preview and clicking in Preview to reposition CV
+    - fix new cursor repositioning under new tab ala Spellcheck
+    - fix prettyprinting of the mark tag in gumbo and sigil_bs4
+    - fix crash when tagname illegally (for xhtml) includes single or double quotes
+    - fix crash in Reports for non-wellformed xhtml that was okay under html5
+    - fix deletion of multiple css files when Book View is open (Windows)
+
+   New Features
+    - update official builds to use Qt 5.11.1 and Python 3.7
+    - update internal Python modules to use latest versions
+    - give Windows users option to bypass the installation of VC runtime altogether during install
+      (for rare situations where the bundled runtime seems to break previously installed versions)
+
+   Changes
+    - Support for Windows Vista officially ends ... Win7sp1 is official minimum required Windows
+      The unofficial Legacy Windows version of Sigil will be available to XP and Vista users
+
+
+Sigil-0.9.10
    Bug Fixes
     - Fix signal handling to prevent double launch of plugins immediately after plugin installed
     - Fixed incorrect named entity tooltips for many of the Insert-> Special Characters
@@ -7,6 +28,15 @@ Sigil-pre0.9.10
     - Fix bug that allowed multiple audio/video tabas of the same resource to be opened
     - Fix plugin related bug when adding/removing last xhtml file
     - Fix Text Direction setting inside body to use structural dir attribute under epub3
+    - Fix duplicate group-position property in epub3 MetaData Editor
+    - Use absolute path references when first opening Sigil with an ebook so that Open Recent works better
+    - Fix "issue" in handling self-closing script tags in head (similar issue that we had with self-closing title tags)
+    - Fix issue converting Qt Strings to their Python equivalent when outside the BMP
+    - Fix issue with trying to add existing html files when names clash due to case insensitive file systems
+    - Fix crash bug after styling text in BookView and immediately going to CodeView without moving cursor
+    - Fix crash bugs after deleting resources contained in a Report in the BookBrowser
+    - Fix bug that destroys nav if left in unparseable state by user even temporarily
+    - Fix bug that moved curosr to beginning of tag block when save is done in CodeView
 
    New Features
     - allow plugins to supply their own icon (plugin.png 48x48) for use on the Quick Launch Toolbar icons
@@ -16,6 +46,11 @@ Sigil-pre0.9.10
     - add support for calibre:series and calibre:series_index to Metadata Editor for epub2
     - add support for calibre:title_sort to Metadata Editor for epub2
     - add support for clicking internal links in Preview to load the proper destination tab
+    - add support for loading Qt's base translation files if present. Allows buttons on native qt dialogs to
+        be translated (Windows users may need to manually copy newer qtbase_xx.qm files to Sigil's translation
+        directory if they didn't exist in Qt5.6.2)
+    - allow user to add custom css rules to Preview/Book View by creating a file called "custom_preview_style.css"
+        in the Sigil preferences folder (not responsible for custom css and ebook css fighting with each other)
 
 
 Sigil-0.9.9
