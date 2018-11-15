@@ -1741,6 +1741,11 @@ void BookBrowser::ChangeItemBGColor()
         if (item) {
             item->setBackground(bgColor);
             item->setForeground(textColor);
+            // record origin color
+            QList<QColor> recordColor;
+            recordColor.append(bgColor);
+            recordColor.append(textColor);
+            m_textItemOriginColor[item] = recordColor;
         }
     }
 }
@@ -1854,7 +1859,15 @@ void BookBrowser::CheckFileWellFormated()
     QStandardItem* htmlModel = m_OPFModel->itemFromIndex(m_OPFModel->GetTextFolderModelIndex());
     int rowcnt = htmlModel->rowCount();
     for (int i = 0; i < rowcnt; i ++) {
-        htmlModel->child(i)->setBackground(QColor(0, 0, 0, 0));
+        QList<QColor>& originColors = m_textItemOriginColor[htmlModel->child(i)];
+        QColor bgColor = WhiteColor;
+        QColor textColor = BlackColor;
+        if (!originColors.empty()) {
+            bgColor = originColors[0];
+            textColor = originColors[1];
+        }
+        htmlModel->child(i)->setBackground(bgColor);
+        htmlModel->child(i)->setForeground(textColor);
     }
     for (QString eFile : errorFileName) {
         for (int i = 0; i < rowcnt; i ++) {
