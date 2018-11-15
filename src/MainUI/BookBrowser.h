@@ -502,6 +502,8 @@ private:
     QList <QModelIndex> m_SavedSelection;
 
     Resource *m_RenamedResource;
+    
+    QMap<QStandardItem *, QList<QColor>> m_textItemOriginColor;
 };
 
 #endif // BOOKBROWSER_H
