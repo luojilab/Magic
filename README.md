@@ -1,6 +1,6 @@
 <img src="./src/Resource_Files/icon/app_icon_512.png" width=128/>
 
-# ETypesetting: An Ebook Editor
+# ETypesetting: an Ebook Editor
 
 [![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md) ![version](https://img.shields.io/badge/version-0.9.27-green.svg)
 [中文文档](./README-CH.md)
@@ -11,10 +11,10 @@
 
 ETypesetting based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Editor that can manipulate epub2 and epub3
 
-## Feature
+## Features
 
 * Support for epub2 and epub3
-* A simulator that can simulate rendering on different mobile phone including iPhone and Xiaomi etc. using DeDao self-designed ebook engine.
+* A simulator that can simulate rendering on different mobile phone including iPhone and Xiaomi etc. using Dedao self-designed ebook engine.
 * Night mode or other background color using in ebook
 * Math formula edit
 * Rendering just in time when editing HTML file
@@ -31,7 +31,6 @@ ETypesetting based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub e
 * Install Python3 on your machine
 * Install Qt5.5 with webkit build, or you can get it from [here]() directly
 * Download [CMake](https://cmake.org/)
-* Download engine library from [here]() and link them
 * Set Qt path to CMAKE_PREFIX_PATH in CMake
 * Create an Xcode project
 * Build and run
@@ -45,7 +44,6 @@ Mac installer dmg is put on **${BuildRootPath}/Build/bin/Release**
 - Install Python3 on your machine
 - Install Qt5.5 with webkit build, or you can get it from [here]() directly
 - Download [CMake](https://cmake.org/)
-- Download engine library from [here]() and link them
 - Set Qt path to CMAKE_PREFIX_PATH in CMake
 - Create an VS project
 - Build and run
@@ -60,9 +58,9 @@ The git log message formate we use is [here](https://github.com/angular/angular/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](./LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details
 
-## Acknowledgments
+## Acknowledgements
 
 * Sigil developers
 * Dedao Ebook typography staff
