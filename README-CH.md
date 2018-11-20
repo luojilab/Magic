@@ -32,7 +32,6 @@ ETypesetting是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编�
 * 在目标机器上安装Python3
 * 编译带有webkit build版本的Qt5.5。或直接从[这里]()获取
 * 下载CMake3.11+
-* 下载引擎库到本地，并且链接。引擎库在[这里]()获取
 * 将Qt的路径设置到CMAKE_PREFIX_PATH
 * 生成Xcode工程文件
 * 编译安装
@@ -46,7 +45,6 @@ ETypesetting是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编�
 - 在目标机器上安装Python3
 - 编译带有webkit build版本的Qt5.5。或直接从[这里]()获取
 - 下载CMake3.11+
-- 下载引擎库到本地，并且链接。引擎库在[这里]()获取
 - 将Qt的路径设置到CMAKE_PREFIX_PATH
 - 生成Xcode工程文件
 - 编译安装
@@ -61,7 +59,7 @@ ETypesetting是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编�
 
 ## 版权
 
-本工程是基于MIT License - 详见[LICENSE.md](./LICENSE.md)
+本工程是基于MIT License - 详见[LICENSE](./LICENSE)
 
 ## 致谢
 
