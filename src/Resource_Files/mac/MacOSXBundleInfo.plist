@@ -11,7 +11,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>RTypesetting Open Source ePub Editor. See https://github.com/luojilab/ETypeSetting</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.sigil-ebook.Sigil.app</string>
+	<string>com.luojilab.Magic</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -38,13 +38,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>ETypesetting</string>
+	<string>Magic</string>
 	<key>CFBundleIconFile</key>
 	<string>Sigil.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>ETypesetting</string>
+	<string>Magic</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
