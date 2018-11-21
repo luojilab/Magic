@@ -137,6 +137,7 @@ void BookBrowser::Refresh()
     m_OPFModel->Refresh();
     RefreshCounts();
     emit UpdateBrowserSelection();
+    restoreItemBGColor();
 }
 
 
@@ -998,6 +999,9 @@ void BookBrowser::RenameSelected()
         new_filenames.append(name);
 
         template_number++;
+        // Update origin color
+        m_textItemOriginColor[name] = m_textItemOriginColor[old_filename];
+        m_textItemOriginColor.remove(old_filename);
     }
 
     foreach (QString s, new_filenames) {
@@ -1028,12 +1032,15 @@ void BookBrowser::RenameSelected()
 
     SelectResources(resources);
     m_TreeView->verticalScrollBar()->setSliderPosition(scrollY);
+    // restore bg color
+    restoreItemBGColor();
 }
 
 
 void BookBrowser::Delete()
 {
     emit RemoveResourcesRequest();
+    restoreItemBGColor();
 }
 
 
@@ -1096,6 +1103,11 @@ void BookBrowser::RemoveResources(QList<Resource *> tab_resources, QList<Resourc
 
     if (files_to_delete.count() < 1) {
         return;
+    }
+    
+    // Update backup color
+    for(auto deleteRes : files_to_delete) {
+        m_textItemOriginColor.remove(deleteRes);
     }
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -1717,6 +1729,7 @@ void BookBrowser::ConnectSignalsToSlots()
     connect(m_ChangeItemBGColor30Gray, SIGNAL(triggered()), this, SLOT(ChangeItemBGColor()));
     connect(m_ChangeItemBGColor60Gray, SIGNAL(triggered()), this, SLOT(ChangeItemBGColor()));
     connect(m_ChangeItemBGColorNormal, SIGNAL(triggered()), this, SLOT(ChangeItemBGColor()));
+    connect(m_OPFModel, SIGNAL(ResourceRenamed(QString, QString)), this, SLOT(UpdateBackColorAfterRename(QString, QString)));
 }
 
 #define GrayColor30 QColor(77, 77, 77)
@@ -1745,7 +1758,7 @@ void BookBrowser::ChangeItemBGColor()
             QList<QColor> recordColor;
             recordColor.append(bgColor);
             recordColor.append(textColor);
-            m_textItemOriginColor[item] = recordColor;
+            m_textItemOriginColor[item->data().toString()] = recordColor;
         }
     }
 }
@@ -1859,7 +1872,7 @@ void BookBrowser::CheckFileWellFormated()
     QStandardItem* htmlModel = m_OPFModel->itemFromIndex(m_OPFModel->GetTextFolderModelIndex());
     int rowcnt = htmlModel->rowCount();
     for (int i = 0; i < rowcnt; i ++) {
-        QList<QColor>& originColors = m_textItemOriginColor[htmlModel->child(i)];
+        QList<QColor>& originColors = m_textItemOriginColor[htmlModel->child(i)->data().toString()];
         QColor bgColor = WhiteColor;
         QColor textColor = BlackColor;
         if (!originColors.empty()) {
@@ -1881,6 +1894,24 @@ void BookBrowser::CheckFileWellFormated()
     }
 }
 
+void BookBrowser::restoreItemBGColor() {
+    QList<QModelIndex> folderIdx = m_OPFModel->GetAllFolderModelIndex();
+    for (QModelIndex idx : folderIdx) {
+        QStandardItem* resModel = m_OPFModel->itemFromIndex(idx);
+        int rowcnt = resModel->rowCount();
+        for (int i = 0; i < rowcnt; i ++) {
+            QList<QColor>& originColors = m_textItemOriginColor[resModel->child(i)->data().toString()];
+            QColor bgColor = Qt::white;
+            QColor textColor = Qt::black;
+            if (!originColors.empty()) {
+                bgColor = originColors[0];
+                textColor = originColors[1];
+            }
+            resModel->child(i)->setBackground(bgColor);
+            resModel->child(i)->setForeground(textColor);
+        }
+    }
+}
 
 void BookBrowser::standardizedHtmlFileNames()
 {
@@ -1897,4 +1928,10 @@ void BookBrowser::standardizedHtmlFileNames()
         std::string fileName = fileNameWithExtension.substr(0, dotPos);
         m_OPFModel->RenameResource(res, (fileName + XHTML_FILE_FORMAT.toStdString()).c_str());
     }
+}
+
+void BookBrowser::UpdateBackColorAfterRename(QString oldName, QString newName) {
+    m_textItemOriginColor[newName] = m_textItemOriginColor[oldName];
+    m_textItemOriginColor.remove(oldName);
+    restoreItemBGColor();
 }
