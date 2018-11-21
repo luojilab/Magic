@@ -323,6 +323,8 @@ private slots:
     void ValidateStylesheetWithW3C();
     
     void ChangeItemBGColor();
+    
+    void UpdateBackColorAfterRename(QString oldName, QString newName);
 
 protected:
     virtual void showEvent(QShowEvent *event);
@@ -422,6 +424,8 @@ private:
 
     void RefreshCounts();
     bool fileExits(const QString&);
+    
+    void restoreItemBGColor();
 
 
     ///////////////////////////////
@@ -503,7 +507,7 @@ private:
 
     Resource *m_RenamedResource;
     
-    QMap<QStandardItem *, QList<QColor>> m_textItemOriginColor;
+    QMap<QString, QList<QColor> > m_textItemOriginColor;
 };
 
 #endif // BOOKBROWSER_H
