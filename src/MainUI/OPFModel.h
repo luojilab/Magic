@@ -92,6 +92,13 @@ public:
      * @return The QModelIndex of the Text folder.
      */
     QModelIndex GetTextFolderModelIndex();
+    
+    /**
+     * Returns the QModelIndex of the All folders.
+     *
+     * @return The QModelIndex of the All folders.
+     */
+    QList<QModelIndex> GetAllFolderModelIndex();
 
     /**
      * Returns the QModelIndex of the resource in any folder.
@@ -169,6 +176,10 @@ signals:
      * Emitted after a rename of a file is attempted.
      */
     void ResourceRenamed();
+    /**
+     * Emitted after a rename of a file is attempted with old name and new name.
+     */
+    void ResourceRenamed(QString oldName, QString newName);
 
 private slots:
 
