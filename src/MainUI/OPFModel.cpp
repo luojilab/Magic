@@ -300,9 +300,11 @@ void OPFModel::ItemChangedHandler(QStandardItem *item)
 {
     Q_ASSERT(item);
     const QString &identifier = item->data().toString();
+    QString old_filename = "";
+    QString new_filename = "";
 
     if (!identifier.isEmpty()) {
-        const QString &new_filename = item->text();
+        new_filename = item->text();
         Resource *resource = m_Book->GetFolderKeeper()->GetResourceByIdentifier(identifier);
 
         if (new_filename != resource->Filename()) {
@@ -310,11 +312,15 @@ void OPFModel::ItemChangedHandler(QStandardItem *item)
                 item->setText(resource->Filename());
                 return;
             }
+            old_filename = resource->Filename();
             RenameResource(resource, new_filename);
         }
     }
 
     emit ResourceRenamed();
+    if (old_filename != new_filename && !old_filename.isEmpty() && !new_filename.isEmpty()) {
+        emit ResourceRenamed(old_filename, new_filename);
+    }
 }
 
 
@@ -617,6 +623,18 @@ bool OPFModel::FilenameIsValid(const QString &old_filename, const QString &new_f
     }
 
     return true;
+}
+
+QList<QModelIndex> OPFModel::GetAllFolderModelIndex() {
+    QList<QModelIndex> ret;
+    ret << m_TextFolderItem->index();
+    ret << m_StylesFolderItem->index();
+    ret << m_ImagesFolderItem->index();
+    ret << m_FontsFolderItem->index();
+    ret << m_AudioFolderItem->index();
+    ret << m_VideoFolderItem->index();
+    ret << m_MiscFolderItem->index();
+    return ret;
 }
 
 
