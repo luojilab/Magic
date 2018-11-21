@@ -9,7 +9,7 @@
 
 cmake_minimum_required( VERSION 3.0 ) 
 
-project( ETypesetting ) 
+project( Magic ) 
 
 set( CMAKE_DEBUG_POSTFIX "d" )
 # Avoid the whole Release/Debug folder creation with Visual Studio
@@ -29,7 +29,7 @@ set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_e
 
 set( SIGIL_MAJOR_VERSION 0 )
 set( SIGIL_MINOR_VERSION 9 )
-set( SIGIL_REVISION_VERSION 29 )
+set( SIGIL_REVISION_VERSION 30 )
 set( SIGIL_FULL_VERSION ${SIGIL_MAJOR_VERSION}.${SIGIL_MINOR_VERSION}.${SIGIL_REVISION_VERSION} )
 
 if( UNIX AND NOT APPLE )
@@ -94,7 +94,7 @@ endif()
 if (APPLE)
     set(LAYOUT_ENGINE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/DDLayoutEngine/macos)
     set(SIGIL_APP ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/Sigil.app)
-    set(ET_APP ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/ETypesetting.app)
+    set(ET_APP ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/Magic.app)
 elseif(WIN32)
     set(LAYOUT_ENGINE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib/DDLayoutEngine/windows)
 	set(LIBLAYOUTENGINE_BIN ${LAYOUT_ENGINE_PATH}/LayoutEngine.dll)

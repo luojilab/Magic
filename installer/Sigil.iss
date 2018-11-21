@@ -3,13 +3,13 @@
 ; Inno, the ones with the dollar we define with CMake.
 
 [Setup]
-AppName=ETypeSetting
-AppVerName=ETypeSetting ${SIGIL_FULL_VERSION}
+AppName=Magic
+AppVerName=Magic ${SIGIL_FULL_VERSION}
 VersionInfoVersion=${SIGIL_FULL_VERSION}
-DefaultDirName={pf}\ETypeSetting
-DefaultGroupName=ETypeSetting
-UninstallDisplayIcon={app}\ETypeSetting.exe
-AppPublisher=ETypeSetting-Ebook
+DefaultDirName={pf}\Magic
+DefaultGroupName=Magic
+UninstallDisplayIcon={app}\Magic.exe
+AppPublisher=Magic-Ebook
 AppPublisherURL=https://github.com/Sigil-Ebook/Sigil
 WizardImageFile=compiler:wizmodernimage-IS.bmp
 WizardSmallImageFile=compiler:wizmodernsmallimage-IS.bmp
@@ -20,7 +20,7 @@ LicenseFile=${LICENSE_LOCATION}
 ; Win 7sp1 is the lowest supported version
 MinVersion=0,6.1.7601
 PrivilegesRequired=admin
-OutputBaseFilename=ETypeSetting-${SIGIL_FULL_VERSION}-Windows${ISS_SETUP_FILENAME_PLATFORM}-Setup
+OutputBaseFilename=Magic-${SIGIL_FULL_VERSION}-Windows${ISS_SETUP_FILENAME_PLATFORM}-Setup
 ChangesAssociations=yes
 
 ; "ArchitecturesAllowed=x64" specifies that Setup cannot run on
@@ -34,38 +34,38 @@ ArchitecturesAllowed="${ISS_ARCH}"
 ArchitecturesInstallIn64BitMode="${ISS_ARCH}"
 
 [Files]
-Source: "ETypesetting\*"; DestDir: "{app}"; Flags: createallsubdirs recursesubdirs ignoreversion
+Source: "Magic\*"; DestDir: "{app}"; Flags: createallsubdirs recursesubdirs ignoreversion
 Source: vendor\vcredist2015.exe; DestDir: {tmp}
 
 [Components]
 ; Main files cannot be unchecked. Doesn't do anything, just here for show
-Name: main; Description: "ETypeSetting"; Types: full compact custom; Flags: fixed
+Name: main; Description: "Magic"; Types: full compact custom; Flags: fixed
 ; Desktop icon.
 Name: dicon; Description: "Create a desktop icon"; Types: full custom
 Name: dicon\common; Description: "For all users"; Types: full custom; Flags: exclusive
 Name: dicon\user; Description: "For the current user only"; Flags: exclusive
 ; File associations
-Name: afiles; Description: "Associate ebook files with ETypeSetting"
+Name: afiles; Description: "Associate ebook files with Magic"
 Name: afiles\epub; Description: "EPUB"
 
 [Registry]
-; Add ETypeSetting as a global file handler for EPUB and HTML.
-Root: HKLM; Subkey: "Software\Classes\.epub\OpenWithList\ETypeSetting.exe"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Classes\.htm\OpenWithList\ETypeSetting.exe"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Classes\.html\OpenWithList\ETypeSetting.exe"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Classes\.xhtml\OpenWithList\ETypeSetting.exe"; Flags: uninsdeletekey
+; Add Magic as a global file handler for EPUB and HTML.
+Root: HKLM; Subkey: "Software\Classes\.epub\OpenWithList\Magic.exe"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Classes\.htm\OpenWithList\Magic.exe"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Classes\.html\OpenWithList\Magic.exe"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Classes\.xhtml\OpenWithList\Magic.exe"; Flags: uninsdeletekey
 ; Associate EPUB files if requested.
-Components: afiles\epub; Root: HKCR; Subkey: ".epub"; ValueType: string; ValueName: ""; ValueData: "ETypeSettingEPUB"; Flags: uninsdeletevalue uninsdeletekeyifempty
-Components: afiles\epub; Root: HKCR; Subkey: "ETypeSettingEPUB"; ValueType: string; ValueName: ""; ValueData: "EPUB"; Flags: uninsdeletekey
-Components: afiles\epub; Root: HKCR; Subkey: "ETypeSettingEPUB\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\ETypeSetting.exe,0"; Flags: uninsdeletekey
-Components: afiles\epub; Root: HKCR; Subkey: "ETypeSettingEPUB\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\ETypeSetting.exe"" ""%1"""; Flags: uninsdeletekey
+Components: afiles\epub; Root: HKCR; Subkey: ".epub"; ValueType: string; ValueName: ""; ValueData: "MagicEPUB"; Flags: uninsdeletevalue uninsdeletekeyifempty
+Components: afiles\epub; Root: HKCR; Subkey: "MagicEPUB"; ValueType: string; ValueName: ""; ValueData: "EPUB"; Flags: uninsdeletekey
+Components: afiles\epub; Root: HKCR; Subkey: "MagicEPUB\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Magic.exe,0"; Flags: uninsdeletekey
+Components: afiles\epub; Root: HKCR; Subkey: "MagicEPUB\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Magic.exe"" ""%1"""; Flags: uninsdeletekey
 
 [Icons]
-Name: "{group}\ETypeSetting"; Filename: "{app}\ETypeSetting.exe"
-Name: "{group}\Uninstall ETypeSetting"; Filename: "{uninstallexe}"
+Name: "{group}\Magic"; Filename: "{app}\Magic.exe"
+Name: "{group}\Uninstall Magic"; Filename: "{uninstallexe}"
 ; Optional desktop icon.
-Components: dicon\common; Name: "{commondesktop}\ETypeSetting"; Filename: "{app}\ETypeSetting.exe"
-Components: dicon\user; Name: "{userdesktop}\ETypeSetting"; Filename: "{app}\ETypeSetting.exe"
+Components: dicon\common; Name: "{commondesktop}\Magic"; Filename: "{app}\Magic.exe"
+Components: dicon\user; Name: "{userdesktop}\Magic"; Filename: "{app}\Magic.exe"
 
 [InstallDelete]
 ; Restructuring done in 0.9.8 makes this folder residual.
