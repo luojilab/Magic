@@ -217,7 +217,7 @@ void BookBrowser::SortHTML()
     QList <Resource *> resources = ValidSelectedResources();
     QMessageBox::StandardButton button_pressed;
     button_pressed = QMessageBox::warning(this,
-                                          tr("Sigil"), tr("Are you sure you want to sort the selected files alphanumerically?") % "\n" % tr("This action cannot be reversed."),
+                                          tr("Magic"), tr("Are you sure you want to sort the selected files alphanumerically?") % "\n" % tr("This action cannot be reversed."),
                                           QMessageBox::Ok | QMessageBox::Cancel
                                          );
 
@@ -627,7 +627,7 @@ QStringList BookBrowser::AddExisting(bool only_multimedia, bool only_images)
                 AUDIO_EXTENSIONS.contains(QFileInfo(filepath).suffix().toLower())) {
                 QMessageBox::StandardButton button_pressed;
                 button_pressed = QMessageBox::warning(this,
-                                                      tr("Sigil"), tr("The multimedia file \"%1\" already exists in the book.\n\nOK to replace?").arg(filename),
+                                                      tr("Magic"), tr("The multimedia file \"%1\" already exists in the book.\n\nOK to replace?").arg(filename),
                                                       QMessageBox::Ok | QMessageBox::Cancel);
 
                 if (button_pressed != QMessageBox::Ok) {
@@ -643,7 +643,7 @@ QStringList BookBrowser::AddExisting(bool only_multimedia, bool only_images)
                     continue;
                 }
             } else {
-                QMessageBox::warning(this, tr("Sigil"), tr("Unable to load \"%1\"\n\nA file with this name already exists in the book.").arg(filename));
+                QMessageBox::warning(this, tr("Magic"), tr("Unable to load \"%1\"\n\nA file with this name already exists in the book.").arg(filename));
                 continue;
             }
         }
@@ -692,7 +692,7 @@ QStringList BookBrowser::AddExisting(bool only_multimedia, bool only_images)
 
     if (!invalid_filenames.isEmpty()) {
         progress.cancel();
-        QMessageBox::warning(this, tr("Sigil"),
+        QMessageBox::warning(this, tr("Magic"),
                              tr("The following file(s) were not loaded due to invalid content or not well formed XML:\n\n%1")
                              .arg(invalid_filenames.join("\n")));
     }
@@ -792,7 +792,7 @@ void BookBrowser::SaveAsFiles()
 
     if (files_exist) {
         button_pressed = QMessageBox::warning(this,
-                                              tr("Sigil"), tr("One or more files already exists.  OK to overwrite?"),
+                                              tr("Magic"), tr("One or more files already exists.  OK to overwrite?"),
                                               QMessageBox::Ok | QMessageBox::Cancel);
 
         if (button_pressed != QMessageBox::Ok) {
@@ -992,7 +992,7 @@ void BookBrowser::RenameSelected()
 
         // Stop if the new name is already used or will be used by a different entry
         if ((book_filenames.contains(name) && resources[i]->Filename() != name) || new_filenames.contains(name)) {
-            QMessageBox::critical(this, tr("Sigil"), tr("Cannot rename files since this would result in duplicate filenames."));
+            QMessageBox::critical(this, tr("Magic"), tr("Cannot rename files since this would result in duplicate filenames."));
             return;
         }
 
