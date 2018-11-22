@@ -122,21 +122,12 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 	if (!m_bookContents) { return; }
 	if (!isVisible()) { return; }
     m_canChangeTOC = false;
-    QList<std::shared_ptr<BookContents>>items = LayoutEngine::GetEngine()->getContentList(m_bookReader);
-    QString name = index.data().toString();
-    std::shared_ptr<BookContents>selectItem = 0;
-    for ( std::shared_ptr<BookContents> item : items ) {
-        if (name == item->text) {
-            selectItem = item;
-            break;
-        }
-    }
-    if ( !selectItem ) {
-        m_canChangeTOC = true;
-        return;
-    }
+    
+    const QAbstractItemModel* absmodel = index.model();
+    QStandardItemModel* model = const_cast<QStandardItemModel *>(dynamic_cast<const QStandardItemModel *>(absmodel));
+    QString url = model->itemFromIndex(index)->data(Qt::UserRole + 2).toString();
 	// goto chapter
-	LayoutEngine::GetEngine()->gotoChapterByFileName(m_bookReader, selectItem->ContentHRef);
+	LayoutEngine::GetEngine()->gotoChapterByFileName(m_bookReader, url);
 }
 
 void PreviewEPUBWindow::engineInitFinish() {
@@ -244,6 +235,8 @@ void PreviewEPUBWindow::generateNavigatorTreeModel(QList<std::shared_ptr<BookCon
 		Q_ASSERT(diff < 2);
 
 		QStandardItem* content = new QStandardItem(text);
+        content->setData(QVariant(item->ContentHRef), Qt::UserRole + 2);
+        
 		lastLevel = level;
 		m_bookItems.push_back(content);
 
