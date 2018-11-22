@@ -27,13 +27,13 @@ endif()
 # We use the lower case name
 # on UNIX systems other than Mac OS X
 if ( WIN32 OR APPLE )
-    project( ETypesetting )
+    project( Magic )
 else()
-    project( eTypesetting )
+    project( Magic )
 endif()
 
 if (APPLE)
-set(ETypesetting_APP ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/ETypesetting.app)
+set(Magic_APP ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/Magic.app)
 endif(APPLE)
 
 #############################################################################
@@ -568,8 +568,8 @@ set_property( SOURCE ${QRC_FILES_CPP} PROPERTY SKIP_AUTOMOC ON )
 qt5_add_translation( QM_FILES ${TS_FILES} )
 
 # Define the Sigil version string for use in source files
-set_source_files_properties( Dialogs/About.cpp PROPERTIES COMPILE_DEFINITIONS SIGIL_FULL_VERSION="${ETypesetting_FULL_VERSION}" )
-set_source_files_properties( Misc/Utility.cpp PROPERTIES COMPILE_DEFINITIONS SIGIL_FULL_VERSION="${ETypesetting_FULL_VERSION}" )
+set_source_files_properties( Dialogs/About.cpp PROPERTIES COMPILE_DEFINITIONS SIGIL_FULL_VERSION="${Magic_FULL_VERSION}" )
+set_source_files_properties( Misc/Utility.cpp PROPERTIES COMPILE_DEFINITIONS SIGIL_FULL_VERSION="${Magic_FULL_VERSION}" )
 
 #############################################################################
 
@@ -615,35 +615,35 @@ if( APPLE )
 
     if( CMAKE_GENERATOR STREQUAL Xcode )
         # Create translation directory.
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/Resources")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/polyfills")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/translations")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/hunspell_dictionaries")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/plugin_launchers")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/plugin_launchers/python")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/python3lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/examples")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/Resources")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/polyfills")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/translations")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/hunspell_dictionaries")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/plugin_launchers")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/plugin_launchers/python")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/python3lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/examples")
 
-        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ETypesetting.app/Contents/polyfills")
-        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ETypesetting.app/Contents/Resources")
-        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ETypesetting.app/Contents/Resources")
-        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/ETypesetting.app/Contents/Resources")
+        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Magic.app/Contents/polyfills")
+        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Magic.app/Contents/Resources")
+        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Magic.app/Contents/Resources")
+        #exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/Magic.app/Contents/Resources")
     else()
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/Resources")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/polyfills")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/Resources")
-        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/Resources")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/Resources")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/polyfills")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/polyfills")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/Resources")
+        exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/Resources")
         # Create translation directory.
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/translations")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/hunspell_dictionaries")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/plugin_launchers")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/plugin_launchers/python")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/python3lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/lib")
-        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ETypesetting.app/Contents/examples")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/translations")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/hunspell_dictionaries")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/plugin_launchers")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/plugin_launchers/python")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/python3lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/lib")
+        exec_program("mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Magic.app/Contents/examples")
     endif()
 
     if ( PKG_SYSTEM_PYTHON )
@@ -653,8 +653,8 @@ if( APPLE )
     # Copy the PLIST file...
     exec_program("cp ${PROJECT_SOURCE_DIR}/Resource_Files/mac/MacOSXBundleInfo.plist ${PROJECT_BINARY_DIR}")
     
-    # ...and set the ETypesetting version string
-    exec_program("sed -i -e 's/SGVERSION/${ETypesetting_FULL_VERSION}/g' ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist")
+    # ...and set the Magic version string
+    exec_program("sed -i -e 's/SGVERSION/${Magic_FULL_VERSION}/g' ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist")
 endif()
 
 #############################################################################
@@ -702,7 +702,7 @@ if ( APPLE )
     SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     message(${PROJECT_BINARY_DIR})
     set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${PROJECT_BINARY_DIR}/MacOSXBundleInfo.plist )
-    set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "ETypesetting")
+    set_target_properties( ${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "Magic")
     set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_SKIP_BUILD_RPATH  TRUE)
 else()
     add_executable( ${PROJECT_NAME} WIN32 ${ALL_SOURCES} )
@@ -757,62 +757,62 @@ if( APPLE )
     else()
         set( WORK_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
     endif()
-    set( MAIN_PACKAGE_DIR ${WORK_DIR}/ETypesetting.app )
+    set( MAIN_PACKAGE_DIR ${WORK_DIR}/Magic.app )
 
     if ("${CODE_SIGN_ID}" STREQUAL "")
         add_custom_target(  addframeworks
-                            COMMAND macdeployqt ${ETypesetting_APP}
+                            COMMAND macdeployqt ${Magic_APP}
                             WORKING_DIRECTORY ${WORK_DIR}
                             DEPENDS ${PROJECT_NAME} )
     ELSE ()
         add_custom_target(  addframeworks
-                            COMMAND macdeployqt  ${ETypesetting_APP} -codesign="${CODE_SIGN_ID}"
+                            COMMAND macdeployqt  ${Magic_APP} -codesign="${CODE_SIGN_ID}"
                             WORKING_DIRECTORY ${WORK_DIR}
                             DEPENDS ${PROJECT_NAME} )
     ENDIF ()
 
     add_custom_target(  makedmg 
-                        COMMAND macdeployqt ${ETypesetting_APP} -dmg
+                        COMMAND macdeployqt ${Magic_APP} -dmg
                         WORKING_DIRECTORY ${WORK_DIR})
 
-    add_custom_command( TARGET ${PROJECT_NAME} COMMAND macdeployqt ${ETypesetting_APP} -dmg)
+    add_custom_command( TARGET ${PROJECT_NAME} COMMAND macdeployqt ${Magic_APP} -dmg)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rpath @executable_path/../lib" )
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rpath @executable_path/../Frameworks" )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libiculx.52.dylib @rpath/libiculx.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuuc.52.dylib @rpath/libicuuc.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicui18n.52.dylib @rpath/libicui18n.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicule.52.dylib @rpath/libicule.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicutu.52.dylib @rpath/libicutu.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
-    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${ETypesetting_APP}/Contents/MacOS/ETypesetting )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  ../lib/libicudata.52.1.dylib @rpath/libicudata.52.dylib ${Magic_APP}/Contents/MacOS/Magic )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libiculx.52.dylib @rpath/libiculx.52.dylib ${Magic_APP}/Contents/MacOS/Magic )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuuc.52.dylib @rpath/libicuuc.52.dylib ${Magic_APP}/Contents/MacOS/Magic )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicui18n.52.dylib @rpath/libicui18n.52.dylib ${Magic_APP}/Contents/MacOS/Magic )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicule.52.dylib @rpath/libicule.52.dylib ${Magic_APP}/Contents/MacOS/Magic )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicutu.52.dylib @rpath/libicutu.52.dylib ${Magic_APP}/Contents/MacOS/Magic )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${Magic_APP}/Contents/MacOS/Magic )
+    add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND install_name_tool -change  @executable_path/../Frameworks/libicuio.52.dylib @rpath/libicuio.52.dylib ${Magic_APP}/Contents/MacOS/Magic )
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                            COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/polyfills)
+                            COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/polyfills/MathJax.js ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/polyfills)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/Resources)
+                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/Sigil.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/Resources)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/Resources)
+                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/sgf.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/Resources)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD 
-                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/ETypesetting.app/Contents/Resources)
+                        COMMAND cp ${PROJECT_SOURCE_DIR}/Resource_Files/icon/epub.icns ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Magic.app/Contents/Resources)
 
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
-        COMMAND mkdir -p ${ETypesetting_APP}/Contents/translations/
-        COMMAND cp ${PROJECT_BINARY_DIR}/*.qm ${ETypesetting_APP}/Contents/translations/ )
+        COMMAND mkdir -p ${Magic_APP}/Contents/translations/
+        COMMAND cp ${PROJECT_BINARY_DIR}/*.qm ${Magic_APP}/Contents/translations/ )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND mkdir -p ${ETypesetting_APP}/Contents/hunspell_dictionaries
-        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/dictionaries/* ${ETypesetting_APP}/Contents/hunspell_dictionaries )
+        COMMAND mkdir -p ${Magic_APP}/Contents/hunspell_dictionaries
+        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/dictionaries/* ${Magic_APP}/Contents/hunspell_dictionaries )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
-        COMMAND mkdir -p ${ETypesetting_APP}/Contents/plugin_launchers/python
-        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/plugin_launchers/python/* ${ETypesetting_APP}/Contents/plugin_launchers/python ) 
+        COMMAND mkdir -p ${Magic_APP}/Contents/plugin_launchers/python
+        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/plugin_launchers/python/* ${Magic_APP}/Contents/plugin_launchers/python ) 
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND mkdir -p ${ETypesetting_APP}/Contents/python3lib
-        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/python3lib/* ${ETypesetting_APP}/Contents/python3lib )
+        COMMAND mkdir -p ${Magic_APP}/Contents/python3lib
+        COMMAND cp -r ${CMAKE_SOURCE_DIR}/src/Resource_Files/python3lib/* ${Magic_APP}/Contents/python3lib )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
-        COMMAND mkdir -p ${ETypesetting_APP}/Contents/examples
-        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/examples/* ${ETypesetting_APP}/Contents/examples )
+        COMMAND mkdir -p ${Magic_APP}/Contents/examples
+        COMMAND cp ${CMAKE_SOURCE_DIR}/src/Resource_Files/examples/* ${Magic_APP}/Contents/examples )
     add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD 
-        COMMAND mkdir -p ${ETypesetting_APP}/Contents/lib/
-        COMMAND cp ${CMAKE_SOURCE_DIR}/lib/icu/mac/lib/*.dylib ${ETypesetting_APP}/Contents/lib/ )
+        COMMAND mkdir -p ${Magic_APP}/Contents/lib/
+        COMMAND cp ${CMAKE_SOURCE_DIR}/lib/icu/mac/lib/*.dylib ${Magic_APP}/Contents/lib/ )
 
     if ( PKG_SYSTEM_PYTHON )
         add_custom_command( TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${PYTHON_EXECUTABLE} ARGS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/osx_add_python_framework.py )
@@ -825,9 +825,10 @@ elseif (MSVC)
     query_qmake(QT_INSTALL_LIBS QT_LIBRARY_DIR)
     query_qmake(QT_INSTALL_BINS QT_INSTALL_BINS)
     query_qmake(QT_INSTALL_PLUGINS QT_PLUGINS_DIR)
+    query_qmake(QT_INSTALL_TRANSLATIONS QT_TRANSLATIONS_DIR)
 
     set( TEMP_PACKAGE_DIR ${CMAKE_BINARY_DIR}/temp_folder )
-    set( MAIN_PACKAGE_DIR ${TEMP_PACKAGE_DIR}/ETypesetting )
+    set( MAIN_PACKAGE_DIR ${TEMP_PACKAGE_DIR}/Magic )
     set( OUTPUT_PACKAGE_DIR ${CMAKE_BINARY_DIR}/installer )
     set( PYTHON_DEST_DIR ${MAIN_PACKAGE_DIR}/python3 )
     
@@ -902,7 +903,18 @@ elseif (MSVC)
     # Copy the translation qm files
     add_custom_command( TARGET ${TARGET_FOR_COPY} PRE_BUILD COMMAND cmake -E make_directory ${MAIN_PACKAGE_DIR}/translations/ )
     foreach( QM ${QM_FILES} )
+        # Copy Sigil's qm files
         add_custom_command( TARGET ${TARGET_FOR_COPY} POST_BUILD COMMAND cmake -E copy ${QM} ${MAIN_PACKAGE_DIR}/translations/ )
+        # Copy Qt's qm files that coincide with the above
+        # message( "QM = ${QM}")
+        string( REGEX REPLACE "(.*)(sigil_)(.*)(\\.qm)" "\\1;\\2;\\3;\\4" PATH_ELEMENTS "${QM}" )
+        list( GET PATH_ELEMENTS 2 LANG_ID )
+        # message( "LANG_ID = ${LANG_ID}")
+        set( QTBASE_QM ${QT_TRANSLATIONS_DIR}/qtbase_${LANG_ID}.qm )
+        # message( "QTBASE_QM = ${QTBASE_QM}" )
+        if ( EXISTS ${QTBASE_QM} )
+            add_custom_command( TARGET ${TARGET_FOR_COPY} POST_BUILD COMMAND cmake -E copy ${QTBASE_QM} ${MAIN_PACKAGE_DIR}/translations/ )
+        endif()
     endforeach( QM )
 
     # Copy the MathJax polyfill
@@ -1070,5 +1082,5 @@ endif()
 if (APPLE)
     #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
      #                  COMMAND rm -rf ${ET_APP} 
-      #                 COMMAND mv ${ETypesetting_APP} ${ET_APP} )
+      #                 COMMAND mv ${Magic_APP} ${ET_APP} )
 endif(APPLE)
