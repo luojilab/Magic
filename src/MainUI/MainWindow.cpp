@@ -5010,6 +5010,8 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionXiaomiQuick, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
     connect(ui.actionStandard_html_name, SIGNAL(triggered()), m_BookBrowser, SLOT(standardizedHtmlFileNames()));
     ui.actionPreviewForIphoneXQuick->setIcon(QIcon(":/main/ipad-preview_48px.png"));
+    connect(ui.actionSplitLeft, SIGNAL(triggered(bool)), this, SLOT(changeSplitStrategy(bool)));
+    connect(ui.actionSplitRight, SIGNAL(triggered(bool)), this, SLOT(changeSplitStrategy(bool)));
     // Change case
     connect(ui.actionCasingLowercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
     connect(ui.actionCasingUppercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
@@ -5163,6 +5165,23 @@ void MainWindow::ConnectSignalsToSlots()
 	m_contentChangedTimer->setSingleShot(true);
 	connect(m_contentChangedTimer, SIGNAL(timeout()), this, SLOT(contentTxetChangedAction()));
 	m_contentChangedTimer->start();
+    
+    // initial checked state
+    SettingsStore setting;
+    int v = setting.splitStrategy();
+    if (v) {
+        if (v == int(CodeViewEditor::SplitStrategy::Right)) {
+            ui.actionSplitRight->setChecked(true);
+            ui.actionSplitLeft->setChecked(false);
+        } else {
+            ui.actionSplitLeft->setChecked(true);
+            ui.actionSplitRight->setChecked(false);
+        }
+    } else {
+        ui.actionSplitLeft->setChecked(true);
+        ui.actionSplitRight->setChecked(false);
+        setting.setSplitStrategy(int(CodeViewEditor::SplitStrategy::Left));
+    }
 }
 
 void MainWindow::fileSavedSuccessAction() {
@@ -5525,4 +5544,28 @@ void MainWindow::closeBookContentDock() {
 	m_previewEPUBDock = NULL;
 	m_bookContentView = NULL;
 	previewer = NULL;*/
+}
+
+void MainWindow::changeSplitStrategy(bool newState) {
+    auto ac = dynamic_cast<QAction *>(sender());
+    ac->setChecked(newState);
+
+    SettingsStore setting;
+    if (ac == ui.actionSplitLeft) {
+        if (!newState) {
+            ui.actionSplitRight->setChecked(true);
+            setting.setSplitStrategy(int(CodeViewEditor::SplitStrategy::Right));
+        } else {
+            setting.setSplitStrategy(int(CodeViewEditor::SplitStrategy::Left));
+            ui.actionSplitRight->setChecked(false);
+        }
+    } else if (ac == ui.actionSplitRight) {
+        if (!newState) {
+            ui.actionSplitLeft->setChecked(true);
+            setting.setSplitStrategy(int(CodeViewEditor::SplitStrategy::Left));
+        } else {
+            setting.setSplitStrategy(int(CodeViewEditor::SplitStrategy::Right));
+            ui.actionSplitLeft->setChecked(false);
+        }
+    }
 }

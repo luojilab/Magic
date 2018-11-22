@@ -67,6 +67,11 @@ public:
         Highlight_XHTML, /**< XHTML source code highlighting */
         Highlight_CSS    /**< CSS source code highlighting */
     };
+    
+    enum class SplitStrategy {
+        Left = 1,
+        Right
+    };
 
     /**
      * Constructor.
