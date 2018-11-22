@@ -326,7 +326,10 @@ QString CodeViewEditor::SplitSection()
 {
     QString text = toPlainText();
     int split_position = textCursor().position();
-
+    SettingsStore setting;
+    split_position = setting.splitStrategy() == int(SplitStrategy::Right) ?
+    textCursor().selectionEnd() : textCursor().selectionStart();
+    
     // Abort splitting the section if user is within a tag - MainWindow will display a status message
     if (IsPositionInTag(split_position, text)) {
         return QString();
