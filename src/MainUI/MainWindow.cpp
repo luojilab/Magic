@@ -540,7 +540,7 @@ void MainWindow::OpenUrl(const QUrl &url)
         OpenResource(resource, line, -1, QString(), MainWindow::ViewState_Unknown, url.fragment());
     } else {
         QMessageBox::StandardButton button_pressed;
-        button_pressed = QMessageBox::warning(this, tr("Sigil"), tr("Are you sure you want to open this external link?\n\n%1").arg(url.toString()), QMessageBox::Ok | QMessageBox::Cancel);
+        button_pressed = QMessageBox::warning(this, tr("Magic"), tr("Are you sure you want to open this external link?\n\n%1").arg(url.toString()), QMessageBox::Ok | QMessageBox::Cancel);
 
         if (button_pressed == QMessageBox::Ok) {
             QDesktopServices::openUrl(url);
@@ -800,7 +800,7 @@ void MainWindow::OpenRecentFile()
             if (!QFile::exists(filename)) {
                 QMessageBox::StandardButton button_pressed;
                 const QString &msg = tr("This file no longer exists. Click OK to remove it from the menu.\n%1");
-                button_pressed = QMessageBox::warning(this, tr("Sigil"),
+                button_pressed = QMessageBox::warning(this, tr("Magic"),
                                                       msg.arg(filename), QMessageBox::Ok | QMessageBox::Cancel);
 
                 if (button_pressed == QMessageBox::Ok) {
@@ -1009,7 +1009,7 @@ void MainWindow::ViewImageDialog(const QUrl &url)
             m_ViewImage->ShowImage(resource->GetFullPath());
         }
     } catch (ResourceDoesNotExist) {
-        QMessageBox::warning(this, tr("Sigil"), tr("Image does not exist: ") + image_path);
+        QMessageBox::warning(this, tr("Magic"), tr("Image does not exist: ") + image_path);
     }
 }
 
@@ -1155,7 +1155,7 @@ bool MainWindow::ProceedWithUndefinedUrlFragments()
                                 " Splitting or merging under these conditions can result in broken links.</p>"
                                 "<p>Do you still wish to continue?</p></html>");
 
-        button_pressed = QMessageBox::warning(this, tr("Sigil"),
+        button_pressed = QMessageBox::warning(this, tr("Magic"),
                                 msg.arg(std::get<1>(result), std::get<2>(result)),
                                 QMessageBox::Yes | QMessageBox::No);
         if (button_pressed != QMessageBox::Yes) {
@@ -1537,7 +1537,7 @@ void MainWindow::ReportsDialog()
 {
     SaveTabData();
     if (!m_Book.data()->GetNonWellFormedHTMLFiles().isEmpty()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("Reports cancelled due to XML not well formed."));
+        QMessageBox::warning(this, tr("Magic"), tr("Reports cancelled due to XML not well formed."));
         return;
     }
     // non-modal dialog
@@ -1624,7 +1624,7 @@ void MainWindow::DeleteUnusedMedia()
 {
     SaveTabData();
     if (!m_Book.data()->GetNonWellFormedHTMLFiles().isEmpty()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("Delete Unused Media Files cancelled due to XML not well formed."));
+        QMessageBox::warning(this, tr("Magic"), tr("Delete Unused Media Files cancelled due to XML not well formed."));
         return;
     }
 
@@ -1679,7 +1679,7 @@ void MainWindow::DeleteUnusedMedia()
         RemoveResources(resources);
         ShowMessageOnStatusBar(tr("Unused media files deleted."));
     } else {
-        QMessageBox::information(this, tr("Sigil"), tr("There are no unused image, video or audio files to delete."));
+        QMessageBox::information(this, tr("Magic"), tr("There are no unused image, video or audio files to delete."));
     }
 }
 
@@ -1687,7 +1687,7 @@ void MainWindow::DeleteUnusedStyles()
 {
     SaveTabData();
     if (!m_Book.data()->GetNonWellFormedHTMLFiles().isEmpty()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("Delete Unused Styles cancelled due to XML not well formed."));
+        QMessageBox::warning(this, tr("Magic"), tr("Delete Unused Styles cancelled due to XML not well formed."));
         return;
     }
 
@@ -1704,7 +1704,7 @@ void MainWindow::DeleteUnusedStyles()
     if (css_selectors_to_delete.count() > 0) {
         DeleteReportsStyles(css_selectors_to_delete);
     } else {
-        QMessageBox::information(this, tr("Sigil"), tr("There are no unused stylesheet classes to delete."));
+        QMessageBox::information(this, tr("Magic"), tr("There are no unused stylesheet classes to delete."));
     }
     qDeleteAll(css_selector_usage);
 }
@@ -1716,7 +1716,7 @@ void MainWindow::InsertFileDialog()
 
     FlowTab *flow_tab = GetCurrentFlowTab();
     if (!flow_tab || !flow_tab->InsertFileEnabled()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("You cannot insert a file at this position."));
+        QMessageBox::warning(this, tr("Magic"), tr("You cannot insert a file at this position."));
         return;
     }
 
@@ -1819,7 +1819,7 @@ void MainWindow::InsertId()
 
     FlowTab *flow_tab = GetCurrentFlowTab();
     if (!flow_tab || !flow_tab->InsertIdEnabled()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("You cannot insert an id at this position."));
+        QMessageBox::warning(this, tr("Magic"), tr("You cannot insert an id at this position."));
         return;
     }
 
@@ -1827,7 +1827,7 @@ void MainWindow::InsertId()
 
     // Prevent adding a hidden anchor id in Book View.
     if (m_ViewState == MainWindow::ViewState_BookView && id.isEmpty() && flow_tab->GetSelectedText().isEmpty()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("You must select text before inserting a new id."));
+        QMessageBox::warning(this, tr("Magic"), tr("You must select text before inserting a new id."));
         return;
     }
 
@@ -1841,12 +1841,12 @@ void MainWindow::InsertId()
         QRegularExpressionMatch mo = invalid_id.match(selected_id);
 
         if (mo.hasMatch()) {
-            QMessageBox::warning(this, tr("Sigil"), tr("ID is invalid - must start with a letter, followed by letter number _ : - or ."));
+            QMessageBox::warning(this, tr("Magic"), tr("ID is invalid - must start with a letter, followed by letter number _ : - or ."));
             return;
         };
 
         if (!flow_tab->InsertId(select_id.GetId())) {
-            QMessageBox::warning(this, tr("Sigil"), tr("You cannot insert an id at this position."));
+            QMessageBox::warning(this, tr("Magic"), tr("You cannot insert an id at this position."));
         }
     }
 }
@@ -1859,7 +1859,7 @@ void MainWindow::InsertHyperlink()
 
     FlowTab *flow_tab = GetCurrentFlowTab();
     if (!flow_tab || !flow_tab->InsertHyperlinkEnabled()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("You cannot insert a link at this position."));
+        QMessageBox::warning(this, tr("Magic"), tr("You cannot insert a link at this position."));
         return;
     }
 
@@ -1867,7 +1867,7 @@ void MainWindow::InsertHyperlink()
 
     // Prevent adding a hidden anchor link in Book View.
     if (m_ViewState == MainWindow::ViewState_BookView && href.isEmpty() && flow_tab->GetSelectedText().isEmpty()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("You must select text before inserting a new link."));
+        QMessageBox::warning(this, tr("Magic"), tr("You must select text before inserting a new link."));
         return;
     }
 
@@ -1878,12 +1878,12 @@ void MainWindow::InsertHyperlink()
     if (select_hyperlink.exec() == QDialog::Accepted) {
         QString target = select_hyperlink.GetTarget();
         if (target.contains("<") || target.contains(">")) {
-            QMessageBox::warning(this, tr("Sigil"), tr("Link is invalid - cannot contain '<' or '>'"));
+            QMessageBox::warning(this, tr("Magic"), tr("Link is invalid - cannot contain '<' or '>'"));
             return;
         };
 
         if (!flow_tab->InsertHyperlink(target)) {
-            QMessageBox::warning(this, tr("Sigil"), tr("You cannot insert a link at this position."));
+            QMessageBox::warning(this, tr("Magic"), tr("You cannot insert a link at this position."));
         }
     }
 }
@@ -1895,7 +1895,7 @@ void MainWindow::MarkForIndex()
 
     FlowTab *flow_tab = GetCurrentFlowTab();
     if (!flow_tab || !flow_tab->MarkForIndexEnabled()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("You cannot mark an index at this position or without selecting text."));
+        QMessageBox::warning(this, tr("Magic"), tr("You cannot mark an index at this position or without selecting text."));
         return;
     }
 
@@ -1905,12 +1905,12 @@ void MainWindow::MarkForIndex()
     if (select_index_title.exec() == QDialog::Accepted) {
         QString entry = select_index_title.GetTitle();
         if (entry.contains("<") || entry.contains(">")) {
-            QMessageBox::warning(this, tr("Sigil"), tr("Entry is invalid - cannot contain '<' or '>'"));
+            QMessageBox::warning(this, tr("Magic"), tr("Entry is invalid - cannot contain '<' or '>'"));
             return;
         };
 
         if (!flow_tab->MarkForIndex(entry)) {
-            QMessageBox::warning(this, tr("Sigil"), tr("You cannot mark an index at this position."));
+            QMessageBox::warning(this, tr("Magic"), tr("You cannot mark an index at this position."));
         }
     }
 }
@@ -2129,14 +2129,14 @@ void MainWindow::MergeResources(QList <Resource *> resources)
         Resource *resource = m_Book->PreviousResource(resources.first());
 
         if (!resource || resource == resources.first()) {
-            QMessageBox::warning(this, tr("Sigil"), tr("One resource selected and there is no previous resource to merge into."));
+            QMessageBox::warning(this, tr("Magic"), tr("One resource selected and there is no previous resource to merge into."));
             return;
         }
 
         resources.prepend(resource);
     } else {
         QMessageBox::StandardButton button_pressed;
-        button_pressed = QMessageBox::warning(this, tr("Sigil"), tr("Are you sure you want to merge the selected files?\nThis action cannot be reversed."), QMessageBox::Ok | QMessageBox::Cancel);
+        button_pressed = QMessageBox::warning(this, tr("Magic"), tr("Are you sure you want to merge the selected files?\nThis action cannot be reversed."), QMessageBox::Ok | QMessageBox::Cancel);
 
         if (button_pressed != QMessageBox::Ok) {
             return;
@@ -2150,12 +2150,12 @@ void MainWindow::MergeResources(QList <Resource *> resources)
             continue;
         }
         if (!h->FileIsWellFormed()) {
-            QMessageBox::warning(this, tr("Sigil"), tr("Merge cancelled: %1, XML not well formed.").arg(h->Filename()));
+            QMessageBox::warning(this, tr("Magic"), tr("Merge cancelled: %1, XML not well formed.").arg(h->Filename()));
             return;
         }
     }
     if (!m_TabManager->IsAllTabDataWellFormed()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("Merge cancelled due to XML not well formed."));
+        QMessageBox::warning(this, tr("Magic"), tr("Merge cancelled due to XML not well formed."));
         return;
     }
 
@@ -2179,7 +2179,7 @@ void MainWindow::MergeResources(QList <Resource *> resources)
 
     if (failed_resource != NULL) {
         QApplication::restoreOverrideCursor();
-        QMessageBox::critical(this, tr("Sigil"), tr("Cannot merge file %1").arg(failed_resource->Filename()));
+        QMessageBox::critical(this, tr("Magic"), tr("Cannot merge file %1").arg(failed_resource->Filename()));
         QApplication::setOverrideCursor(Qt::WaitCursor);
         resource_to_open = failed_resource;
     } else {
@@ -2211,7 +2211,7 @@ void MainWindow::LinkStylesheetsToResources(QList <Resource *> resources)
             continue;
         }
         if (!h->FileIsWellFormed()) {
-            QMessageBox::warning(this, tr("Sigil"), tr("Link Stylesheets cancelled: %1, XML not well formed.").arg(h->Filename()));
+            QMessageBox::warning(this, tr("Magic"), tr("Link Stylesheets cancelled: %1, XML not well formed.").arg(h->Filename()));
             return;
         }
     }
@@ -3496,19 +3496,19 @@ void MainWindow::UpdateZoomLabel(float new_zoom_factor)
 void MainWindow::CreateSectionBreakOldTab(QString content, HTMLResource *originating_resource)
 {
     if (content.isEmpty()) {
-        QMessageBox::warning(this, tr("Sigil"), tr("File cannot be split at this position."));
+        QMessageBox::warning(this, tr("Magic"), tr("File cannot be split at this position."));
         return;
     }
 
     // XXX: This should be using the mime type not the extension.
     if (!TEXT_EXTENSIONS.contains(QFileInfo(originating_resource->Filename()).suffix().toLower())) {
-        QMessageBox::warning(this, tr("Sigil"), tr("Cannot split since it may not be an HTML file."));
+        QMessageBox::warning(this, tr("Magic"), tr("Cannot split since it may not be an HTML file."));
         return;
     }
 
     HTMLResource * nav_resource = m_Book->GetConstOPF()->GetNavResource();
     if (nav_resource && nav_resource == originating_resource) {
-        QMessageBox::warning(this, tr("Sigil"), tr("The Nav file cannot be split."));
+        QMessageBox::warning(this, tr("Magic"), tr("The Nav file cannot be split."));
         return;
     }
 
@@ -3550,19 +3550,19 @@ void MainWindow::SplitOnSGFSectionMarkers()
     foreach(Resource * resource, html_resources) {
         HTMLResource *html_resource = qobject_cast<HTMLResource *>(resource);
         if (!html_resource) {
-            QMessageBox::warning(this, tr("Sigil"), tr("Cannot split since at least one file is not an HTML file."));
+            QMessageBox::warning(this, tr("Magic"), tr("Cannot split since at least one file is not an HTML file."));
             return;
         }
 
         // Check if data is well formed before splitting.
         if (!html_resource->FileIsWellFormed()) {
-            QMessageBox::warning(this, tr("Sigil"), tr("Cannot split: %1 XML is not well formed").arg(html_resource->Filename()));
+            QMessageBox::warning(this, tr("Magic"), tr("Cannot split: %1 XML is not well formed").arg(html_resource->Filename()));
             return;
         }
 
         // XXX: This should be using the mime type not the extension.
         if (!TEXT_EXTENSIONS.contains(QFileInfo(html_resource->Filename()).suffix().toLower())) {
-            QMessageBox::warning(this, tr("Sigil"), tr("Cannot split since at least one file may not be an HTML file."));
+            QMessageBox::warning(this, tr("Magic"), tr("Cannot split since at least one file may not be an HTML file."));
             return;
         }
 
@@ -3719,7 +3719,7 @@ bool MainWindow::MaybeSaveDialogSaysProceed()
     if (isWindowModified()) {
         QMessageBox::StandardButton button_pressed;
         button_pressed = QMessageBox::warning(this,
-                                              tr("Sigil"),
+                                              tr("Magic"),
                                               tr("The document has been modified.\n"
                                                       "Do you want to save your changes?"),
                                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel
@@ -3951,7 +3951,7 @@ bool MainWindow::SaveFile(const QString &fullfilepath, bool update_current_filen
             if (not_well_formed) {
                 QApplication::restoreOverrideCursor();
                 bool auto_fix = QMessageBox::Yes == QMessageBox::warning(this,
-                                tr("Sigil"),
+                                tr("Magic"),
                                 tr("This EPUB has HTML files that are not well formed and "
                                    "your current Clean Source preferences are set to automatically mend on Save. "
                                    "Saving a file that is not well formed will cause it to be automatically "

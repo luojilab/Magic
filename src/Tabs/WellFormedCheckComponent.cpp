@@ -48,7 +48,7 @@ WellFormedCheckComponent::WellFormedCheckComponent(WellFormedContent *content, Q
                            "<p>The <i>Fix Automatically</i> option will instruct Sigil to try to "
                            "repair the document. <b>This option may lead to loss of data!</b></p>");
     m_MessageBox = new QMessageBox(parent);
-    m_MessageBox->setWindowTitle("Sigil");
+    m_MessageBox->setWindowTitle("Magic");
     m_MessageBox->setIcon(QMessageBox::Critical);
     m_AutoFixButton =
         m_MessageBox->addButton(tr("Fix &Automatically"), QMessageBox::DestructiveRole);
