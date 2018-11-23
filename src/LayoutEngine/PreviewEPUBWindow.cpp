@@ -124,7 +124,7 @@ void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
     m_canChangeTOC = false;
     
     const QAbstractItemModel* absmodel = index.model();
-    QStandardItemModel* model = const_cast<QStandardItemModel *>(dynamic_cast<const QStandardItemModel *>(absmodel));
+    const QStandardItemModel* model = dynamic_cast<const QStandardItemModel *>(absmodel);
     QString url = model->itemFromIndex(index)->data(Qt::UserRole + 2).toString();
 	// goto chapter
 	LayoutEngine::GetEngine()->gotoChapterByFileName(m_bookReader, url);
