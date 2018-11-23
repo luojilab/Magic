@@ -538,7 +538,7 @@ void Utility::DisplayExceptionErrorDialog(const QString &error_info)
     message_box.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
     message_box.setModal(true);
     message_box.setIcon(QMessageBox::Critical);
-    message_box.setWindowTitle("Sigil");
+    message_box.setWindowTitle("Magic");
     // Spaces are added to the end because otherwise the dialog is too small.
     message_box.setText(QObject::tr("Sigil has encountered a problem.") % "                                                                                                       ");
     message_box.setInformativeText(QObject::tr("Sigil may need to close."));
@@ -566,7 +566,7 @@ void Utility::DisplayStdErrorDialog(const QString &error_message, const QString 
     message_box.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
     message_box.setModal(true);
     message_box.setIcon(QMessageBox::Critical);
-    message_box.setWindowTitle("Sigil");
+    message_box.setWindowTitle("Magic");
     message_box.setText(error_message);
 
     if (!detailed_text.isEmpty()) {
@@ -584,7 +584,7 @@ void Utility::DisplayStdWarningDialog(const QString &warning_message, const QStr
     message_box.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
     message_box.setModal(true);
     message_box.setIcon(QMessageBox::Warning);
-    message_box.setWindowTitle("Sigil");
+    message_box.setWindowTitle("Magic");
     message_box.setText(warning_message);
     message_box.setTextFormat(Qt::RichText);
 
@@ -653,7 +653,7 @@ bool Utility::use_filename_warning(const QString &filename)
 {
     if (has_non_ascii_chars(filename)) {
         return QMessageBox::Apply == QMessageBox::warning(QApplication::activeWindow(),
-                tr("Sigil"),
+                tr("Magic"),
                 tr("The requested file name contains non-ASCII characters. "
                    "You should only use ASCII characters in filenames. "
                    "Using non-ASCII characters can prevent the EPUB from working "
