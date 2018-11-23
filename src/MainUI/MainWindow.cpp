@@ -5188,6 +5188,8 @@ void MainWindow::fileSavedSuccessAction() {
 	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
         if (dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource())) {
             m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true, QSize(0,0));
+        } else {
+            m_previewerToHTML->reloadHTML("", true, QSize(0,0));
         }
 	}
 }
