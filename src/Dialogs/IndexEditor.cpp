@@ -308,7 +308,7 @@ void IndexEditor::Open()
 void IndexEditor::Reload()
 {
     QMessageBox::StandardButton button_pressed;
-    button_pressed = QMessageBox::warning(this, tr("Sigil"), tr("Are you sure you want to reload all entries?  This will overwrite any unsaved changes."), QMessageBox::Ok | QMessageBox::Cancel);
+    button_pressed = QMessageBox::warning(this, tr("Magic"), tr("Are you sure you want to reload all entries?  This will overwrite any unsaved changes."), QMessageBox::Ok | QMessageBox::Cancel);
 
     if (button_pressed == QMessageBox::Ok) {
         m_IndexEditorModel->LoadInitialData();

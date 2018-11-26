@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QScreen>
 #include <QApplication>
+#include <QMessageBox>
 #include "HTMLViewQt.h"
 
 using future_core::HTMLViewQt;
@@ -160,16 +161,21 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
     if (!reload) {
         return;
     }
+    QFile f((htmlPath.empty() ? m_htmlPath : htmlPath).c_str());
+    if (!f.exists()) {
+        close();
+        QMessageBox::warning(this, tr("Magic"), tr("文件不存在"));
+        return;
+    }
     if (standardSize.width() && standardSize.height()) {
         m_standardSize = standardSize;
     }
     cleanResource();
     initialCoreView();
     initialRenderSize();
-    m_htmlPath = htmlPath;
-    
-    QFile f(htmlPath.c_str());
-    m_htmlPath = htmlPath;
+    if (!htmlPath.empty()) {
+        m_htmlPath = htmlPath;
+    }
     m_innerHtmlPath = tempFilePath(m_htmlPath);
     if ( !QFile(tempFilePath(m_htmlPath).c_str()).exists() ) {
         f.copy(tempFilePath(m_htmlPath).c_str());
@@ -216,11 +222,11 @@ void PreviewHTMLWindow::cleanResource()
 {
     if (m_viewCore) {
         m_viewCore->destory();
-        m_viewCore = 0;
+        m_viewCore = NULL;
     }
     if (m_htmlReader) {
         LayoutEngine::GetEngine()->closeHtml(m_htmlReader);
-        m_htmlReader = 0;
+        m_htmlReader = NULL;
     }
     m_currentPageIndex = 0;
     m_isNightMode = false;
