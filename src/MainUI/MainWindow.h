@@ -306,6 +306,7 @@ private:typedef enum {
 		void closeBookContentDock();
 		void showBookContentList();
 		void gotoHtmlSourceCodeForBookPreview(const std::string&, size_t);
+        void changeSplitStrategy(bool);
 
 		void AddCover();
 

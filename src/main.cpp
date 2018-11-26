@@ -246,9 +246,9 @@ int main(int argc, char *argv[])
         app.addLibraryPath("imageformats");
         // Set application information for
         // easier use of QSettings classes
-        QCoreApplication::setOrganizationName("sigil-ebook");
+        QCoreApplication::setOrganizationName("Deodao");
         QCoreApplication::setOrganizationDomain("sigil-ebook.com");
-        QCoreApplication::setApplicationName("sigil");
+        QCoreApplication::setApplicationName("Magic");
         QCoreApplication::setApplicationVersion(SIGIL_VERSION);
 
         QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));

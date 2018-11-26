@@ -94,7 +94,7 @@ void UpdateChecker::CheckForUpdate()
             QMessageBox::StandardButton button_clicked;
             button_clicked = QMessageBox::question(
                                  0,
-                                 QObject::tr("Sigil"),
+                                 QObject::tr("Magic"),
                                  QObject::tr("<p>A newer version of Sigil is available, version <b>%1</b>.<br/>"
                                              "<p>Would you like to go to the download page?</p>")
                                  .arg(current_online_version),

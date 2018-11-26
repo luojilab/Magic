@@ -139,6 +139,8 @@ public:
     QStringList pluginMap();
 
     QString defaultVersion();
+    
+    int splitStrategy();
 
     /**
      * All appearance settings related to BookView.
@@ -353,6 +355,11 @@ public slots:
      * Set the number of clipboard history items to retain
      */
     void setClipboardHistoryLimit(int limit);
+    
+    /**
+     * Set split strategy
+     */
+    void setSplitStrategy(int strategy);
 
 private:
     /**
