@@ -347,7 +347,7 @@ void LinksWidget::Save()
     try {
         Utility::WriteUnicodeTextFile(report_info, destination);
     } catch (CannotOpenFile) {
-        QMessageBox::warning(this, tr("Sigil"), tr("Cannot save report file."));
+        QMessageBox::warning(this, tr("Magic"), tr("Cannot save report file."));
     }
 
     m_LastDirSaved = QFileInfo(destination).absolutePath();

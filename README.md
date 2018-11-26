@@ -1,6 +1,6 @@
 <img src="./src/Resource_Files/icon/app_icon_512.png" width=128/>
 
-# ETypesetting: an Ebook Editor
+# Magic: an Ebook Editor
 
 [![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md) ![version](https://img.shields.io/badge/version-0.9.27-green.svg)
 [中文文档](./README-CH.md)
@@ -9,7 +9,7 @@
 
 ## Overview
 
-ETypesetting based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Editor that can manipulate epub2 and epub3
+Magic based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Editor that can manipulate epub2 and epub3
 
 ## Features
 
@@ -78,7 +78,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 - jQuery.ScrollTo-2.1.2 (src/Resource_Files/javascript/jquery.scrollTo-2.1.2.min.js)
 - MathJax.js single file version: (src/Resource_Files/polyfills)
 
-In addtion, ETypesetting uses the following other packages that have been specifically modified for use inside ETypesetting:
+In addtion, Magic uses the following other packages that have been specifically modified for use inside Magic:
 
 - Beautiful Soup 4 (src/Resource_Files/plugin_launchers/sigil_bs4)
 - Google's Gumbo Parser (internal/gumbo)

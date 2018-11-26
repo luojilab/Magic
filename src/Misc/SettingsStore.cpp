@@ -98,6 +98,8 @@ static QString KEY_SPECIAL_CHARACTER_FONT_SIZE = SETTINGS_GROUP + "/" + "special
 static QString KEY_MAIN_MENU_ICON_SIZE = SETTINGS_GROUP + "/" + "main_menu_icon_size";
 static QString KEY_CLIPBOARD_HISTORY_LIMIT = SETTINGS_GROUP + "/" + "clipboard_history_limit";
 
+static QString KEY_SPLIT_STRATEGY = SETTINGS_GROUP + "/" + "split_strategy";
+
 SettingsStore::SettingsStore()
     : QSettings(Utility::DefinePrefsDir() + "/sigil.ini", QSettings::IniFormat)
 {
@@ -615,4 +617,16 @@ void SettingsStore::clearSettingsGroup()
     while (!group().isEmpty()) {
         endGroup();
     }
+}
+
+int SettingsStore::splitStrategy()
+{
+    clearSettingsGroup();
+    return value(KEY_SPLIT_STRATEGY).toInt();
+}
+
+void SettingsStore::setSplitStrategy(int strategy)
+{
+    clearSettingsGroup();
+    setValue(KEY_SPLIT_STRATEGY, strategy);
 }
