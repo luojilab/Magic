@@ -349,6 +349,14 @@
      <addaction name="actionXiaoMi_inTime"/>
      <addaction name="actionIPad_inTime"/>
     </widget>
+    <widget class="QMenu" name="menu_2">
+     <property name="title">
+      <string>切割策略</string>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionSplitLeft"/>
+     <addaction name="actionSplitRight"/>
+    </widget>
     <addaction name="actionAddCover"/>
     <addaction name="actionMetaEditor"/>
     <addaction name="menuTOC"/>
@@ -371,6 +379,7 @@
     <addaction name="menu"/>
     <addaction name="separator"/>
     <addaction name="actionStandard_html_name"/>
+    <addaction name="menu_2"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
     <property name="title">
@@ -2509,8 +2518,30 @@
    </property>
   </action>
   <action name="actionStandard_html_name">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>标准化HTML文件名</string>
+   </property>
+  </action>
+  <action name="actionSplitLeft">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>左切割</string>
+   </property>
+   <property name="toolTip">
+    <string>SplitLeft</string>
+   </property>
+  </action>
+  <action name="actionSplitRight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>右切割</string>
    </property>
   </action>
  </widget>
