@@ -1,6 +1,6 @@
 <img src="./src/Resource_Files/icon/app_icon_512.png" width=128/>
 
-# ETypesetting: EPUB编辑器
+# Magic: EPUB编辑器
 
 [![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md) ![version](https://img.shields.io/badge/version-0.9.27-green.svg)
 
@@ -10,7 +10,7 @@
 
 ## 概述
 
-ETypesetting是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2和Epub3的电子书
+Magic是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2和Epub3的电子书
 
 ## 特性
 
@@ -82,3 +82,4 @@ ETypesetting是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编�
 
 - Beautiful Soup 4 (src/Resource_Files/plugin_launchers/sigil_bs4)
 - Google's Gumbo Parser (internal/gumbo)
+
