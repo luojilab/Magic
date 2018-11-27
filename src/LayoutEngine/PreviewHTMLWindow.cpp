@@ -1,4 +1,4 @@
-#include "PreviewHTMLWindow.h"
+﻿#include "PreviewHTMLWindow.h"
 #include <QPainter>
 #include <QMouseEvent>
 #include <QReadWriteLock>
@@ -164,7 +164,7 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
     QFile f((htmlPath.empty() ? m_htmlPath : htmlPath).c_str());
     if (!f.exists()) {
         close();
-        QMessageBox::warning(this, tr("Magic"), tr("文件不存在"));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"文件不存在"));
         return;
     }
     if (standardSize.width() && standardSize.height()) {
