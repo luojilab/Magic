@@ -50,7 +50,7 @@
      <x>0</x>
      <y>0</y>
      <width>1436</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -149,11 +149,11 @@
     <addaction name="separator"/>
     <addaction name="actionInsertId"/>
     <addaction name="actionInsertHyperlink"/>
+    <addaction name="actionInsertAnnotation"/>
     <addaction name="separator"/>
     <addaction name="actionInsertClosingTag"/>
     <addaction name="separator"/>
     <addaction name="menuClip"/>
-    <addaction name="actionInsertAnnotation"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -465,6 +465,7 @@
    <addaction name="actionInsertSpecialCharacter"/>
    <addaction name="actionInsertId"/>
    <addaction name="actionInsertHyperlink"/>
+   <addaction name="actionInsertAnnotation"/>
   </widget>
   <widget class="QToolBar" name="toolBarBack">
    <property name="windowTitle">
@@ -607,7 +608,6 @@
    <addaction name="actionTextDirectionLTR"/>
    <addaction name="actionTextDirectionRTL"/>
    <addaction name="actionTextDirectionDefault"/>
-   <addaction name="actionInsertAnnotation"/>
   </widget>
   <widget class="QToolBar" name="toolBarClips">
    <property name="windowTitle">
@@ -2549,13 +2549,21 @@
   <action name="actionInsertAnnotation">
    <property name="icon">
     <iconset resource="../Resource_Files/main/main.qrc">
-     <normaloff>:/main/document-add_48px.png</normaloff>:/main/document-add_48px.png</iconset>
+     <normaloff>:/main/insert-annotation_48px.png</normaloff>:/main/insert-annotation_48px.png</iconset>
    </property>
    <property name="text">
-    <string>Insert Annotation</string>
+    <string>Annotation...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;p style=&quot;padding-top: 0.5em;&quot; &gt;&lt;b&gt;Insert Annotation&lt;/b&gt;&lt;/p&gt;
+
+&lt;p style=&quot;margin-left: 0.5em;&quot;&gt;Insert an annotation icon with custom text which displays when the icon clicked.&lt;/p&gt;</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+A</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>false</bool>
    </property>
   </action>
  </widget>
