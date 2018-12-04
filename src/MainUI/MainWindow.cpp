@@ -672,7 +672,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (MaybeSaveDialogSaysProceed()) {
-        ShowMessageOnStatusBar(tr("Sigil is closing..."));
+        ShowMessageOnStatusBar(tr("Magic is closing..."));
         WriteSettings();
         KeyboardShortcutManager *sm = KeyboardShortcutManager::instance();
         sm->removeActionsOf(this);
@@ -3879,7 +3879,7 @@ bool MainWindow::LoadFile(const QString &fullfilepath, bool is_internal)
         QApplication::restoreOverrideCursor();
         Utility::DisplayStdErrorDialog(
             tr("The creator of this file has encrypted it with DRM. "
-               "Sigil cannot open such files."));
+               "Magic cannot open such files."));
     } catch (EPUBLoadParseError epub_load_error) {
         ShowMessageOnStatusBar();
         QApplication::restoreOverrideCursor();
@@ -3927,7 +3927,7 @@ bool MainWindow::SaveFile(const QString &fullfilepath, bool update_current_filen
         if (!SUPPORTED_SAVE_TYPE.contains(extension)) {
             ShowMessageOnStatusBar();
             Utility::DisplayStdErrorDialog(
-                tr("Sigil cannot save files of type \"%1\".\n"
+                tr("Magic cannot save files of type \"%1\".\n"
                    "Please choose a different format.")
                 .arg(extension)
             );
