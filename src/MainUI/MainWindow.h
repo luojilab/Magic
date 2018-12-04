@@ -695,6 +695,10 @@ private:typedef enum {
 		 */
 		void loadPluginsMenu();
 		void unloadPluginsMenu();
+    
+		// insert an img at the cursor
+		// which can display annotations when clicked
+        void insertAnnotation();
 
 private:
 

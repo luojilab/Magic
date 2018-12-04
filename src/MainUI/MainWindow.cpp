@@ -4950,6 +4950,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionInsertId,        SIGNAL(triggered()),  this,   SLOT(InsertId()));
     connect(ui.actionInsertHyperlink, SIGNAL(triggered()),  this,   SLOT(InsertHyperlink()));
     connect(ui.actionPreferences,     SIGNAL(triggered()), this, SLOT(PreferencesDialog()));
+    connect(ui.actionInsertAnnotation, SIGNAL(triggered()), this, SLOT(insertAnnotation()));
     // Search
     connect(ui.actionFind,             SIGNAL(triggered()), this, SLOT(Find()));
     connect(ui.actionFindNext,         SIGNAL(triggered()), m_FindReplace, SLOT(FindNext()));
@@ -5570,4 +5571,28 @@ void MainWindow::changeSplitStrategy(bool newState) {
             ui.actionSplitLeft->setChecked(false);
         }
     }
+}
+
+// insert an img at the cursor
+// which can display annotations when clicked
+void MainWindow::insertAnnotation()
+{
+    bool annoOK; // flag: OK clicked
+    QString annoImgSrc = tr("../Images/AnnoIcon0.png");
+    QString annoPre = tr("<img class=\"magic-annotation\" src=\"") + annoImgSrc + tr("\" alt=\""); // prefix in html
+    QString annoSuf = tr("\" />");                                                                 // suffix in html
+
+    // get current working tab and code view editor widget
+    FlowTab *tab = GetCurrentFlowTab();
+    CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(tab->GetSearchableContent());
+
+    // get annotation text input using QInputDialog::getText()
+    QString annoText = QInputDialog::getText(this, tr("Annotation"), tr("Annotation:"), QLineEdit::Normal, nullptr, &annoOK);
+    annoText = annoPre + annoText + annoSuf;
+
+    // insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText()
+    if (annoOK && !annoText.isEmpty())
+        codeView->insertPlainText(annoText);
+    else if (annoOK && annoText.isEmpty())
+        QMessageBox::warning(this, tr("Empty Input"), tr("<h1>Empty Input</h1>"));
 }
