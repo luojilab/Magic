@@ -118,10 +118,8 @@ void PreviewEPUBWindow::reloadEPUB(const std::string& bundlePath, const std::str
 
 void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
 {
-    if (!m_canChangeTOC) { return; }
 	if (!m_bookContents) { return; }
 	if (!isVisible()) { return; }
-    m_canChangeTOC = false;
     
     const QAbstractItemModel* absmodel = index.model();
     const QStandardItemModel* model = dynamic_cast<const QStandardItemModel *>(absmodel);
@@ -322,9 +320,6 @@ void PreviewEPUBWindow::bookViewCoreInitial()
     m_viewCore = new BookViewQt(this);
     m_viewCore->setUpdateViewCallback([this]() {
         update();
-		if (!m_canChangeTOC) {
-			m_canChangeTOC = true;
-		}
     });
 }
 
