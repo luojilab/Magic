@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 **
 **  Copyright (C) 2015, 2016, 2017, 2018  Kevin B. Hendricks Stratford, ON, Canada 
 **  Copyright (C) 2009, 2010, 2011  Strahinja Markovic  <strahinja.markovic@gmail.com>
@@ -281,7 +281,7 @@ const static QString FULL_SCREEN_TEMPLATE =
 
 Book::Book()
     :
-    m_Mainfolder(new FolderKeeper(this)),
+    m_Mainfolder(NULL),
     m_IsModified(false)
 {
 }
@@ -1379,4 +1379,9 @@ QPair<QString, QStringList> Book::GetOneFileIDs(HTMLResource *html_resource)
     id_pair.first = html_resource->Filename();
     id_pair.second = ids;
     return id_pair;
+}
+
+void Book::createFoldkeeper(const QString& mainFolderPath)
+{
+    m_Mainfolder = mainFolderPath.isEmpty() ? new FolderKeeper(this) : new FolderKeeper(this, mainFolderPath);
 }

@@ -41,10 +41,6 @@
 #include "Misc/OpenExternally.h"
 #include "Misc/SettingsStore.h"
 
-const QStringList IMAGE_EXTENSIONS = QStringList() << "jpg"   << "jpeg"  << "png"
-                                     << "gif"   << "tif"   << "tiff"
-                                     << "bm"    << "bmp";
-const QStringList SVG_EXTENSIONS = QStringList() << "svg";
 const QStringList SMIL_EXTENSIONS = QStringList() << "smil";
 const QStringList JPG_EXTENSIONS = QStringList()   << "jpg"   << "jpeg";
 const QStringList TIFF_EXTENSIONS = QStringList()  << "tif"  << "tiff";
@@ -55,21 +51,25 @@ const QStringList TIFF_EXTENSIONS = QStringList()  << "tif"  << "tiff";
 // through untouched.
 const QRegularExpression FILE_EXCEPTIONS("META-INF");
 
-const QStringList MISC_TEXT_EXTENSIONS = QStringList()  << "txt"  << "js";
-const QStringList MISC_XML_EXTENSIONS  = QStringList() << "smil" << "xpgt" << "pls";
-const QStringList FONT_EXTENSIONS      = QStringList() << "ttf"   << "ttc"   << "otf" << "woff" << "woff2";
-const QStringList TEXT_EXTENSIONS      = QStringList() << "xhtml" << "html"  << "htm";
-const QStringList STYLE_EXTENSIONS     = QStringList() << "css";
-const QStringList AUDIO_EXTENSIONS     = QStringList() << "aac" << "m4a" << "mp3" << "mpeg" << "mpg" << "oga" << "ogg";
-const QStringList VIDEO_EXTENSIONS     = QStringList() << "m4v" << "mp4" << "mov" << "ogv" << "webm" << "vtt" << "ttml";
+extern const QStringList IMAGE_EXTENSIONS = QStringList() << "jpg"   << "jpeg"  << "png"
+<< "gif"   << "tif"   << "tiff"
+<< "bm"    << "bmp";
+extern const QStringList SVG_EXTENSIONS = QStringList() << "svg";
+extern const QStringList MISC_TEXT_EXTENSIONS = QStringList()  << "txt"  << "js";
+extern const QStringList MISC_XML_EXTENSIONS  = QStringList() << "smil" << "xpgt" << "pls";
+extern const QStringList FONT_EXTENSIONS      = QStringList() << "ttf"   << "ttc"   << "otf" << "woff" << "woff2";
+extern const QStringList TEXT_EXTENSIONS      = QStringList() << "xhtml" << "html"  << "htm";
+extern const QStringList STYLE_EXTENSIONS     = QStringList() << "css";
+extern const QStringList AUDIO_EXTENSIONS     = QStringList() << "aac" << "m4a" << "mp3" << "mpeg" << "mpg" << "oga" << "ogg";
+extern const QStringList VIDEO_EXTENSIONS     = QStringList() << "m4v" << "mp4" << "mov" << "ogv" << "webm" << "vtt" << "ttml";
 
-const QString IMAGE_FOLDER_NAME = "Images";
-const QString FONT_FOLDER_NAME  = "Fonts";
-const QString TEXT_FOLDER_NAME  = "Text";
-const QString STYLE_FOLDER_NAME = "Styles";
-const QString AUDIO_FOLDER_NAME = "Audio";
-const QString VIDEO_FOLDER_NAME = "Video";
-const QString MISC_FOLDER_NAME  = "Misc";
+extern const QString IMAGE_FOLDER_NAME = "Images";
+extern const QString FONT_FOLDER_NAME  = "Fonts";
+extern const QString TEXT_FOLDER_NAME  = "Text";
+extern const QString STYLE_FOLDER_NAME = "Styles";
+extern const QString AUDIO_FOLDER_NAME = "Audio";
+extern const QString VIDEO_FOLDER_NAME = "Video";
+extern const QString MISC_FOLDER_NAME  = "Misc";
 
 const QStringList IMAGE_MIMEYPES     = QStringList() << "image/gif" << "image/jpeg" << "image/png";
 const QStringList SVG_MIMETYPES      = QStringList() << "image/svg+xml";
@@ -98,8 +98,21 @@ FolderKeeper::FolderKeeper(QObject *parent)
     QObject(parent),
     m_OPF(NULL),
     m_NCX(NULL),
+    m_TempFolder(new TempFolder),
     m_FSWatcher(new QFileSystemWatcher()),
-    m_FullPathToMainFolder(m_TempFolder.GetPath())
+    m_FullPathToMainFolder(m_TempFolder->GetPath())
+{
+    CreateExtensionToMediaTypeMap();
+    CreateFolderStructure();
+    CreateInfrastructureFiles();
+}
+
+FolderKeeper::FolderKeeper(QObject *parent, const QString& mainDirPath):
+    QObject(parent),
+    m_OPF(NULL),
+    m_NCX(NULL),
+    m_FSWatcher(new QFileSystemWatcher()),
+    m_FullPathToMainFolder(mainDirPath)
 {
     CreateExtensionToMediaTypeMap();
     CreateFolderStructure();
@@ -126,6 +139,8 @@ FolderKeeper::~FolderKeeper()
         disconnect(resource, SIGNAL(Deleted(const Resource *)), this, SLOT(RemoveResource(const Resource *)));
         resource->Delete();
     }
+    
+    QDir(m_FullPathToMainFolder).removeRecursively();
 }
 
 Resource *FolderKeeper::AddContentFileToFolder(const QString &fullfilepath, bool update_opf, const QString &mimetype)
@@ -202,7 +217,9 @@ Resource *FolderKeeper::AddContentFileToFolder(const QString &fullfilepath, bool
         }
 
     }
-    QFile::copy(fullfilepath, new_file_path);
+    if (fullfilepath != new_file_path) {
+        QFile::copy(fullfilepath, new_file_path);
+    }
 
     if (QThread::currentThread() != QApplication::instance()->thread()) {
         resource->moveToThread(QApplication::instance()->thread());
@@ -461,6 +478,11 @@ void FolderKeeper::ResumeWatchingResources()
         }
         m_SuspendedWatchedFiles.clear();
     }
+}
+
+void FolderKeeper::AddReferenceToTempFolder(std::shared_ptr<TempFolder> folder)
+{
+    m_TempFolder = folder;
 }
 
 // The required folder structure is this:
