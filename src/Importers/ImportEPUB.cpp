@@ -218,10 +218,12 @@ QSharedPointer<Book> ImportEPUB::GetBook(bool extract_metadata)
         QApplication::setOverrideCursor(Qt::WaitCursor);
     }
 
-    const QStringList load_errors = UniversalUpdates::PerformUniversalUpdates(false, resources, updates, non_well_formed);
-
-    Q_FOREACH (QString err, load_errors) {
-        AddLoadWarning(QString("%1").arg(err));
+    if (!bookStandard) {
+        const QStringList load_errors = UniversalUpdates::PerformUniversalUpdates(false, resources, updates, non_well_formed);
+        
+        Q_FOREACH (QString err, load_errors) {
+            AddLoadWarning(QString("%1").arg(err));
+        }
     }
 
     ProcessFontFiles(resources, updates, encrypted_files);
