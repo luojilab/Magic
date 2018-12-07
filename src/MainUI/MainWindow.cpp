@@ -671,6 +671,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    m_willClose = true;
     if (MaybeSaveDialogSaysProceed()) {
         ShowMessageOnStatusBar(tr("Sigil is closing..."));
         WriteSettings();
@@ -718,6 +719,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
         event->accept();
     } else {
+        m_willClose = false;
         event->ignore();
     }
 }
@@ -5185,7 +5187,7 @@ void MainWindow::ConnectSignalsToSlots()
 }
 
 void MainWindow::fileSavedSuccessAction() {
-	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+	if (m_previewerToHTML && m_previewerToHTML->isVisible() && !m_willClose) {
         if (dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource())) {
             m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true, QSize(0,0));
         } else {

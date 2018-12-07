@@ -1066,6 +1066,7 @@ private:
 
 	QStringList m_pluginList;
 	bool m_SaveCSS;
+    bool m_willClose {false};
 
 	/**
 	 * Holds all the widgets Qt Designer created for us.
