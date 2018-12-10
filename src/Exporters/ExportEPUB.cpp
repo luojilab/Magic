@@ -69,7 +69,6 @@ extern const QString CONTAINER_FILE_PATH;
 extern const QString OPF_FILE_PATH;
 extern const QString TOC_FILE_PATH;
 const QString ENCRYPTION_FILE_PATH = "META-INF/encryption.xml";
-const QString MIME_FILE_PATH = "mimetype";
 
 
 // Constructor;
@@ -177,7 +176,6 @@ void ExportEPUB::SaveFolderAsEpubToLocation(const QString &fullfolderpath, const
         resourcePaths[res->GetFullPath()] = true;
     }
     
-    const QString mimePath = workDir + "/" + MIME_FILE_PATH;            // memetype
     const QString containerPath = workDir + "/" + CONTAINER_FILE_PATH;  // META-INF/container.xml
     const QString opfPath = workDir + "/" + OPF_FILE_PATH;              // OEBPS/content.opf
     const QString tocPath = workDir + "/" + TOC_FILE_PATH;              // OEBPS/toc.ncx
@@ -187,7 +185,6 @@ void ExportEPUB::SaveFolderAsEpubToLocation(const QString &fullfolderpath, const
         QString filePath = it.filePath();
         QString relpath = it.filePath().remove(workDir);
         if ( !resourcePaths[filePath] &&
-            mimePath != filePath &&
             opfPath != filePath &&
             tocPath != filePath &&
             encPath != filePath &&
