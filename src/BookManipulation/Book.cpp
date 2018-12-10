@@ -369,9 +369,8 @@ QString Book::GetFirstUniqueSectionName(QString extension)
         extension = first_html_file.right(first_html_file.length() - first_html_file.lastIndexOf("."));
         // do not create new extensions with .xml or any other strange extension that are vague
         // ie. xhtml is xml but xml need not be xhtml
-        if ((extension != ".xhtml") && (extension != ".htm") && (extension != ".html")) {
-            extension = ".xhtml";
-        }
+        // We use xhtml as default in Magic of Dedao
+        extension = ".xhtml";
         // If no extension use the default first name extension
         if (extension.isEmpty()) {
             extension = FIRST_SECTION_NAME;
