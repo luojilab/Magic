@@ -4371,7 +4371,7 @@ void MainWindow::layout(PreviewPhoneType type, bool landscape) {
     m_previewerToEpubContainer->setStyleSheet("background-color:;"); // used for relayout the view;
     //update content
 	std::string emptyStr = "";
-    m_epubPreviewer->reloadEPUB(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
+    m_epubPreviewer->reloadEPUB(emptyStr, m_CurrentFilePath.toStdString(), "", QSize(width, height));
 	m_previewEPUBDock->show();
 	m_epubPreviewer->setFocus();
 }
@@ -5195,7 +5195,17 @@ void MainWindow::fileSavedSuccessAction() {
         } else {
             m_previewerToHTML->reloadHTML("", true, QSize(0,0));
         }
+        return;
 	}
+    if (m_previewEPUBDock && m_previewEPUBDock->isVisible() && !m_willClose) {
+        HTMLResource* htmlRes = dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource());
+        std::string jumpPath("");
+        if (htmlRes) {
+            jumpPath = htmlRes->GetRelativePathToRoot().toStdString();
+        }
+        m_epubPreviewer->reloadEPUB("", m_CurrentFilePath.toStdString(), jumpPath);
+        return;
+    }
 }
 
 void MainWindow::MakeTabConnections(ContentTab *tab)

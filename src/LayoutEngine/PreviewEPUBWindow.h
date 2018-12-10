@@ -20,7 +20,7 @@ class PreviewEPUBWindow : public QWidget {
 public:
 	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize);
 	~PreviewEPUBWindow();
-	void reloadEPUB(const std::string& bundlePath = "", const std::string& epubPath = "", const QSize& defaultSize = QSize(0, 0));
+	void reloadEPUB(const std::string& bundlePath = "", const std::string& epubPath = "", const std::string& jumpHtmlFilePath = "", const QSize& defaultSize = QSize(0, 0));
 	QStandardItemModel *getBookContentList() { return m_bookContents; };
 
 private:
