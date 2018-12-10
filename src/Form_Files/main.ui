@@ -2562,9 +2562,6 @@
    <property name="shortcut">
     <string>Ctrl+Alt+A</string>
    </property>
-   <property name="shortcutVisibleInContextMenu">
-    <bool>false</bool>
-   </property>
   </action>
  </widget>
  <resources>
