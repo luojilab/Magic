@@ -389,6 +389,9 @@ private:typedef enum {
 
 		void InsertHyperlink();
 
+		// insert an img with text in "alt" to display annotations on devices
+		void insertAnnotation();
+
 		void MarkForIndex();
 
 		/**
@@ -695,10 +698,6 @@ private:typedef enum {
 		 */
 		void loadPluginsMenu();
 		void unloadPluginsMenu();
-    
-		// insert an img at the cursor
-		// which can display annotations when clicked
-        void insertAnnotation();
 
 private:
 

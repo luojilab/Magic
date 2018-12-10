@@ -67,6 +67,7 @@
 #include "Dialogs/SelectHyperlink.h"
 #include "Dialogs/SelectId.h"
 #include "Dialogs/SelectIndexTitle.h"
+#include "Dialogs/SelectAnnotation.h"
 #include "Exporters/ExportEPUB.h"
 #include "Exporters/ExporterFactory.h"
 #include "Importers/ImporterFactory.h"
@@ -1888,6 +1889,48 @@ void MainWindow::InsertHyperlink()
     }
 }
 
+// insert an img with text in "alt" to display annotations on devices
+void MainWindow::insertAnnotation()
+{
+    SaveTabData();
+    ShowMessageOnStatusBar();
+
+    FlowTab *flow_tab = GetCurrentFlowTab();
+    if (!flow_tab || !flow_tab->InsertHyperlinkEnabled()) { // use hyperlink check function
+        QMessageBox::warning(this, tr("Magic"), tr("You cannot insert an annotation at this position. (AnnoErr0)"));
+        return;
+    }
+
+    QString href = flow_tab->GetAttributeHref();
+
+    // Prevent adding a hidden anchor link in Book View.
+    if (m_ViewState == MainWindow::ViewState_BookView && href.isEmpty() && flow_tab->GetSelectedText().isEmpty()) {
+        QMessageBox::warning(this, tr("Magic"), tr("You must select text before inserting a new annotation. (AnnoErr1)"));
+        return;
+    }
+
+    HTMLResource *html_resource = qobject_cast<HTMLResource *>(flow_tab->GetLoadedResource());
+    // QList<Resource *> resources = GetAllHTMLResources() + m_BookBrowser->AllMediaResources();
+    QList<Resource *> resources = nullptr;
+    // reserved for automatical convert
+
+    SelectAnnotation select_annotation(href, html_resource, resources, m_Book, this);
+
+    if (select_annotation.exec() == QDialog::Accepted) {
+        QString annoText = select_annotation.getText();
+        QString annoIcon = select_annotation.getIcon();
+
+        if (annoText.isEmpty()) {
+            QMessageBox::warning(this, tr("Magic"), tr("Input text is empty. (AnnoErr2)"));
+            return;
+        }
+
+        if (SelectAnnotation::insertAnnotation(annoText, annoIcon)) {
+            QMessageBox::warning(this, tr("Magic"), tr("Inserting annotation fail. (AnnoErr3)"));
+        }
+    }
+}
+
 void MainWindow::MarkForIndex()
 {
     SaveTabData();
@@ -3016,6 +3059,7 @@ void MainWindow::SetStateActionsBookView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(true);
     ui.actionInsertHyperlink->setEnabled(true);
+    ui.actionInsertAnnotation->setEnabled(true);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3088,6 +3132,7 @@ void MainWindow::SetStateActionsCodeView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(true);
     ui.actionInsertHyperlink->setEnabled(true);
+    ui.actionInsertAnnotation->setEnabled(true);
     ui.actionInsertClosingTag->setEnabled(true);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3177,6 +3222,7 @@ void MainWindow::SetStateActionsRawView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(false);
     ui.actionInsertHyperlink->setEnabled(false);
+    ui.actionInsertAnnotation->setEnabled(false);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3249,6 +3295,7 @@ void MainWindow::SetStateActionsStaticView()
     ui.actionInsertSpecialCharacter->setEnabled(false);
     ui.actionInsertId->setEnabled(false);
     ui.actionInsertHyperlink->setEnabled(false);
+    ui.actionInsertAnnotation->setEnabled(false);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(false);
     ui.actionRedo->setEnabled(false);
@@ -4501,6 +4548,7 @@ void MainWindow::ExtendUI()
     sm->registerAction(this, ui.actionInsertSpecialCharacter, "MainWindow.InsertSpecialCharacter");
     sm->registerAction(this, ui.actionInsertId, "MainWindow.InsertId");
     sm->registerAction(this, ui.actionInsertHyperlink, "MainWindow.InsertHyperlink");
+    sm->registerAction(this, ui.actionInsertAnnotation, "MainWindow.insertAnnotation");
     sm->registerAction(this, ui.actionMarkForIndex, "MainWindow.MarkForIndex");
     sm->registerAction(this, ui.actionSplitSection, "MainWindow.SplitSection");
     sm->registerAction(this, ui.actionInsertSGFSectionMarker, "MainWindow.InsertSGFSectionMarker");
@@ -4949,8 +4997,8 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionInsertSpecialCharacter, SIGNAL(triggered()), this, SLOT(InsertSpecialCharacter()));
     connect(ui.actionInsertId,        SIGNAL(triggered()),  this,   SLOT(InsertId()));
     connect(ui.actionInsertHyperlink, SIGNAL(triggered()),  this,   SLOT(InsertHyperlink()));
-    connect(ui.actionPreferences,     SIGNAL(triggered()), this, SLOT(PreferencesDialog()));
     connect(ui.actionInsertAnnotation, SIGNAL(triggered()), this, SLOT(insertAnnotation()));
+    connect(ui.actionPreferences,     SIGNAL(triggered()), this, SLOT(PreferencesDialog()));
     // Search
     connect(ui.actionFind,             SIGNAL(triggered()), this, SLOT(Find()));
     connect(ui.actionFindNext,         SIGNAL(triggered()), m_FindReplace, SLOT(FindNext()));
@@ -5571,28 +5619,4 @@ void MainWindow::changeSplitStrategy(bool newState) {
             ui.actionSplitLeft->setChecked(false);
         }
     }
-}
-
-// insert an img at the cursor
-// which can display annotations when clicked
-void MainWindow::insertAnnotation()
-{
-    bool annoOK; // flag: OK clicked
-    QString annoImgSrc = tr("../Images/AnnoIcon0.png");
-    QString annoPre = tr("<img class=\"magic-annotation\" src=\"") + annoImgSrc + tr("\" alt=\""); // prefix in html
-    QString annoSuf = tr("\" />");                                                                 // suffix in html
-
-    // get current working tab and code view editor widget
-    FlowTab *tab = GetCurrentFlowTab();
-    CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(tab->GetSearchableContent());
-
-    // get annotation text input using QInputDialog::getText()
-    QString annoText = QInputDialog::getText(this, tr("Annotation"), tr("Annotation:"), QLineEdit::Normal, nullptr, &annoOK);
-    annoText = annoPre + annoText + annoSuf;
-
-    // insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText()
-    if (annoOK && !annoText.isEmpty())
-        codeView->insertPlainText(annoText);
-    else if (annoOK && annoText.isEmpty())
-        QMessageBox::warning(this, tr("Empty Input"), tr("<h1>Empty Input</h1>"));
 }
