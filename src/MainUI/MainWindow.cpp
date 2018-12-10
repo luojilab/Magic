@@ -1895,8 +1895,8 @@ void MainWindow::insertAnnotation()
     SaveTabData();
     ShowMessageOnStatusBar();
 
-    FlowTab *flow_tab = GetCurrentFlowTab();
-    if (!flow_tab || !flow_tab->InsertHyperlinkEnabled()) { // use hyperlink check function
+    FlowTab *flowTab = GetCurrentFlowTab();
+    if (!flowTab || !flowTab->InsertHyperlinkEnabled()) { // use hyperlink check function
         QMessageBox::warning(this, tr("Magic"), tr("You cannot insert an annotation at this position. (AnnoErr0)"));
         return;
     }
@@ -1904,14 +1904,13 @@ void MainWindow::insertAnnotation()
     QString href = flow_tab->GetAttributeHref();
 
     // Prevent adding a hidden anchor link in Book View.
-    if (m_ViewState == MainWindow::ViewState_BookView && href.isEmpty() && flow_tab->GetSelectedText().isEmpty()) {
+    if (m_ViewState == MainWindow::ViewState_BookView && href.isEmpty() && flowTab->GetSelectedText().isEmpty()) {
         QMessageBox::warning(this, tr("Magic"), tr("You must select text before inserting a new annotation. (AnnoErr1)"));
         return;
     }
 
-    HTMLResource *html_resource = qobject_cast<HTMLResource *>(flow_tab->GetLoadedResource());
-    // QList<Resource *> resources = GetAllHTMLResources() + m_BookBrowser->AllMediaResources();
-    QList<Resource *> resources = nullptr;
+    HTMLResource *html_resource = qobject_cast<HTMLResource *>(flowTab->GetLoadedResource());
+    QList<Resource *> resources = GetAllHTMLResources();
     // reserved for automatical convert
 
     SelectAnnotation select_annotation(href, html_resource, resources, m_Book, this);
@@ -1925,8 +1924,20 @@ void MainWindow::insertAnnotation()
             return;
         }
 
+        if (flowTab->GetViewState() == ViewState_BookView)
+        {
+            CodeView();
+            // flowTab = GetCurrentFlowTab();
+        }
+
+        CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
+        if (!codeView)
+        {
+            QMessageBox::warning(this, tr("Magic"), tr("CodeViewEditor failed. (AnnoErr3)"));
+        }
+
         if (SelectAnnotation::insertAnnotation(annoText, annoIcon)) {
-            QMessageBox::warning(this, tr("Magic"), tr("Inserting annotation fail. (AnnoErr3)"));
+            QMessageBox::warning(this, tr("Magic"), tr("Inserting annotation fail. (AnnoErr4)"));
         }
     }
 }

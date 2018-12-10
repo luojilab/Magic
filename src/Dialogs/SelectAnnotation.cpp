@@ -71,23 +71,7 @@ static int SelectAnnotation::insertAnnotation(const QString &annoText, const QSt
     QString annoInf = tr("\" alt=\"");
     QString annoSuf = tr("\" />");
     QString annotation = annoPre + annoIcon + annoInf + annoText + annoSuf;
-
-    // get current working tab and code view editor widget
-    FlowTab *tab = GetCurrentFlowTab();
-    if (!tab)
-    {
-        return 1;
-    }
-    if (tab->GetViewState() == ViewState_BookView)
-    {
-        CodeView();
-        tab = GetCurrentFlowTab();
-    }
-    CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(tab->GetSearchableContent());
-    if (!codeView)
-    {
-        return 2;
-    }
+    
     // insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText()
     codeView->insertPlainText(annotation);
 
