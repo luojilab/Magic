@@ -1901,7 +1901,7 @@ void MainWindow::insertAnnotation()
         return;
     }
 
-    QString href = flow_tab->GetAttributeHref();
+    QString href = flowTab->GetAttributeHref();
 
     // Prevent adding a hidden anchor link in Book View.
     if (m_ViewState == MainWindow::ViewState_BookView && href.isEmpty() && flowTab->GetSelectedText().isEmpty()) {
@@ -1936,7 +1936,7 @@ void MainWindow::insertAnnotation()
             QMessageBox::warning(this, tr("Magic"), tr("CodeViewEditor failed. (AnnoErr3)"));
         }
 
-        if (SelectAnnotation::insertAnnotation(annoText, annoIcon)) {
+        if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
             QMessageBox::warning(this, tr("Magic"), tr("Inserting annotation fail. (AnnoErr4)"));
         }
     }

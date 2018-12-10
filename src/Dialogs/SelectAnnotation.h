@@ -31,6 +31,11 @@ SOFTWARE.
 
 #include <QDialog>
 
+#include "ResourceObjects/Resource.h"
+#include "BookManipulation/Book.h"
+#include "MainUI/MainWindow.h"
+#include "ViewEditors/CodeViewEditor.h"
+
 namespace Ui
 {
 class SelectAnnotation;
@@ -49,12 +54,12 @@ class SelectAnnotation : public QDialog
     ~SelectAnnotation();
 
     // get annotation text
-    QString getText();
+    QString getText() { return mAnnoText; }
     // get annotation icon src
-    QString getIcon();
+    QString getIcon() { return mAnnoIcon; }
 
     // insert annotation into html file
-    static int insertAnnotation(const QString &annoText, const QString &annoIcon);
+    static int insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView);
 
   private slots:
     void writeSettings();
@@ -64,12 +69,12 @@ class SelectAnnotation : public QDialog
     void connectSignalsSlots();
 
     // memeber data
-    QString _annoText;
-    QString _annoIcon;
+    QString mAnnoText;
+    QString mAnnoIcon;
 
-    HTMLResource *_HTMLResource;
-    QList<Resource *> _Resources;
-    QSharedPointer<Book> _Book;
+    HTMLResource *mHTMLResource;
+    QList<Resource *> mResources;
+    QSharedPointer<Book> mBook;
 
     Ui::SelectAnnotation *ui;
 };

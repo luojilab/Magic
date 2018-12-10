@@ -28,23 +28,27 @@ SOFTWARE.
 
 #include "SelectAnnotation.h"
 #include "ui_SelectAnnotation.h"
+#include "ViewEditors/CodeViewEditor.h"
 
 #define DEFAULT_ICON_SRC "../Images/AnnoIcon0.png"
 
 SelectAnnotation::SelectAnnotation(QString href,
-                                   HTMLResource *html_resource,
+                                   HTMLResource *htmlResource,
                                    QList<Resource *> resources,
                                    QSharedPointer<Book> book,
                                    QWidget *parent)
     : QDialog(parent),
       ui(new Ui::SelectAnnotation),
-      _HTMLResource(html_resource),
-      _Resources(resources),
-      _Book(book),
-      _annoText(QString()),
-      _annoIcon(tr(DEFAULT_ICON_SRC))
+      mHTMLResource(htmlResource),
+      mResources(resources),
+      mBook(book),
+      mAnnoText(QString()),
+      mAnnoIcon(tr(DEFAULT_ICON_SRC))
 {
     ui->setupUi(this);
+    
+    connectSignalsSlots();
+    readSettings();
 }
 
 SelectAnnotation::~SelectAnnotation()
@@ -52,18 +56,8 @@ SelectAnnotation::~SelectAnnotation()
     delete ui;
 }
 
-// get annotation text
-QString SelectAnnotation::getText()
-{
-}
-
-// get annotation icon src
-QString SelectAnnotation::getIcon()
-{
-}
-
 // insert annotation into html file
-static int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &annoIcon)
+int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView)
 {
     // TODO...
     // QString annoIcon = tr("../Images/AnnoIcon0.png");
@@ -81,13 +75,17 @@ static int SelectAnnotation::insertAnnotation(const QString &annoText, const QSt
 // private slots:
 void SelectAnnotation::writeSettings()
 {
+    mAnnoText = ui->AnnoText->toPlainText();
+    // TODO
 }
 
 // private:
 void SelectAnnotation::readSettings()
 {
+    // TODO
 }
 
 void SelectAnnotation::connectSignalsSlots()
 {
+    connect(this, SIGNAL(accepted()), this, SLOT(writeSettings()));
 }
