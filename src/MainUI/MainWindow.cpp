@@ -3801,6 +3801,7 @@ void MainWindow::ResourcesAddedOrDeleted()
 void MainWindow::CreateNewBook()
 {
     QSharedPointer<Book> new_book = QSharedPointer<Book>(new Book());
+    new_book->createFoldkeeper("");
     new_book->CreateEmptyHTMLFile();
     QString version = new_book->GetConstOPF()->GetEpubVersion();
     if (version.startsWith('3')) {
