@@ -5579,7 +5579,7 @@ void MainWindow::insertAnnotation()
 {
     bool annoOK; // flag: OK clicked
     QString annoImgSrc = tr("../Images/AnnoIcon0.png");
-    QString annoPre = tr("<img class=\"magic-annotation\" src=\"") + annoImgSrc + tr("\" alt=\""); // prefix in html
+    QString annoPre = tr("<img class=\"epub-footnote\" src=\"") + annoImgSrc + tr("\" style=\"width:1em; height:1em;\" alt=\""); // prefix in html
     QString annoSuf = tr("\" />");                                                                 // suffix in html
 
     // get current working tab and code view editor widget
