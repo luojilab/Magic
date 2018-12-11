@@ -30,20 +30,23 @@ SOFTWARE.
 #include "ui_SelectAnnotation.h"
 #include "ViewEditors/CodeViewEditor.h"
 
-#define DEFAULT_ICON_SRC "../Images/AnnoIcon0.png"
+const QString S_dedaultIconSrc = QString("../Images/AnnoIcon0.png");
+const QString S_annoPre = QString("<img class=\"epub-footnote\" src=\"");
+const QString S_annoInf = QString("\" alt=\"");
+const QString S_annoSuf = QString("\" />");
 
-SelectAnnotation::SelectAnnotation(QString href,
+SelectAnnotation::SelectAnnotation(/* QString href,
                                    HTMLResource *htmlResource,
                                    QList<Resource *> resources,
-                                   QSharedPointer<Book> book,
+                                   QSharedPointer<Book> book, */
                                    QWidget *parent)
     : QDialog(parent),
       ui(new Ui::SelectAnnotation),
-      mHTMLResource(htmlResource),
-      mResources(resources),
-      mBook(book),
-      mAnnoText(QString()),
-      mAnnoIcon(tr(DEFAULT_ICON_SRC))
+      /* m_HTMLResource(htmlResource),
+      m_Resources(resources),
+      m_Book(book), */
+      m_AnnoText(QString()),
+      m_AnnoIcon(S_dedaultIconSrc)
 {
     ui->setupUi(this);
     
@@ -57,10 +60,7 @@ SelectAnnotation::~SelectAnnotation()
 
 int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView)
 {
-    QString annoPre = tr("<img class=\"epub-footnote\" src=\"");
-    QString annoInf = tr("\" alt=\"");
-    QString annoSuf = tr("\" />");
-    QString annotation = annoPre + annoIcon + annoInf + annoText + annoSuf;
+    QString annotation = S_annoPre + annoIcon + S_annoInf + annoText + S_annoSuf;
     
     // Insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText().
     codeView->insertPlainText(annotation);
@@ -70,7 +70,7 @@ int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &a
 
 void SelectAnnotation::getInput()
 {
-    mAnnoText = ui->annoTextEdit->toPlainText();
+    m_AnnoText = ui->annoTextEdit->toPlainText();
 }
 
 void SelectAnnotation::connectSignalsSlots()

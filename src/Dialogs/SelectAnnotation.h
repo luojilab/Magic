@@ -52,15 +52,15 @@ class SelectAnnotation : public QDialog
     Q_OBJECT
 
   public:
-    explicit SelectAnnotation(QString href,
+    explicit SelectAnnotation(/* QString &href,
                               HTMLResource *htmlResource,
-                              QList<Resource *> resources,
-                              QSharedPointer<Book> book,
+                              QList<Resource *> &resources,
+                              QSharedPointer<Book> book, */
                               QWidget *parent = 0);
     ~SelectAnnotation();
 
-    QString getText() { return mAnnoText; }
-    QString getIcon() { return mAnnoIcon; }
+    QString getText() { return m_AnnoText; }
+    QString getIcon() { return m_AnnoIcon; }
 
     // Insert annotation code to html file.
     static int insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView);
@@ -71,13 +71,15 @@ class SelectAnnotation : public QDialog
   private:
     void connectSignalsSlots();
 
-    QString mAnnoText;
-    QString mAnnoIcon;
+    QString m_AnnoText;
+    QString m_AnnoIcon;
 
     // Resources for future work.
-    HTMLResource *mHTMLResource;
-    QList<Resource *> mResources;
-    QSharedPointer<Book> mBook;
+    /*
+    HTMLResource *m_HTMLResource;
+    QList<Resource *> &m_Resources;
+    QSharedPointer<Book> m_Book;
+    */
 
     Ui::SelectAnnotation *ui;
 };
