@@ -335,6 +335,7 @@
      <addaction name="actionIPhone6P"/>
      <addaction name="actionIPhoneX"/>
      <addaction name="actionIPad"/>
+     <addaction name="actionIPad_landscape"/>
      <addaction name="separator"/>
      <addaction name="actionXiaoMi"/>
     </widget>
@@ -2556,6 +2557,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+A</string>
+    </property>
+  </action>
+  <action name="actionIPad_landscape">
+   <property name="text">
+    <string>iPad  (landscape)</string>
    </property>
   </action>
  </widget>

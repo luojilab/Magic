@@ -671,6 +671,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    m_willClose = true;
     if (MaybeSaveDialogSaysProceed()) {
         ShowMessageOnStatusBar(tr("Magic is closing..."));
         WriteSettings();
@@ -718,6 +719,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
         event->accept();
     } else {
+        m_willClose = false;
         event->ignore();
     }
 }
@@ -3799,6 +3801,7 @@ void MainWindow::ResourcesAddedOrDeleted()
 void MainWindow::CreateNewBook()
 {
     QSharedPointer<Book> new_book = QSharedPointer<Book>(new Book());
+    new_book->createFoldkeeper("");
     new_book->CreateEmptyHTMLFile();
     QString version = new_book->GetConstOPF()->GetEpubVersion();
     if (version.startsWith('3')) {
@@ -4307,7 +4310,7 @@ void MainWindow::PlatformSpecificTweaks()
     sizeMenuIcons();
 }
 
-void MainWindow::layout(PreviewPhoneType type) {
+void MainWindow::layout(PreviewPhoneType type, bool landscape) {
     if (m_epubPreviewer && m_epubPreviewer->isVisible()) {
         QMessageBox::information(this, "", u8"请先关闭当前预览窗口", QMessageBox::Ok);
         return;
@@ -4321,7 +4324,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 	}
     
     float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
-	QSize d_size = m_previewPhoneSizeMap[type];
+    QSize d_size = landscape ? QSize(m_previewPhoneSizeMap[type].height(), m_previewPhoneSizeMap[type].width()) : m_previewPhoneSizeMap[type];
     int screenHeight = QApplication::desktop()->screenGeometry().size().height();
     float height = d_size.height() / ratio > screenHeight ? screenHeight - 100 : d_size.height() / ratio;
     float width = (float(d_size.width()) / d_size.height()) * height / ratio;
@@ -5001,6 +5004,7 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(ui.actionIPhoneX, SIGNAL(triggered()), this, SLOT(previewForIphoneX()));
 	connect(ui.actionXiaoMi, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
 	connect(ui.actionIPad, SIGNAL(triggered()), this, SLOT(previewForIpad()));
+    connect(ui.actionIPad_landscape, SIGNAL(triggered()), this, SLOT(previewForIpadLandscape()));
 	connect(ui.actionIPhone5_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone5()));
 	connect(ui.actionIPhone6_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone6()));
 	connect(ui.actionIPhone6P_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone6P()));
@@ -5186,7 +5190,7 @@ void MainWindow::ConnectSignalsToSlots()
 }
 
 void MainWindow::fileSavedSuccessAction() {
-	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+	if (m_previewerToHTML && m_previewerToHTML->isVisible() && !m_willClose) {
         if (dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource())) {
             m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true, QSize(0,0));
         } else {

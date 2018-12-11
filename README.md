@@ -35,7 +35,7 @@ Magic based on [Sigil](https://github.com/Sigil-Ebook/Sigil) is an Epub ebook Ed
 * Create an Xcode project
 * Build and run
 
-When you want to build a **release version**, put Python framework in your application's **lib or Frameworks** directory and reset shared libraries linked to **@rpath/Python.framework/Versions/${versionNumber}/Python**
+When you want to build a **release version**, put Python framework in your application's **lib or Frameworks** directory and reset shared libraries linked to **@rpath/Python.framework/Versions/${versionNumber}/Python**
 
 Mac installer dmg is put on **${BuildRootPath}/Build/bin/Release**
 
