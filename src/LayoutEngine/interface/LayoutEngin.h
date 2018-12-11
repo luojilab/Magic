@@ -50,7 +50,7 @@ public:
     
     ENGINE_EXPORT void gotoChapterByFileName(BookReader *bookModel, const QString& fileName);
     
-    ENGINE_EXPORT void closeEpub(BookReader *bookModel);
+    ENGINE_EXPORT void closeEpub(BookReader *bookModel, std::function<void()>cb);
     
     ENGINE_EXPORT void repaint(BookReader *bookModel);
     ENGINE_EXPORT void repaint(HTMLReader *htmlReader);

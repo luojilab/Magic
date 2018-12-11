@@ -100,23 +100,22 @@ void PreviewEPUBWindow::reloadEPUB(const std::string& bundlePath, const std::str
         });
 	} else {
         if (m_bookReader != NULL) {
-            closed();
+            closeBase();
+            LayoutEngine::GetEngine()->closeEpub(m_bookReader, [=](){
+                bookViewCoreInitial();
+                if (defaultSize != m_defaultSize && !defaultSize.isNull()) {
+                    m_defaultSize = defaultSize;
+                }
+                m_epubPath = epubPath;
+                LayoutEngine* engine = LayoutEngine::GetEngine();
+                engine->openEpub(m_viewCore, m_epubPath, "", "", [=](BookReader* bookReader,int ecode) {
+                    engineOpenBookFinish(bookReader, ecode);
+                    engine->gotoChapterByFileName(bookReader, (m_epubPath + "|" + jumpHtmlFilePath).c_str());
+                });
+            });
+            m_bookReader = 0;
         }
-        if ( !m_bookReader ) {
-            bookViewCoreInitial();
-        }
-        if (defaultSize != m_defaultSize && !defaultSize.isNull()) {
-            m_defaultSize = defaultSize;
-        }
-        m_epubPath = epubPath;
-        
-        LayoutEngine* engine = LayoutEngine::GetEngine();
-        engine->openEpub(m_viewCore, m_epubPath, "", "", [=](BookReader* bookReader,int ecode) {
-            engineOpenBookFinish(bookReader, ecode);
-            engine->gotoChapterByFileName(bookReader, (m_epubPath + "|" + jumpHtmlFilePath).c_str());
-        });
 	}
-    
 }
 
 void PreviewEPUBWindow::gotoChapterByIndex(const QModelIndex index)
@@ -270,8 +269,18 @@ void PreviewEPUBWindow::closed()
     if ( !m_bookReader ) {
         return;
     }
-    LayoutEngine::GetEngine()->closeEpub(m_bookReader);
+    LayoutEngine::GetEngine()->closeEpub(m_bookReader, [](){});
     m_bookReader = 0;
+    delete m_bookContents;
+    delete m_viewCore;
+    m_viewCore = 0;
+    m_bookContents = 0;
+}
+
+void PreviewEPUBWindow::closeBase() {
+    if ( !m_bookReader ) {
+        return;
+    }
     delete m_bookContents;
     delete m_viewCore;
     m_viewCore = 0;

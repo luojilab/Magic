@@ -52,6 +52,7 @@ private:
     bool m_haveSelction{ false };
 
 private:
+    void closeBase();
 	void generateNavigatorTreeModel(QList<std::shared_ptr<BookContents>>);
 	void changeBGColor(int color, bool isNightMode = false);
     void bookViewCoreInitial();
