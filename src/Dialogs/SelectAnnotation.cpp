@@ -48,7 +48,6 @@ SelectAnnotation::SelectAnnotation(QString href,
     ui->setupUi(this);
     
     connectSignalsSlots();
-    readSettings();
 }
 
 SelectAnnotation::~SelectAnnotation()
@@ -56,36 +55,25 @@ SelectAnnotation::~SelectAnnotation()
     delete ui;
 }
 
-// insert annotation into html file
 int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView)
 {
-    // TODO...
-    // QString annoIcon = tr("../Images/AnnoIcon0.png");
     QString annoPre = tr("<img class=\"epub-footnote\" src=\"");
     QString annoInf = tr("\" alt=\"");
     QString annoSuf = tr("\" />");
     QString annotation = annoPre + annoIcon + annoInf + annoText + annoSuf;
     
-    // insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText()
+    // Insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText().
     codeView->insertPlainText(annotation);
 
     return 0;
 }
 
-// private slots:
-void SelectAnnotation::writeSettings()
+void SelectAnnotation::getInput()
 {
-    mAnnoText = ui->AnnoText->toPlainText();
-    // TODO
-}
-
-// private:
-void SelectAnnotation::readSettings()
-{
-    // TODO
+    mAnnoText = ui->annoTextEdit->toPlainText();
 }
 
 void SelectAnnotation::connectSignalsSlots()
 {
-    connect(this, SIGNAL(accepted()), this, SLOT(writeSettings()));
+    connect(this, SIGNAL(accepted()), this, SLOT(getInput()));
 }
