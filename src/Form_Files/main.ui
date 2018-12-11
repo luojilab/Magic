@@ -50,7 +50,7 @@
      <x>0</x>
      <y>0</y>
      <width>1436</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -149,7 +149,6 @@
     <addaction name="separator"/>
     <addaction name="actionInsertId"/>
     <addaction name="actionInsertHyperlink"/>
-    <addaction name="actionInsertAnnotation"/>
     <addaction name="separator"/>
     <addaction name="actionInsertClosingTag"/>
     <addaction name="separator"/>
@@ -465,7 +464,6 @@
    <addaction name="actionInsertSpecialCharacter"/>
    <addaction name="actionInsertId"/>
    <addaction name="actionInsertHyperlink"/>
-   <addaction name="actionInsertAnnotation"/>
   </widget>
   <widget class="QToolBar" name="toolBarBack">
    <property name="windowTitle">
@@ -2544,23 +2542,6 @@
    </property>
    <property name="text">
     <string>右切割</string>
-   </property>
-  </action>
-  <action name="actionInsertAnnotation">
-   <property name="icon">
-    <iconset resource="../Resource_Files/main/main.qrc">
-     <normaloff>:/main/insert-annotation_48px.png</normaloff>:/main/insert-annotation_48px.png</iconset>
-   </property>
-   <property name="text">
-    <string>Annotation...</string>
-   </property>
-   <property name="toolTip">
-    <string>&lt;p style=&quot;padding-top: 0.5em;&quot; &gt;&lt;b&gt;Insert Annotation&lt;/b&gt;&lt;/p&gt;
-
-&lt;p style=&quot;margin-left: 0.5em;&quot;&gt;Insert an annotation icon with custom text which displays when the icon clicked.&lt;/p&gt;</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Alt+A</string>
    </property>
   </action>
  </widget>

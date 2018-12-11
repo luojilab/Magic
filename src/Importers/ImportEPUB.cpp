@@ -164,7 +164,7 @@ QSharedPointer<Book> ImportEPUB::GetBook(bool extract_metadata)
         if (QMessageBox::Yes == QMessageBox::warning(QApplication::activeWindow(),
                 tr("Magic"),
                 tr("This EPUB has HTML files that are not well formed. "
-                   "Magic can attempt to automatically fix these files, although this "
+                   "Sigil can attempt to automatically fix these files, although this "
                    "can result in data loss.\n\n"
                    "Do you want to automatically fix the files?"),
                 QMessageBox::Yes|QMessageBox::No)
@@ -219,7 +219,7 @@ QSharedPointer<Book> ImportEPUB::GetBook(bool extract_metadata)
             m_Book->GetOPF()->SetDCMetadata(originalMetadata);
         }
         AddLoadWarning(QObject::tr("The OPF file does not contain a valid spine.") % "\n" %
-                       QObject::tr("Magic has created a new one for you."));
+                       QObject::tr("Sigil has created a new one for you."));
     }
 
     // If we have modified the book to add spine attribute, manifest item or NCX mark as changed.
@@ -674,7 +674,7 @@ void ImportEPUB::LocateOrCreateNCX(const QString &ncx_id_on_spine)
             if (QFileInfo(ncxSearch.value()).suffix().toLower() == NCX_EXTENSION) {
                 m_NCXId = ncxSearch.key();
                 load_warning = QObject::tr("The OPF file did not identify the NCX file correctly.") + "\n" + 
-                               " - "  +  QObject::tr("Magic has used the following file as the NCX:") + 
+                               " - "  +  QObject::tr("Sigil has used the following file as the NCX:") + 
                                QString(" %1").arg(m_NcxCandidates[ m_NCXId ]);
                 ncx_href = m_NcxCandidates[ m_NCXId ];
                 break;
@@ -702,15 +702,15 @@ void ImportEPUB::LocateOrCreateNCX(const QString &ncx_id_on_spine)
         ncx_resource.SaveToDisk();
 
         if (m_PackageVersion.startsWith('3')) { 
-            load_warning = QObject::tr("Magic has created a template NCX") + "\n" + 
+            load_warning = QObject::tr("Sigil has created a template NCX") + "\n" + 
               QObject::tr("to support epub2 backwards compatibility.");
         } else {
             if (ncx_href.isEmpty()) {
                 load_warning = QObject::tr("The OPF file does not contain an NCX file.") + "\n" + 
-                               " - " +  QObject::tr("Magic has created a new one for you.");
+                               " - " +  QObject::tr("Sigil has created a new one for you.");
             } else {
                 load_warning = QObject::tr("The NCX file is not present in this EPUB.") + "\n" + 
-                               " - " + QObject::tr("Magic has created a new one for you.");
+                               " - " + QObject::tr("Sigil has created a new one for you.");
             }
         }
     }

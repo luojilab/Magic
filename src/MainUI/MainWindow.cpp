@@ -67,7 +67,6 @@
 #include "Dialogs/SelectHyperlink.h"
 #include "Dialogs/SelectId.h"
 #include "Dialogs/SelectIndexTitle.h"
-#include "Dialogs/SelectAnnotation.h"
 #include "Exporters/ExportEPUB.h"
 #include "Exporters/ExporterFactory.h"
 #include "Importers/ImporterFactory.h"
@@ -673,7 +672,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (MaybeSaveDialogSaysProceed()) {
-        ShowMessageOnStatusBar(tr("Magic is closing..."));
+        ShowMessageOnStatusBar(tr("Sigil is closing..."));
         WriteSettings();
         KeyboardShortcutManager *sm = KeyboardShortcutManager::instance();
         sm->removeActionsOf(this);
@@ -1889,53 +1888,6 @@ void MainWindow::InsertHyperlink()
     }
 }
 
-// Insert an img with text in "alt" to display annotations on devices.
-void MainWindow::insertAnnotation()
-{
-    SaveTabData();
-    ShowMessageOnStatusBar();
-
-    FlowTab *flowTab = GetCurrentFlowTab();
-    if (!flowTab || !flowTab->InsertHyperlinkEnabled()) { // Use check function from insertHyperlink.
-        QMessageBox::warning(this, tr("Magic"), tr("插入注释位置错误。You cannot insert an annotation at this position. (AnnoErr0)"));
-        return;
-    }
-    if (flowTab->GetViewState() == ViewState_BookView)
-    {
-        QMessageBox::warning(this, tr("Magic"), tr("请在代码视图操作。You should insert an annotation in codeview."));
-        CodeView();
-    }
-
-    QString href = flowTab->GetAttributeHref();
-    // Reserved for future work.
-    HTMLResource *html_resource = qobject_cast<HTMLResource *>(flowTab->GetLoadedResource());
-    QList<Resource *> resources = GetAllHTMLResources();
-
-    // Open a dialog to get text and icon input.
-    SelectAnnotation select_annotation(href, html_resource, resources, m_Book, this);
-
-    if (select_annotation.exec() == QDialog::Accepted) {
-        QString annoText = select_annotation.getText();
-        QString annoIcon = select_annotation.getIcon();
-
-        if (annoText.isEmpty()) {
-            QMessageBox::warning(this, tr("Magic"), tr("输入文本为空。Input text is empty. (AnnoErr1)"));
-            return;
-        }
-
-        CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
-        if (!codeView) {
-            QMessageBox::warning(this, tr("Magic"), tr("代码视图编辑器获取失败。Get CodeViewEditor failed. (AnnoErr2)"));
-            return;
-        }
-
-        if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
-            QMessageBox::warning(this, tr("Magic"), tr("插入注释失败。Inserting annotation fail. (AnnoErr3)"));
-            return;
-        }
-    }
-}
-
 void MainWindow::MarkForIndex()
 {
     SaveTabData();
@@ -3064,7 +3016,6 @@ void MainWindow::SetStateActionsBookView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(true);
     ui.actionInsertHyperlink->setEnabled(true);
-    ui.actionInsertAnnotation->setEnabled(true);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3137,7 +3088,6 @@ void MainWindow::SetStateActionsCodeView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(true);
     ui.actionInsertHyperlink->setEnabled(true);
-    ui.actionInsertAnnotation->setEnabled(true);
     ui.actionInsertClosingTag->setEnabled(true);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3227,7 +3177,6 @@ void MainWindow::SetStateActionsRawView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(false);
     ui.actionInsertHyperlink->setEnabled(false);
-    ui.actionInsertAnnotation->setEnabled(false);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3300,7 +3249,6 @@ void MainWindow::SetStateActionsStaticView()
     ui.actionInsertSpecialCharacter->setEnabled(false);
     ui.actionInsertId->setEnabled(false);
     ui.actionInsertHyperlink->setEnabled(false);
-    ui.actionInsertAnnotation->setEnabled(false);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(false);
     ui.actionRedo->setEnabled(false);
@@ -3931,7 +3879,7 @@ bool MainWindow::LoadFile(const QString &fullfilepath, bool is_internal)
         QApplication::restoreOverrideCursor();
         Utility::DisplayStdErrorDialog(
             tr("The creator of this file has encrypted it with DRM. "
-               "Magic cannot open such files."));
+               "Sigil cannot open such files."));
     } catch (EPUBLoadParseError epub_load_error) {
         ShowMessageOnStatusBar();
         QApplication::restoreOverrideCursor();
@@ -3979,7 +3927,7 @@ bool MainWindow::SaveFile(const QString &fullfilepath, bool update_current_filen
         if (!SUPPORTED_SAVE_TYPE.contains(extension)) {
             ShowMessageOnStatusBar();
             Utility::DisplayStdErrorDialog(
-                tr("Magic cannot save files of type \"%1\".\n"
+                tr("Sigil cannot save files of type \"%1\".\n"
                    "Please choose a different format.")
                 .arg(extension)
             );
@@ -4553,7 +4501,6 @@ void MainWindow::ExtendUI()
     sm->registerAction(this, ui.actionInsertSpecialCharacter, "MainWindow.InsertSpecialCharacter");
     sm->registerAction(this, ui.actionInsertId, "MainWindow.InsertId");
     sm->registerAction(this, ui.actionInsertHyperlink, "MainWindow.InsertHyperlink");
-    sm->registerAction(this, ui.actionInsertAnnotation, "MainWindow.insertAnnotation");
     sm->registerAction(this, ui.actionMarkForIndex, "MainWindow.MarkForIndex");
     sm->registerAction(this, ui.actionSplitSection, "MainWindow.SplitSection");
     sm->registerAction(this, ui.actionInsertSGFSectionMarker, "MainWindow.InsertSGFSectionMarker");
@@ -5002,7 +4949,6 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionInsertSpecialCharacter, SIGNAL(triggered()), this, SLOT(InsertSpecialCharacter()));
     connect(ui.actionInsertId,        SIGNAL(triggered()),  this,   SLOT(InsertId()));
     connect(ui.actionInsertHyperlink, SIGNAL(triggered()),  this,   SLOT(InsertHyperlink()));
-    connect(ui.actionInsertAnnotation, SIGNAL(triggered()), this, SLOT(insertAnnotation()));
     connect(ui.actionPreferences,     SIGNAL(triggered()), this, SLOT(PreferencesDialog()));
     // Search
     connect(ui.actionFind,             SIGNAL(triggered()), this, SLOT(Find()));
