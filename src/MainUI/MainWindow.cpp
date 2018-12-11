@@ -1892,47 +1892,48 @@ void MainWindow::InsertHyperlink()
 // Insert an img with text in "alt" to display annotations on devices.
 void MainWindow::insertAnnotation()
 {
-    SaveTabData();
-    ShowMessageOnStatusBar();
-
     FlowTab *flowTab = GetCurrentFlowTab();
     if (!flowTab || !flowTab->InsertHyperlinkEnabled()) { // Use check function from insertHyperlink.
         QMessageBox::warning(this, tr("Magic"), tr("插入注释位置错误。You cannot insert an annotation at this position. (AnnoErr0)"));
         return;
     }
-    if (flowTab->GetViewState() == ViewState_BookView)
-    {
+    if (flowTab->GetViewState() == ViewState_BookView) {
         QMessageBox::warning(this, tr("Magic"), tr("请在代码视图操作。You should insert an annotation in codeview."));
         CodeView();
+        return;
     }
 
-    QString href = flowTab->GetAttributeHref();
     // Reserved for future work.
-    HTMLResource *html_resource = qobject_cast<HTMLResource *>(flowTab->GetLoadedResource());
+    /*
+    QString href = flowTab->GetAttributeHref();
+    HTMLResource *htmlResource = qobject_cast<HTMLResource *>(flowTab->GetLoadedResource());
     QList<Resource *> resources = GetAllHTMLResources();
+    */
 
     // Open a dialog to get text and icon input.
-    SelectAnnotation select_annotation(href, html_resource, resources, m_Book, this);
+    SelectAnnotation selectAnnotation(/* href, htmlResource, resources, m_Book, */ this);
 
-    if (select_annotation.exec() == QDialog::Accepted) {
-        QString annoText = select_annotation.getText();
-        QString annoIcon = select_annotation.getIcon();
+    if (selectAnnotation.exec() != QDialog::Accepted) {
+        return;
+    }
 
-        if (annoText.isEmpty()) {
-            QMessageBox::warning(this, tr("Magic"), tr("输入文本为空。Input text is empty. (AnnoErr1)"));
-            return;
-        }
+    QString annoText = selectAnnotation.getText();
+    QString annoIcon = selectAnnotation.getIcon();
 
-        CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
-        if (!codeView) {
-            QMessageBox::warning(this, tr("Magic"), tr("代码视图编辑器获取失败。Get CodeViewEditor failed. (AnnoErr2)"));
-            return;
-        }
+    if (annoText.isEmpty()) {
+        QMessageBox::warning(this, tr("Magic"), tr("输入文本为空。Input text is empty. (AnnoErr1)"));
+        return;
+    }
 
-        if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
-            QMessageBox::warning(this, tr("Magic"), tr("插入注释失败。Inserting annotation fail. (AnnoErr3)"));
-            return;
-        }
+    CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
+    if (!codeView) {
+        QMessageBox::warning(this, tr("Magic"), tr("代码视图编辑器获取失败。Get CodeViewEditor failed. (AnnoErr2)"));
+        return;
+    }
+
+    if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
+        QMessageBox::warning(this, tr("Magic"), tr("插入注释失败。Inserting annotation fail. (AnnoErr3)"));
+        return;
     }
 }
 
