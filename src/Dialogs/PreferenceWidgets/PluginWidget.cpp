@@ -206,7 +206,7 @@ void PluginWidget::addPlugin()
             Utility::DisplayStdWarningDialog(tr("Error: Plugin Could Not be Unzipped."));
             return;
         case PluginDB::AR_INVALID:
-            Utility::DisplayStdWarningDialog(tr("Error: Plugin not a valid Sigil plugin."));
+            Utility::DisplayStdWarningDialog(tr("Error: Plugin not a valid Magic plugin."));
             return;
         case PluginDB::AR_SUCCESS:
             break;

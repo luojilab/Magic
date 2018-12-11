@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
         // Set application information for
         // easier use of QSettings classes
         QCoreApplication::setOrganizationName("Deodao");
-        QCoreApplication::setOrganizationDomain("sigil-ebook.com");
+        QCoreApplication::setOrganizationDomain("luojilab.com");
         QCoreApplication::setApplicationName("Magic");
         QCoreApplication::setApplicationVersion(SIGIL_VERSION);
 

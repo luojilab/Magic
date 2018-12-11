@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/annotation icons">
+        <file>AnnoIcon0.png</file>
+    </qresource>
+</RCC>

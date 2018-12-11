@@ -545,7 +545,7 @@ void Utility::DisplayExceptionErrorDialog(const QString &error_info)
     message_box.setStandardButtons(QMessageBox::Close);
     QStringList detailed_text;
     detailed_text << "Error info: "    + error_info
-                  << "Sigil version: " + QString(SIGIL_FULL_VERSION)
+                  << "Magic version: " + QString(SIGIL_FULL_VERSION)
                   << "Runtime Qt: "    + QString(qVersion())
                   << "Compiled Qt: "   + QString(QT_VERSION_STR);
 #if defined Q_OS_WIN32
