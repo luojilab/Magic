@@ -144,6 +144,8 @@ set( DIALOG_FILES
     Dialogs/SelectHyperlink.h
     Dialogs/SelectId.cpp
     Dialogs/SelectId.h
+    Dialogs/SelectAnnotation.cpp
+    Dialogs/SelectAnnotation.h
     Dialogs/SelectIndexTitle.cpp
     Dialogs/SelectIndexTitle.h
     Dialogs/SelectFiles.cpp
@@ -433,6 +435,7 @@ set( UI_FILES
     Form_Files/SelectCharacter.ui
     Form_Files/SelectHyperlink.ui
     Form_Files/SelectId.ui
+    Form_Files/SelectAnnotation.ui
     Form_Files/SelectIndexTitle.ui
     Form_Files/SelectFiles.ui
     Form_Files/MetaEditor.ui 
