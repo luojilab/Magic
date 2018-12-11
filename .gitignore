@@ -75,4 +75,5 @@ qrc_*
 OpenCandy
 tags
 build
+lib/DDLayoutEngine/macos/*d.a
 

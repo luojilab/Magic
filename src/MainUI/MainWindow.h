@@ -286,6 +286,7 @@ private:typedef enum {
 		void previewForIphone6P() { layout(iPhone6P); };
 		void previewForIphoneX() { layout(iPhoneX); };
 		void previewForIpad() { layout(iPad); };
+        void previewForIpadLandscape() { layout(iPad, true); };
 		void previewForXiaoMi() { layout(XiaoMi); };
 
 		void previewIntimeForIphone5() { previewForCurrentHTML(iPhone5); };
@@ -701,7 +702,7 @@ private:typedef enum {
 
 private:
 
-	void layout(PreviewPhoneType);
+	void layout(PreviewPhoneType, bool landscape = false);
 	void updateToolTipsOnPluginIcons();
 	void UpdateClipButton(int clip_number, QAction *ui_action);
 	void InsertFiles(const QStringList &selected_images);
@@ -1069,6 +1070,7 @@ private:
 
 	QStringList m_pluginList;
 	bool m_SaveCSS;
+    bool m_willClose {false};
 
 	/**
 	 * Holds all the widgets Qt Designer created for us.

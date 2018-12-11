@@ -89,11 +89,48 @@ static const QString CONTAINER_XML       = "<?xml version=\"1.0\" encoding=\"UTF
 
 static QCodePage437Codec *cp437 = 0;
 
+
+extern const QStringList IMAGE_EXTENSIONS;
+extern const QStringList SVG_EXTENSIONS;
+extern const QStringList MISC_TEXT_EXTENSIONS;
+extern const QStringList MISC_XML_EXTENSIONS;
+extern const QStringList FONT_EXTENSIONS;
+extern const QStringList TEXT_EXTENSIONS;
+extern const QStringList STYLE_EXTENSIONS;
+extern const QStringList AUDIO_EXTENSIONS;
+extern const QStringList VIDEO_EXTENSIONS;
+
+extern const QString IMAGE_FOLDER_NAME;
+extern const QString FONT_FOLDER_NAME;
+extern const QString TEXT_FOLDER_NAME;
+extern const QString STYLE_FOLDER_NAME;
+extern const QString AUDIO_FOLDER_NAME;
+extern const QString VIDEO_FOLDER_NAME;
+extern const QString MISC_FOLDER_NAME;
+extern const QString OPF_FILE_NAME;
+extern const QString NCX_FILE_NAME;
+const QString OEBPS_FOLEDER_NAME = "OEBPS";
+const QString META_FOLEDER_NAME = "META-INF";
+extern const QString MIME_FILE_NAME = "mimetype";
+const QString CONTAINER_FILE_NAME = "container.xml";
+
+extern const QString CONTAINER_FILE_PATH = META_FOLEDER_NAME + "/" + CONTAINER_FILE_NAME;
+extern const QString OPF_FILE_PATH = OEBPS_FOLEDER_NAME + "/" + OPF_FILE_NAME;
+extern const QString TOC_FILE_PATH = OEBPS_FOLEDER_NAME + "/" + NCX_FILE_NAME;
+const QString TEXT_FOLDER_PATH = OEBPS_FOLEDER_NAME + "/" + TEXT_FOLDER_NAME ;
+const QString FONT_FOLDER_PATH = OEBPS_FOLEDER_NAME + "/" + FONT_FOLDER_NAME ;
+const QString IMAGE_FOLDER_PATH = OEBPS_FOLEDER_NAME + "/" + IMAGE_FOLDER_NAME ;
+const QString STYLE_FOLDER_PATH = OEBPS_FOLEDER_NAME + "/" + STYLE_FOLDER_NAME ;
+const QString MISIC_FOLDER_PATH = OEBPS_FOLEDER_NAME + "/" + MISC_FOLDER_NAME ;
+const QString AUDIO_FOLDER_PATH = OEBPS_FOLEDER_NAME + "/" + AUDIO_FOLDER_NAME ;
+const QString VIDEO_FOLDER_PATH = OEBPS_FOLEDER_NAME + "/" + VIDEO_FOLDER_NAME ;
+
 // Constructor;
 // The parameter is the file to be imported
 ImportEPUB::ImportEPUB(const QString &fullfilepath)
     : Importer(fullfilepath),
-      m_ExtractedFolderPath(m_TempFolder.GetPath()),
+      m_TempFolder(new TempFolder()),
+      m_ExtractedFolderPath(m_TempFolder->GetPath()),
       m_HasSpineItems(false),
       m_NCXNotInManifest(false),
       m_NavResource(NULL)
@@ -112,7 +149,14 @@ QSharedPointer<Book> ImportEPUB::GetBook(bool extract_metadata)
     }
 
     // These read the EPUB file
-    ExtractContainer();
+    QStringList extracted = ExtractContainer();
+    bool bookStandard = BookStandardForMagic(extracted);
+    if (bookStandard) {
+        m_Book->createFoldkeeper(m_ExtractedFolderPath);
+        m_Book->GetFolderKeeper()->AddReferenceToTempFolder(m_TempFolder);
+    } else {
+        m_Book->createFoldkeeper("");
+    }
     QHash<QString, QString> encrypted_files = ParseEncryptionXml();
 
     if (BookContentEncrypted(encrypted_files)) {
@@ -174,10 +218,12 @@ QSharedPointer<Book> ImportEPUB::GetBook(bool extract_metadata)
         QApplication::setOverrideCursor(Qt::WaitCursor);
     }
 
-    const QStringList load_errors = UniversalUpdates::PerformUniversalUpdates(false, resources, updates, non_well_formed);
-
-    Q_FOREACH (QString err, load_errors) {
-        AddLoadWarning(QString("%1").arg(err));
+    if (!bookStandard) {
+        const QStringList load_errors = UniversalUpdates::PerformUniversalUpdates(false, resources, updates, non_well_formed);
+        
+        Q_FOREACH (QString err, load_errors) {
+            AddLoadWarning(QString("%1").arg(err));
+        }
     }
 
     ProcessFontFiles(resources, updates, encrypted_files);
@@ -373,8 +419,9 @@ void ImportEPUB::ProcessFontFiles(const QList<Resource *> &resources,
     }
 }
 
-void ImportEPUB::ExtractContainer()
+QStringList ImportEPUB::ExtractContainer()
 {
+    QStringList extractedFileLists;
     int res = 0;
     if (!cp437) {
         cp437 = new QCodePage437Codec();
@@ -469,6 +516,7 @@ void ImportEPUB::ExtractContainer()
                     QString cp437_file_path = m_ExtractedFolderPath + "/" + cp437_file_name;
                     QFile::copy(file_path, cp437_file_path);
                 }
+                extractedFileLists.append(qfile_name);
             }
         } while ((res = unzGoToNextFile(zfile)) == UNZ_OK);
     }
@@ -479,6 +527,7 @@ void ImportEPUB::ExtractContainer()
     }
 
     unzClose(zfile);
+    return extractedFileLists;
 }
 
 void ImportEPUB::LocateOPF()
@@ -800,4 +849,66 @@ QString ImportEPUB::PrepareOPFForReading(const QString &source)
         source_copy.replace(mo.capturedStart(1), mo.capturedLength(1), "1.0");
     }
     return source_copy;
+}
+
+bool ImportEPUB::BookStandardForMagic(const QStringList &list)
+{
+    auto isFileStandard = [](const QString& folderPath, const QString& fileName, const QString& comparePath) {
+        return folderPath + "/" + fileName == comparePath;
+    };
+    bool isStandard = true;
+    for (const QString& s : list) {
+        QFileInfo fileInfo(s);
+        QString fileName = fileInfo.fileName();
+        QString extension = fileInfo.suffix().toLower();
+        if (IMAGE_EXTENSIONS.contains(extension) || SVG_EXTENSIONS.contains(extension)) {
+            // IMAGE
+            if (!isFileStandard(IMAGE_FOLDER_PATH, fileName, s)) {
+                isStandard = false;
+                break ;
+            }
+        } else if (TEXT_EXTENSIONS.contains(extension)) {
+            // TEXT
+            if (!isFileStandard(TEXT_FOLDER_PATH, fileName, s)) {
+                isStandard = false;
+                break ;
+            }
+        } else if (STYLE_EXTENSIONS.contains(extension)) {
+            // STYLE
+            if (!isFileStandard(STYLE_FOLDER_PATH, fileName, s)) {
+                isStandard = false;
+                break ;
+            }
+        } else if (AUDIO_EXTENSIONS.contains(extension)) {
+            // AUDIO
+            if (!isFileStandard(AUDIO_FOLDER_PATH, fileName, s)) {
+                isStandard = false;
+                break ;
+            }
+        } else if (VIDEO_EXTENSIONS.contains(extension)) {
+            // VIDEO
+            if (!isFileStandard(VIDEO_FOLDER_PATH, fileName, s)) {
+                isStandard = false;
+                break ;
+            }
+        } else if (FONT_EXTENSIONS.contains(extension)) {
+            // FONT
+            if (!isFileStandard(FONT_FOLDER_PATH, fileName, s)) {
+                isStandard = false;
+                break ;
+            }
+        } else if (MISC_XML_EXTENSIONS.contains(extension) || MISC_TEXT_EXTENSIONS.contains(extension)) {
+            // MISC
+            if (!isFileStandard(MISIC_FOLDER_PATH, fileName, s)) {
+                isStandard = false;
+                break ;
+            }
+        } else {
+            if (s != TOC_FILE_PATH && s != OPF_FILE_PATH && s != MIME_FILE_NAME && s != CONTAINER_FILE_PATH) {
+                isStandard = false;
+                break;
+            }
+        }
+    }
+    return isStandard;
 }
