@@ -10,7 +10,7 @@
 
 ## 概述
 
-Magic是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2和Epub3的电子书
+Magic是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2和Epub3的电子书编辑器
 
 ## 特性
 
@@ -30,7 +30,7 @@ Magic是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2�
 ### 在macOS上编译工程
 
 * 在目标机器上安装Python3
-* 编译带有webkit build版本的Qt5.5。或直接从[这里]()获取
+* 编译带有webkit build版本的Qt5.5
 * 下载CMake3.11+
 * 将Qt的路径设置到CMAKE_PREFIX_PATH
 * 生成Xcode工程文件
@@ -43,10 +43,10 @@ Magic是基于[Sigil](https://github.com/Sigil-Ebook/Sigil)的可以编辑Epub2�
 ### 在Windows上编译工程
 
 - 在目标机器上安装Python3
-- 编译带有webkit build版本的Qt5.5。或直接从[这里]()获取
+- 编译带有webkit build版本的Qt5.5
 - 下载CMake3.11+
 - 将Qt的路径设置到CMAKE_PREFIX_PATH
-- 生成Xcode工程文件
+- 生成VS工程文件
 - 编译安装
 
 通过运行makeinstaller工程来生成Windows应用安装器

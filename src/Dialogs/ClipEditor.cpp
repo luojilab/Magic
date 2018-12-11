@@ -77,7 +77,7 @@ void ClipEditor::SetupClipEditorTree()
         "</dl>");
     ui.buttonBox->setToolTip(QString() +
                              "<dl>" +
-                             "<dt><b>" + tr("Save") + "</b><dd>" + tr("Save your changes.") + "<br/><br/>" + tr("If any other instances of Sigil are running they will be automatically updated with your changes.") + "</dd>" +
+                             "<dt><b>" + tr("Save") + "</b><dd>" + tr("Save your changes.") + "<br/><br/>" + tr("If any other instances of Magic are running they will be automatically updated with your changes.") + "</dd>" +
                              "</dl>");
     ui.ClipEditorTree->header()->setStretchLastSection(true);
 }
@@ -733,7 +733,7 @@ bool ClipEditor::MaybeSaveDialogSaysProceed(bool is_forced)
         QMessageBox::StandardButtons buttons = is_forced ? QMessageBox::Save | QMessageBox::Discard
                                                : QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel;
         button_pressed = QMessageBox::warning(this,
-                                              tr("Sigil: Clip Editor"),
+                                              tr("Magic: Clip Editor"),
                                               tr("The Clip entries may have been modified.\n"
                                                       "Do you want to save your changes?"),
                                               buttons
