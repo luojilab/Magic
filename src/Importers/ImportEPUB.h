@@ -53,8 +53,10 @@ private:
      * Extracts the EPUB file to a temporary folder.
      * The path to the the temp folder with the extracted files
      * is stored in m_ExtractedFolderPath.
+     *
+     * @return the extracted file path list
      */
-    void ExtractContainer();
+    QStringList ExtractContainer();
 
     /**
      * Locates the OPF file in the extracted folder.
@@ -154,11 +156,13 @@ private:
     void ProcessFontFiles(const QList<Resource *> &resources,
                           const QHash<QString, QString> &updates,
                           const QHash<QString, QString> &encrypted_files);
+    
+    bool BookStandardForMagic(const QStringList&);
 
     /**
      * The main temp folder where files are stored.
      */
-    TempFolder m_TempFolder;
+    std::shared_ptr<TempFolder> m_TempFolder;
 
     /**
      * The full path to the folder where the

@@ -41,40 +41,45 @@ namespace Ui
 class SelectAnnotation;
 }
 
+// SelectAnnotation functions:
+// 1. Open a dialog to get annotation text.
+// 2. A static function to insert annotation code.
+// TODO: 3. get foreground and background colors to generate icon.
+// TODO: 4. Detect and replace selected superscript with corresponding footnote.
+// TODO: 5. Automatically detect footnotes and replace in-text references.
 class SelectAnnotation : public QDialog
 {
     Q_OBJECT
 
   public:
-    explicit SelectAnnotation(QString href,
-                              HTMLResource *html_resource,
-                              QList<Resource *> resources,
-                              QSharedPointer<Book> book,
+    explicit SelectAnnotation(/* QString &href,
+                              HTMLResource *htmlResource,
+                              QList<Resource *> &resources,
+                              QSharedPointer<Book> book, */
                               QWidget *parent = 0);
     ~SelectAnnotation();
 
-    // get annotation text
-    QString getText() { return mAnnoText; }
-    // get annotation icon src
-    QString getIcon() { return mAnnoIcon; }
+    QString getText() { return m_AnnoText; }
+    QString getIcon() { return m_AnnoIcon; }
 
-    // insert annotation into html file
+    // Insert annotation code to html file.
     static int insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView);
 
   private slots:
-    void writeSettings();
+    void getInput();
 
   private:
-    void readSettings();
     void connectSignalsSlots();
 
-    // memeber data
-    QString mAnnoText;
-    QString mAnnoIcon;
+    QString m_AnnoText;
+    QString m_AnnoIcon;
 
-    HTMLResource *mHTMLResource;
-    QList<Resource *> mResources;
-    QSharedPointer<Book> mBook;
+    // Resources for future work.
+    /*
+    HTMLResource *m_HTMLResource;
+    QList<Resource *> &m_Resources;
+    QSharedPointer<Book> m_Book;
+    */
 
     Ui::SelectAnnotation *ui;
 };

@@ -672,6 +672,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    m_willClose = true;
     if (MaybeSaveDialogSaysProceed()) {
         ShowMessageOnStatusBar(tr("Magic is closing..."));
         WriteSettings();
@@ -719,6 +720,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
         event->accept();
     } else {
+        m_willClose = false;
         event->ignore();
     }
 }
@@ -1889,56 +1891,51 @@ void MainWindow::InsertHyperlink()
     }
 }
 
-// insert an img with text in "alt" to display annotations on devices
+// Insert an img with text in "alt" to display annotations on devices.
 void MainWindow::insertAnnotation()
 {
-    SaveTabData();
-    ShowMessageOnStatusBar();
-
     FlowTab *flowTab = GetCurrentFlowTab();
-    if (!flowTab || !flowTab->InsertHyperlinkEnabled()) { // use hyperlink check function
-        QMessageBox::warning(this, tr("Magic"), tr("You cannot insert an annotation at this position. (AnnoErr0)"));
+    if (!flowTab || !flowTab->InsertHyperlinkEnabled()) { // Use check function from insertHyperlink.
+        QMessageBox::warning(this, tr("Magic"), tr("插入注释位置错误。You cannot insert an annotation at this position. (AnnoErr0)"));
+        return;
+    }
+    if (flowTab->GetViewState() == ViewState_BookView) {
+        QMessageBox::warning(this, tr("Magic"), tr("请在代码视图操作。You should insert an annotation in codeview."));
+        CodeView();
         return;
     }
 
+    // Reserved for future work.
+    /*
     QString href = flowTab->GetAttributeHref();
+    HTMLResource *htmlResource = qobject_cast<HTMLResource *>(flowTab->GetLoadedResource());
+    QList<Resource *> resources = GetAllHTMLResources();
+    */
 
-    // Prevent adding a hidden anchor link in Book View.
-    if (m_ViewState == MainWindow::ViewState_BookView && href.isEmpty() && flowTab->GetSelectedText().isEmpty()) {
-        QMessageBox::warning(this, tr("Magic"), tr("You must select text before inserting a new annotation. (AnnoErr1)"));
+    // Open a dialog to get text and icon input.
+    SelectAnnotation selectAnnotation(/* href, htmlResource, resources, m_Book, */ this);
+
+    if (selectAnnotation.exec() != QDialog::Accepted) {
         return;
     }
 
-    HTMLResource *html_resource = qobject_cast<HTMLResource *>(flowTab->GetLoadedResource());
-    QList<Resource *> resources = GetAllHTMLResources();
-    // reserved for automatical convert
+    QString annoText = selectAnnotation.getText();
+    QString annoIcon = selectAnnotation.getIcon();
 
-    SelectAnnotation select_annotation(href, html_resource, resources, m_Book, this);
+    if (annoText.isEmpty()) {
+        QMessageBox::warning(this, tr("Magic"), tr("输入文本为空。Input text is empty. (AnnoErr1)"));
+        return;
+    }
 
-    if (select_annotation.exec() == QDialog::Accepted) {
-        QString annoText = select_annotation.getText();
-        QString annoIcon = select_annotation.getIcon();
+    CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
+    if (!codeView) {
+        QMessageBox::warning(this, tr("Magic"), tr("代码视图编辑器获取失败。Get CodeViewEditor failed. (AnnoErr2)"));
+        return;
+    }
 
-        if (annoText.isEmpty()) {
-            QMessageBox::warning(this, tr("Magic"), tr("Input text is empty. (AnnoErr2)"));
-            return;
-        }
-
-        if (flowTab->GetViewState() == ViewState_BookView)
-        {
-            CodeView();
-            // flowTab = GetCurrentFlowTab();
-        }
-
-        CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
-        if (!codeView)
-        {
-            QMessageBox::warning(this, tr("Magic"), tr("CodeViewEditor failed. (AnnoErr3)"));
-        }
-
-        if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
-            QMessageBox::warning(this, tr("Magic"), tr("Inserting annotation fail. (AnnoErr4)"));
-        }
+    if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
+        QMessageBox::warning(this, tr("Magic"), tr("插入注释失败。Inserting annotation fail. (AnnoErr3)"));
+        return;
     }
 }
 
@@ -3857,6 +3854,7 @@ void MainWindow::ResourcesAddedOrDeleted()
 void MainWindow::CreateNewBook()
 {
     QSharedPointer<Book> new_book = QSharedPointer<Book>(new Book());
+    new_book->createFoldkeeper("");
     new_book->CreateEmptyHTMLFile();
     QString version = new_book->GetConstOPF()->GetEpubVersion();
     if (version.startsWith('3')) {
@@ -4365,7 +4363,7 @@ void MainWindow::PlatformSpecificTweaks()
     sizeMenuIcons();
 }
 
-void MainWindow::layout(PreviewPhoneType type) {
+void MainWindow::layout(PreviewPhoneType type, bool landscape) {
     if (m_epubPreviewer && m_epubPreviewer->isVisible()) {
         QMessageBox::information(this, "", u8"请先关闭当前预览窗口", QMessageBox::Ok);
         return;
@@ -4379,7 +4377,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 	}
     
     float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
-	QSize d_size = m_previewPhoneSizeMap[type];
+    QSize d_size = landscape ? QSize(m_previewPhoneSizeMap[type].height(), m_previewPhoneSizeMap[type].width()) : m_previewPhoneSizeMap[type];
     int screenHeight = QApplication::desktop()->screenGeometry().size().height();
     float height = d_size.height() / ratio > screenHeight ? screenHeight - 100 : d_size.height() / ratio;
     float width = (float(d_size.width()) / d_size.height()) * height / ratio;
@@ -4426,7 +4424,7 @@ void MainWindow::layout(PreviewPhoneType type) {
     m_previewerToEpubContainer->setStyleSheet("background-color:;"); // used for relayout the view;
     //update content
 	std::string emptyStr = "";
-    m_epubPreviewer->reloadEPUB(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
+    m_epubPreviewer->reloadEPUB(emptyStr, m_CurrentFilePath.toStdString(), "", QSize(width, height));
 	m_previewEPUBDock->show();
 	m_epubPreviewer->setFocus();
 }
@@ -5060,6 +5058,7 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(ui.actionIPhoneX, SIGNAL(triggered()), this, SLOT(previewForIphoneX()));
 	connect(ui.actionXiaoMi, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
 	connect(ui.actionIPad, SIGNAL(triggered()), this, SLOT(previewForIpad()));
+    connect(ui.actionIPad_landscape, SIGNAL(triggered()), this, SLOT(previewForIpadLandscape()));
 	connect(ui.actionIPhone5_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone5()));
 	connect(ui.actionIPhone6_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone6()));
 	connect(ui.actionIPhone6P_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone6P()));
@@ -5245,13 +5244,23 @@ void MainWindow::ConnectSignalsToSlots()
 }
 
 void MainWindow::fileSavedSuccessAction() {
-	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+	if (m_previewerToHTML && m_previewerToHTML->isVisible() && !m_willClose) {
         if (dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource())) {
             m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true, QSize(0,0));
         } else {
             m_previewerToHTML->reloadHTML("", true, QSize(0,0));
         }
+        return;
 	}
+    if (m_previewEPUBDock && m_previewEPUBDock->isVisible() && !m_willClose) {
+        HTMLResource* htmlRes = dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource());
+        std::string jumpPath("");
+        if (htmlRes) {
+            jumpPath = htmlRes->GetRelativePathToRoot().toStdString();
+        }
+        m_epubPreviewer->reloadEPUB("", m_CurrentFilePath.toStdString(), jumpPath);
+        return;
+    }
 }
 
 void MainWindow::MakeTabConnections(ContentTab *tab)

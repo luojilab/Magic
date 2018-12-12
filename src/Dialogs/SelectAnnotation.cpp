@@ -30,25 +30,27 @@ SOFTWARE.
 #include "ui_SelectAnnotation.h"
 #include "ViewEditors/CodeViewEditor.h"
 
-#define DEFAULT_ICON_SRC "../Images/AnnoIcon0.png"
+const QString S_dedaultIconSrc = QString("../Images/AnnoIcon0.png");
+const QString S_annoPre = QString("<img class=\"epub-footnote\" src=\"");
+const QString S_annoInf = QString("\" alt=\"");
+const QString S_annoSuf = QString("\" />");
 
-SelectAnnotation::SelectAnnotation(QString href,
+SelectAnnotation::SelectAnnotation(/* QString href,
                                    HTMLResource *htmlResource,
                                    QList<Resource *> resources,
-                                   QSharedPointer<Book> book,
+                                   QSharedPointer<Book> book, */
                                    QWidget *parent)
     : QDialog(parent),
       ui(new Ui::SelectAnnotation),
-      mHTMLResource(htmlResource),
-      mResources(resources),
-      mBook(book),
-      mAnnoText(QString()),
-      mAnnoIcon(tr(DEFAULT_ICON_SRC))
+      /* m_HTMLResource(htmlResource),
+      m_Resources(resources),
+      m_Book(book), */
+      m_AnnoText(QString()),
+      m_AnnoIcon(S_dedaultIconSrc)
 {
     ui->setupUi(this);
     
     connectSignalsSlots();
-    readSettings();
 }
 
 SelectAnnotation::~SelectAnnotation()
@@ -56,36 +58,22 @@ SelectAnnotation::~SelectAnnotation()
     delete ui;
 }
 
-// insert annotation into html file
 int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView)
 {
-    // TODO...
-    // QString annoIcon = tr("../Images/AnnoIcon0.png");
-    QString annoPre = tr("<img class=\"epub-footnote\" src=\"");
-    QString annoInf = tr("\" alt=\"");
-    QString annoSuf = tr("\" />");
-    QString annotation = annoPre + annoIcon + annoInf + annoText + annoSuf;
+    QString annotation = S_annoPre + annoIcon + S_annoInf + annoText + S_annoSuf;
     
-    // insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText()
+    // Insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText().
     codeView->insertPlainText(annotation);
 
     return 0;
 }
 
-// private slots:
-void SelectAnnotation::writeSettings()
+void SelectAnnotation::getInput()
 {
-    mAnnoText = ui->AnnoText->toPlainText();
-    // TODO
-}
-
-// private:
-void SelectAnnotation::readSettings()
-{
-    // TODO
+    m_AnnoText = ui->annoTextEdit->toPlainText();
 }
 
 void SelectAnnotation::connectSignalsSlots()
 {
-    connect(this, SIGNAL(accepted()), this, SLOT(writeSettings()));
+    connect(this, SIGNAL(accepted()), this, SLOT(getInput()));
 }

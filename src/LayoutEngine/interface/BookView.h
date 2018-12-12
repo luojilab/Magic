@@ -11,6 +11,26 @@ class QImage;
 namespace WebCore {
     typedef QImage* NativeImagePtr;
 }
+class BookViewParameter {
+public:
+    BookViewParameter()
+    : width(0)
+    , height (0)
+    , marginTop(0)
+    , marginBottom(0) {}
+    
+    void SetInvalid() {
+        width = -1;
+        height = -1;
+        marginTop = -1;
+        marginBottom = -1;
+    }
+
+    int width;
+    int height;
+    int marginTop;
+    int marginBottom;
+};
 
 namespace future_core {
     class BookReader;
@@ -27,14 +47,20 @@ namespace future_core {
 
         void UpdateView(int code);
 
-        virtual void SetPaintSize(int width, int height) = 0;
-
+        virtual void SetPaintSize(int width, int height);   //need call in override.
+        virtual void SetViewTopMargin(int topMargin);   //need call in override.
+        virtual void SetViewBottomMargin(int bottomMargin); //need call in override.
+        
         virtual int GetWidth();
 
         virtual int GetHeight();
 
         virtual float GetDensity() = 0;
 
+        void UseBeforeSettingParameter();
+        void UseNormalParameter();
+        void ClearSavedParameter();
+        
     protected:
         virtual ~BookView();
 
@@ -50,11 +76,19 @@ namespace future_core {
         virtual void
         ImageOnClicked(WebCore::NativeImagePtr, int, int, int, int);
 
+        virtual void
+        NoteImageOnClicked(const std::string &altStr,
+                           int x,
+                           int y,
+                           int width,
+                           int height);
+        
     protected:
         future_core::BookReader *m_BookReader;
         float m_Density;
-        int m_Width;
-        int m_Height;
+
+        BookViewParameter m_Param;
+        BookViewParameter m_BeforeSettingParam;
     };
 }
 
