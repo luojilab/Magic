@@ -41,12 +41,11 @@ SelectAnnotation::SelectAnnotation(/* QString href,
                                    QSharedPointer<Book> book, */
                                    QWidget *parent)
     : QDialog(parent),
-      ui(new Ui::SelectAnnotation),
       /* m_HTMLResource(htmlResource),
       m_Resources(resources),
       m_Book(book), */
-      m_AnnoText(QString()),
-      m_AnnoIcon(S_dedaultIconSrc)
+      m_AnnoIcon(S_dedaultIconSrc),
+      ui(new Ui::SelectAnnotation)
 {
     ui->setupUi(this);
     
