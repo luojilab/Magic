@@ -45,17 +45,17 @@
       </property>
       <item>
        <widget class="QGraphicsView" name="iconView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="maximumSize">
          <size>
           <width>160</width>
           <height>160</height>
          </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="interactive">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
