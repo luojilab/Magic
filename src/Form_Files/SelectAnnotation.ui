@@ -66,29 +66,15 @@
         </property>
         <item>
          <widget class="QPushButton" name="backgroundColor">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
-           <string>背景色
-Background Color</string>
+           <string>背景色</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="foregroundColor">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="text">
-           <string>前景色
-Foreground Color</string>
+           <string>前景色</string>
           </property>
          </widget>
         </item>
