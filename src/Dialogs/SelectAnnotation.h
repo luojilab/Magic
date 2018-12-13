@@ -30,7 +30,10 @@ SOFTWARE.
 #define SELECTANNOTATION_H
 
 #include <QDialog>
+#include <QGraphicsScene>
+#include <QSvgRenderer>
 
+#include "ui_SelectAnnotation.h"
 #include "ResourceObjects/Resource.h"
 #include "BookManipulation/Book.h"
 #include "MainUI/MainWindow.h"
@@ -44,14 +47,14 @@ class SelectAnnotation;
 // SelectAnnotation functions:
 // 1. Open a dialog to get annotation text.
 // 2. A static function to insert annotation code.
-// TODO: 3. get foreground and background colors to generate icon.
+// 3. get foreground and background colors to generate icon.
 // TODO: 4. Detect and replace selected superscript with corresponding footnote.
 // TODO: 5. Automatically detect footnotes and replace in-text references.
 class SelectAnnotation : public QDialog
 {
     Q_OBJECT
 
-  public:
+public:
     explicit SelectAnnotation(/* QString &href,
                               HTMLResource *htmlResource,
                               QList<Resource *> &resources,
@@ -59,20 +62,35 @@ class SelectAnnotation : public QDialog
                               QWidget *parent = 0);
     ~SelectAnnotation();
 
-    QString getText() { return m_AnnoText; }
-    QString getIcon() { return m_AnnoIcon; }
+    QString getText() { return m_annoText; }
+    QString getIcon() { return m_iconSrc; }
 
     // Insert annotation code to html file.
     static int insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView);
-
-  private slots:
+    
+private slots:
+    void selectBgColor() { selectColor(m_bgColor, ui->backgroundColor); }
+    void selectFgColor() { selectColor(m_fgColor, ui->foregroundColor); }
     void getInput();
+    void saveIcon();
 
-  private:
+private:
+    void initSvg();
+    void initUI();
+    void selectColor(QString &colorMemeber, QPushButton *colorButtion);
+    void renderButton(QString &colorMember, QPushButton *colorButton);
+    void renderIcon();
     void connectSignalsSlots();
 
-    QString m_AnnoText;
-    QString m_AnnoIcon;
+    QString m_annoText;
+    QString m_iconSrc;
+    QString m_bgColor;
+    QString m_fgColor;
+    QImage m_iconImg;
+    QByteArray m_svgBytes;
+    QSvgRenderer m_renderer;
+    QPainter m_painter;
+    QGraphicsScene m_graphScene;
 
     // Resources for future work.
     /*
