@@ -37,7 +37,7 @@ SOFTWARE.
 #include <QByteArray>                   // Store and modify SVG data
 #include <QMessageBox>                  // QMessageBox::Warning()
 
-const QString S_iconSvgSrc = QString("/Users/luojilab/Documents/GitHub/MagicBuild/Books/AnnoIcon0.svg");
+const QString S_iconSvgSrc = QString(":icon/AnnoIcon.svg");
 const QString S_iconSavePath = QString("AnnoIcon0.png");
 const QString S_srcBgColor = QString("#000000");
 const QString S_srcFgColor = QString("#FFFFFF");
