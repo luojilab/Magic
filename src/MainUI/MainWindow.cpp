@@ -1913,7 +1913,7 @@ void MainWindow::insertAnnotation()
     */
 
     // Open a dialog to get text and icon input.
-    SelectAnnotation selectAnnotation(/* href, htmlResource, resources, m_Book, */ this);
+    SelectAnnotation selectAnnotation(/* href, htmlResource, resources, */ m_Book, m_BookBrowser, this);
 
     if (selectAnnotation.exec() != QDialog::Accepted) {
         return;

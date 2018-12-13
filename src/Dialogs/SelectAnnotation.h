@@ -57,8 +57,9 @@ class SelectAnnotation : public QDialog
 public:
     explicit SelectAnnotation(/* QString &href,
                               HTMLResource *htmlResource,
-                              QList<Resource *> &resources,
-                              QSharedPointer<Book> book, */
+                              QList<Resource *> &resources, */
+                              QSharedPointer<Book> book,
+                              BookBrowser *bookBrowser,
                               QWidget *parent = 0);
     ~SelectAnnotation();
 
@@ -72,13 +73,12 @@ private slots:
     void selectBgColor() { selectColor(m_bgColor, ui->backgroundColor); }
     void selectFgColor() { selectColor(m_fgColor, ui->foregroundColor); }
     void getInput();
-    void saveIcon();
+    void addIconFile();
 
 private:
     void initSvg();
     void initUI();
     void selectColor(QString &colorMemeber, QPushButton *colorButtion);
-    void renderButton(QString &colorMember, QPushButton *colorButton);
     void renderIcon();
     void connectSignalsSlots();
 
@@ -93,13 +93,16 @@ private:
     QGraphicsScene m_graphScene;
 
     // Resources for future work.
-    /*
-    HTMLResource *m_HTMLResource;
-    QList<Resource *> &m_Resources;
-    QSharedPointer<Book> m_Book;
-    */
+    /* HTMLResource *m_HTMLResource;
+    QList<Resource *> &m_Resources; */
+    QSharedPointer<Book> m_book;
+    BookBrowser *m_bookBroswer;
 
     Ui::SelectAnnotation *ui;
+    
+    static QString S_lastBgColor;
+    static QString S_lastFgColor;
+    static bool annoIconAdded;
 };
 
 #endif // SELECTANNOTATION_H

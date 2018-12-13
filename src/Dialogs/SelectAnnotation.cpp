@@ -29,11 +29,13 @@ SOFTWARE.
 #include "SelectAnnotation.h"
 #include "ui_SelectAnnotation.h"
 #include "ViewEditors/CodeViewEditor.h" // QPlainTextEdit::insertPlainText()
+#include "MainUI/BookBrowser.h"         // BookBrowser::Refresh()
 
 #include <QSvgRenderer>                 // Render SVG graph
 #include <QColorDialog>                 // QColorDialog::getColor()
 #include <QFile>                        // Read SVG file
 #include <QByteArray>                   // Store and modify SVG data
+#include <QMessageBox>                  // QMessageBox::Warning()
 
 const QString S_iconSvgSrc = QString("/Users/luojilab/Documents/GitHub/MagicBuild/Books/AnnoIcon0.svg");
 const QString S_iconSavePath = QString("AnnoIcon0.png");
@@ -45,13 +47,15 @@ const QString S_annoPre = QString("<img class=\"epub-footnote\" src=\"");
 const QString S_annoInf = QString("\" alt=\"");
 const QString S_annoSuf = QString("\" />");
 
-QString S_lastBgColor = QString("#998181");
-QString S_lastFgColor = QString("#FFFFFF");
+QString SelectAnnotation::S_lastBgColor = QString("#998181");
+QString SelectAnnotation::S_lastFgColor = QString("#FFFFFF");
+bool SelectAnnotation::annoIconAdded = false;
 
 SelectAnnotation::SelectAnnotation(/* QString href,
                                    HTMLResource *htmlResource,
-                                   QList<Resource *> resources,
-                                   QSharedPointer<Book> book, */
+                                   QList<Resource *> resources, */
+                                   QSharedPointer<Book> book,
+                                   BookBrowser *bookBrowser,
                                    QWidget *parent)
     : QDialog(parent),
       m_iconSrc(S_defaultIconSrc),
@@ -60,8 +64,9 @@ SelectAnnotation::SelectAnnotation(/* QString href,
       m_iconImg(S_iconSize, QImage::Format_ARGB32),
       m_painter(&m_iconImg),
       /* m_HTMLResource(htmlResource),
-      m_Resources(resources),
-      m_Book(book), */
+      m_Resources(resources), */
+      m_book(book),
+      m_bookBroswer(bookBrowser),
       ui(new Ui::SelectAnnotation)
 {
     initSvg();
@@ -103,10 +108,8 @@ void SelectAnnotation::initUI()
     m_graphScene.setBackgroundBrush(Qt::white);
     ui->iconView->setScene(&m_graphScene);
     
-    // Render default icon and button
+    // Render default icon
     renderIcon();
-    renderButton(m_bgColor, ui->backgroundColor);
-    renderButton(m_fgColor, ui->foregroundColor);
 }
 
 void SelectAnnotation::getInput()
@@ -121,13 +124,7 @@ void SelectAnnotation::selectColor(QString &colorMember, QPushButton *colorButto
     {
         colorMember = temp.name();
         renderIcon();
-        renderButton(colorMember, colorButton);
     }
-}
-
-void SelectAnnotation::renderButton(QString &colorMember, QPushButton *colorButton)
-{
-    colorButton->setStyleSheet("background-color: " + colorMember + "; border: none;");
 }
 
 void SelectAnnotation::renderIcon()
@@ -147,15 +144,26 @@ void SelectAnnotation::renderIcon()
     m_graphScene.addPixmap(QPixmap::fromImage(m_iconImg));
 }
 
-void SelectAnnotation::saveIcon()
+void SelectAnnotation::addIconFile()
 {
     // Save image, format based on file extension
     m_iconImg.save(S_iconSavePath);
     
-    // Add icon file to epub using addExsistingFile
-    if (/* icon file not exist */1)
+    // Add icon file to epub
+    if (!annoIconAdded)
     {
-        /* addExsistingFile() */;
+        Resource *iconImg = m_book->GetFolderKeeper()->AddContentFileToFolder(S_iconSavePath);
+        if (!iconImg)
+        {
+            QMessageBox::warning(this, tr("Magic"), tr("添加文件失败。Adding File Failed. (AnnoErr4)"));
+            return;
+        }
+        
+        // Signals and function from BookBrowser
+        //emit ResourcesAdded();
+        //emit BookContentModified();
+        m_bookBroswer->Refresh();
+        annoIconAdded = true;
     }
 }
 
@@ -164,5 +172,5 @@ void SelectAnnotation::connectSignalsSlots()
     connect(ui->backgroundColor, SIGNAL(clicked()), this, SLOT(selectBgColor()));
     connect(ui->foregroundColor, SIGNAL(clicked()), this, SLOT(selectFgColor()));
     connect(this, SIGNAL(accepted()), this, SLOT(getInput()));
-    connect(this, SIGNAL(accepted()), this, SLOT(saveIcon()));
+    connect(this, SIGNAL(accepted()), this, SLOT(addIconFile()));
 }
