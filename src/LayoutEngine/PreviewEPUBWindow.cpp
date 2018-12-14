@@ -98,6 +98,7 @@ void PreviewEPUBWindow::reloadEPUB(const std::string& bundlePath, const std::str
         });
 	} else {
         if (m_bookReader != NULL) {
+            // Not close preview window
             closeBase();
             LayoutEngine::GetEngine()->closeEpub(m_bookReader, [=](){
                 bookViewCoreInitial();
@@ -113,7 +114,9 @@ void PreviewEPUBWindow::reloadEPUB(const std::string& bundlePath, const std::str
             });
             m_bookReader = 0;
 		} else {
+            // have close preview window and reopen
 			m_epubPath = epubPath;
+            m_defaultSize = defaultSize;
 			LayoutEngine* engine = LayoutEngine::GetEngine();
 			bookViewCoreInitial();
 			engine->openEpub(m_viewCore, m_epubPath, "", "", [=](BookReader* bookReader, int ecode) {
