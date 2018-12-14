@@ -38,7 +38,8 @@ SOFTWARE.
 #include <QMessageBox>                  // QMessageBox::Warning()
 
 const QString S_iconSvgSrc = QString(":icon/AnnoIcon.svg");
-const QString S_iconSavePath = QString("AnnoIcon0.png");
+const QString S_iconSaveName = QString("AnnoIcon0.png");
+const QString S_annotationStylesheetPath = QString(":icon/AnnotationStyles.css");
 const QString S_srcBgColor = QString("#000000");
 const QString S_srcFgColor = QString("#FFFFFF");
 const QSize S_iconSize = QSize(100, 100);
@@ -46,16 +47,19 @@ const QString S_defaultIconSrc = QString("../Images/AnnoIcon0.png");
 const QString S_annoPre = QString("<img class=\"epub-footnote\" src=\"");
 const QString S_annoInf = QString("\" alt=\"");
 const QString S_annoSuf = QString("\" />");
+const QString S_annoStyleLink = QString("<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />");
 
 QString SelectAnnotation::S_lastBgColor = QString("#998181");
 QString SelectAnnotation::S_lastFgColor = QString("#FFFFFF");
-bool SelectAnnotation::annoIconAdded = false;
+bool SelectAnnotation::S_annoIconAdded = false;
+bool SelectAnnotation::S_annoStylesheetAdded = false;
 
 SelectAnnotation::SelectAnnotation(/* QString href,
                                    HTMLResource *htmlResource,
                                    QList<Resource *> resources, */
                                    QSharedPointer<Book> book,
                                    BookBrowser *bookBrowser,
+                                   CodeViewEditor *codeView,
                                    QWidget *parent)
     : QDialog(parent),
       m_iconSrc(S_defaultIconSrc),
@@ -67,6 +71,7 @@ SelectAnnotation::SelectAnnotation(/* QString href,
       m_Resources(resources), */
       m_book(book),
       m_bookBroswer(bookBrowser),
+      m_codeView(codeView),
       ui(new Ui::SelectAnnotation)
 {
     initSvg();
@@ -133,10 +138,18 @@ void SelectAnnotation::renderIcon()
     m_iconImg.fill(0x00000000);
     
     // Replace color old colors with new colors
-    m_svgBytes.replace(S_lastBgColor, m_bgColor.toUtf8());
-    m_svgBytes.replace(S_lastFgColor, m_fgColor.toUtf8());
-    S_lastBgColor = m_bgColor;
-    S_lastFgColor = m_fgColor;
+    if (S_lastBgColor != m_bgColor)
+    {
+        m_svgBytes.replace(S_lastBgColor, m_bgColor.toUtf8());
+        S_lastBgColor = m_bgColor;
+        S_annoIconAdded = false;
+    }
+    if (S_lastFgColor != m_fgColor)
+    {
+        m_svgBytes.replace(S_lastFgColor, m_fgColor.toUtf8());
+        S_lastFgColor = m_fgColor;
+        S_annoIconAdded = false;
+    }
     
     // Render new graph
     m_renderer.load(m_svgBytes);
@@ -146,24 +159,52 @@ void SelectAnnotation::renderIcon()
 
 void SelectAnnotation::addIconFile()
 {
-    // Save image, format based on file extension
-    m_iconImg.save(S_iconSavePath);
-    
-    // Add icon file to epub
-    if (!annoIconAdded)
+    if (!S_annoIconAdded)
     {
-        Resource *iconImg = m_book->GetFolderKeeper()->AddContentFileToFolder(S_iconSavePath);
+        // Save image, format based on file extension
+        m_iconImg.save(S_iconSaveName);
+        
+        // Add icon and stylesheet file to epub
+        Resource *iconImg = m_book->GetFolderKeeper()->AddContentFileToFolder(S_iconSaveName);
         if (!iconImg)
         {
-            QMessageBox::warning(this, tr("Magic"), tr("添加文件失败。Adding File Failed. (AnnoErr4)"));
+            QMessageBox::warning(this, tr("Magic"), tr("添加图标文件失败。Adding Icon File Failed. (AnnoErr4)"));
+            return;
+        }
+        S_annoIconAdded = true;
+    }
+    
+    if (!S_annoStylesheetAdded)
+    {
+        Resource *annoStyle = m_book->GetFolderKeeper()->AddContentFileToFolder(S_annotationStylesheetPath);
+        if (!annoStyle)
+        {
+            QMessageBox::warning(this, tr("Magic"), tr("添加样式文件失败。Adding CSS file failed. (AnnoErr5)"));
+            return;
+        }
+        addStylesheetLink();
+        S_annoStylesheetAdded = true;
+    }
+    
+    // Refresh view to display newly added files
+    m_bookBroswer->Refresh();
+}
+
+void SelectAnnotation::addStylesheetLink()
+{
+    QTextCursor initialCursor = m_codeView->textCursor();
+    bool linkFound = m_codeView->find(S_annoStyleLink, QTextDocument::FindBackward);
+    if (!linkFound)
+    {
+        bool headFound = m_codeView->find("</head>", QTextDocument::FindBackward);
+        if (!headFound)
+        {
+            QMessageBox::warning(this, tr("Magic"), tr("未找到head标签。Tag head not found. (AnnoErr6)"));
             return;
         }
         
-        // Signals and function from BookBrowser
-        //emit ResourcesAdded();
-        //emit BookContentModified();
-        m_bookBroswer->Refresh();
-        annoIconAdded = true;
+        m_codeView->textCursor().insertText(S_annoStyleLink + tr("\n</head>"));
+        m_codeView->setTextCursor(initialCursor);
     }
 }
 

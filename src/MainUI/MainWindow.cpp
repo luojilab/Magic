@@ -1905,6 +1905,12 @@ void MainWindow::insertAnnotation()
         return;
     }
 
+    CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
+    if (!codeView) {
+        QMessageBox::warning(this, tr("Magic"), tr("代码视图编辑器获取失败。Get CodeViewEditor failed. (AnnoErr1)"));
+        return;
+    }
+    
     // Reserved for future work.
     /*
     QString href = flowTab->GetAttributeHref();
@@ -1913,7 +1919,7 @@ void MainWindow::insertAnnotation()
     */
 
     // Open a dialog to get text and icon input.
-    SelectAnnotation selectAnnotation(/* href, htmlResource, resources, */ m_Book, m_BookBrowser, this);
+    SelectAnnotation selectAnnotation(/* href, htmlResource, resources, */ m_Book, m_BookBrowser, codeView, this);
 
     if (selectAnnotation.exec() != QDialog::Accepted) {
         return;
@@ -1923,13 +1929,7 @@ void MainWindow::insertAnnotation()
     QString annoIcon = selectAnnotation.getIcon();
 
     if (annoText.isEmpty()) {
-        QMessageBox::warning(this, tr("Magic"), tr("输入文本为空。Input text is empty. (AnnoErr1)"));
-        return;
-    }
-
-    CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
-    if (!codeView) {
-        QMessageBox::warning(this, tr("Magic"), tr("代码视图编辑器获取失败。Get CodeViewEditor failed. (AnnoErr2)"));
+        QMessageBox::warning(this, tr("Magic"), tr("输入文本为空。Input text is empty. (AnnoErr2)"));
         return;
     }
 

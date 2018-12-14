@@ -60,6 +60,7 @@ public:
                               QList<Resource *> &resources, */
                               QSharedPointer<Book> book,
                               BookBrowser *bookBrowser,
+                              CodeViewEditor *codeView,
                               QWidget *parent = 0);
     ~SelectAnnotation();
 
@@ -80,6 +81,7 @@ private:
     void initUI();
     void selectColor(QString &colorMemeber, QPushButton *colorButtion);
     void renderIcon();
+    void addStylesheetLink();
     void connectSignalsSlots();
 
     QString m_annoText;
@@ -97,12 +99,14 @@ private:
     QList<Resource *> &m_Resources; */
     QSharedPointer<Book> m_book;
     BookBrowser *m_bookBroswer;
+    CodeViewEditor *m_codeView;
 
     Ui::SelectAnnotation *ui;
     
     static QString S_lastBgColor;
     static QString S_lastFgColor;
-    static bool annoIconAdded;
+    static bool S_annoIconAdded;
+    static bool S_annoStylesheetAdded;
 };
 
 #endif // SELECTANNOTATION_H
