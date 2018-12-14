@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 **
 **  Copyright (C) 2016 Kevin B. Hendricks, Stratford, Ontario Canada
 **  Copyright (C) 2012-2015 John Schember <john@nachtimwald.com>
@@ -3831,7 +3831,7 @@ void MainWindow::changePreviewContent()
 	}
     if (m_previewEPUBDock && m_previewEPUBDock->isVisible()) {
 		m_previewEPUBDock->close();
-		layout(iPhone5);
+		//layout(iPhone5);
     }
     if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
 		m_previewerToHTML->close();
