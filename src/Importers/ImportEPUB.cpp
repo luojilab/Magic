@@ -150,7 +150,11 @@ QSharedPointer<Book> ImportEPUB::GetBook(bool extract_metadata)
 
     // These read the EPUB file
     QStringList extracted = ExtractContainer();
-    bool bookStandard = BookStandardForMagic(extracted);
+#ifdef WIN32
+	bool bookStandard = false;
+#else
+	bool bookStandard = BookStandardForMagic(extracted);
+#endif // WIN32
     if (bookStandard) {
         m_Book->createFoldkeeper(m_ExtractedFolderPath);
         m_Book->GetFolderKeeper()->AddReferenceToTempFolder(m_TempFolder);

@@ -28,8 +28,6 @@ PreviewEPUBWindow::PreviewEPUBWindow(QWidget* parent,const std::string& bundlePa
     float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
 	LayoutEngine::GetEngine()->SetViewTopMargin(margin / ratio);
 	LayoutEngine::GetEngine()->SetViewBottomMargin(margin / ratio);
-//    LayoutEngine::GetEngine()->setSelectionBackgroundColor(QColor(255,0,0));
-//    LayoutEngine::GetEngine()->setCaretColor(QColor(0,255,0));
 	setFocusPolicy(Qt::ClickFocus);
     bookViewCoreInitial();
 	connect(this, SIGNAL(putTextIntoClipboard(QString)), this, SLOT(setClipboard(QString)));
@@ -42,7 +40,7 @@ PreviewEPUBWindow::~PreviewEPUBWindow()
 }
 
 void PreviewEPUBWindow::paintEvent(QPaintEvent *) {
-    if ( !m_viewCore ) {
+    if ( !m_viewCore && !m_bookReader ) {
         return;
     }
     m_viewCore->onDraw();
@@ -114,7 +112,14 @@ void PreviewEPUBWindow::reloadEPUB(const std::string& bundlePath, const std::str
                 });
             });
             m_bookReader = 0;
-        }
+		} else {
+			m_epubPath = epubPath;
+			LayoutEngine* engine = LayoutEngine::GetEngine();
+			bookViewCoreInitial();
+			engine->openEpub(m_viewCore, m_epubPath, "", "", [=](BookReader* bookReader, int ecode) {
+				engineOpenBookFinish(bookReader, ecode);
+			});
+		}
 	}
 }
 
