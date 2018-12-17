@@ -164,6 +164,26 @@ void SelectAnnotation::addIconFile()
         // Save image, format based on file extension
         m_iconImg.save(S_iconSaveName);
         
+        // If the file already exists, delete the old one.
+        QStringList currentFilenames = m_book->GetFolderKeeper()->GetAllFilenames();
+        if (currentFilenames.contains(S_iconSaveName, Qt::CaseInsensitive ))
+        {
+            QMessageBox::StandardButton buttonPressed;
+            buttonPressed = QMessageBox::warning(this, tr("Magic"), tr("文件\"%1\"已存在，是否替换？\nThe file \"%1\" already exists in the book.\nOK to replace?").arg(S_iconSaveName), QMessageBox::Ok | QMessageBox::Cancel);
+            if (buttonPressed == QMessageBox::Ok)
+            {
+                Resource *oldFile = m_book->GetFolderKeeper()->GetResourceByFilename(S_iconSaveName);
+                if (oldFile)
+                {
+                    oldFile->Delete();
+                }
+                else
+                {
+                    QMessageBox::warning(this, tr("Magic"), tr("未找到文件"));
+                }
+            }
+        }
+        
         // Add icon and stylesheet file to epub
         Resource *iconImg = m_book->GetFolderKeeper()->AddContentFileToFolder(S_iconSaveName);
         if (!iconImg)
@@ -182,9 +202,9 @@ void SelectAnnotation::addIconFile()
             QMessageBox::warning(this, tr("Magic"), tr("添加样式文件失败。Adding CSS file failed. (AnnoErr5)"));
             return;
         }
-        addStylesheetLink();
         S_annoStylesheetAdded = true;
     }
+    addStylesheetLink();
     
     // Refresh view to display newly added files
     m_bookBroswer->Refresh();
@@ -204,8 +224,8 @@ void SelectAnnotation::addStylesheetLink()
         }
         
         m_codeView->textCursor().insertText(S_annoStyleLink + tr("\n</head>"));
-        m_codeView->setTextCursor(initialCursor);
     }
+    m_codeView->setTextCursor(initialCursor);
 }
 
 void SelectAnnotation::connectSignalsSlots()
