@@ -90,7 +90,6 @@ private:
     QString m_fgColor;
     QImage m_iconImg;
     QByteArray m_svgBytes;
-    QSvgRenderer m_renderer;
     QPainter m_painter;
     QGraphicsScene m_graphScene;
 
