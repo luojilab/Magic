@@ -169,13 +169,13 @@ bool CSSParser::parse() {
 					} else {
 						node->head->setRuleData(token->data);
 						node->head->setHostCSSFilePath(m_hostCssFile);
-						m_selectors.insert(node->head);
+                        m_selectors.push_back(node->head);
 					}
 					delete result;
 					LRMtranverseAST(*it++, cleanASTTree);
 				}
 				if (isGroupSelector) {
-					m_selectors.insert(group);
+					m_selectors.push_back(group);
 					group->setRuleData(token->data);
 					group->setHostCSSFilePath(m_hostCssFile);
 				}
@@ -724,7 +724,7 @@ bool CSSParser::topHaveSign(std::stack<Selector *>& stack) {
 	return topSelector->getType() == Selector::SignSelector;
 }
 
-std::set<Selector *> CSSParser::getSelectors() {
+std::list<Selector *> CSSParser::getSelectors() {
 	return m_selectors;
 }
 

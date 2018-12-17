@@ -51,7 +51,7 @@ namespace future {
         /**
          * Get the selector models
          */
-        std::set<Selector *>       getSelectors();
+        std::list<Selector *>       getSelectors();
         
         /**
          * Get the Keyworld models
@@ -104,7 +104,7 @@ namespace future {
         Lex*                        m_lexer;
         CSSParserStatus             m_status;
         std::string                 m_hostCssFile;
-        std::set<Selector *>       m_selectors;
+        std::list<Selector *>       m_selectors;
         std::list<KeywordItem *>    m_keywords;
         std::list<Selector *> 		 m_signSelecors;
     };
