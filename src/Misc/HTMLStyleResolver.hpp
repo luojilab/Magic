@@ -38,11 +38,6 @@ private:
     using SelectorCacheType = QMap<QString, QList<QSharedPointer<future::Selector> > >;
     SelectorCacheType m_cache;
     QString m_currentHTMLDir;
-private:
-    struct StyleContainer {
-        QSharedPointer<future::Selector> selector;
-        HTMLTagStylesType styleRules;
-    };
 };
 
 #endif /* HTMLStyleResolver_hpp */

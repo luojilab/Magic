@@ -43,7 +43,7 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
     if (allSelectors.empty()) {
         return styles;
     }
-    std::list<StyleContainer> filterStyles;
+    std::list<std::pair<QSharedPointer<future::Selector>, HTMLTagStylesType> > filterStyles;
     for (auto selector : allSelectors) {
         GumboNode *internalNode = (GumboNode *)node;
         future::HTMLCSSRefAdaptor::GumboArray nodesArray = &internalNode;
@@ -55,36 +55,38 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
             }
         }
     }
+    const int SELECTOR = 0, STYLE_RULES_MAP = 1;
+    const int STYLE_KEY = 0, STYLE_VALUE = 1;
     QMap<QString, QPair<QSharedPointer<future::Selector>, QString> >lastFilter;
     auto tagStyleAttributes = scanCSSRule(getNodeAttribute(node, S_kStyle)).toStdMap();
     std::for_each(tagStyleAttributes.begin(), tagStyleAttributes.end(), [&](const std::pair<QString, QString>& kv) {
-        lastFilter[kv.first] = {QSharedPointer<future::Selector>(nullptr), kv.second};
+        lastFilter[std::get<STYLE_KEY>(kv)] = {QSharedPointer<future::Selector>(nullptr), std::get<STYLE_VALUE>(kv)};
     });
-    std::for_each(filterStyles.rbegin(), filterStyles.rend(), [&](const StyleContainer& style) {
-        auto rules = style.styleRules.toStdMap();
+    std::for_each(filterStyles.rbegin(), filterStyles.rend(), [&](const std::pair<QSharedPointer<future::Selector>, HTMLTagStylesType>& style) {
+        auto rules = std::get<STYLE_RULES_MAP>(style).toStdMap();
         std::for_each(rules.begin(), rules.end(), [&](const std::pair<QString, QString>& kv) {
-            if (!lastFilter.contains(kv.first)) {
-                lastFilter[kv.first] = {style.selector, kv.second};
+            if (!lastFilter.contains(std::get<STYLE_KEY>(kv))) {
+                lastFilter[std::get<STYLE_KEY>(kv)] = {std::get<SELECTOR>(style), std::get<STYLE_VALUE>(kv)};
                 return;
             }
-            auto oldSelector = lastFilter[kv.first].first;
-            auto newSelector = style.selector;
-            auto oldValue = lastFilter[kv.first].second;
-            auto newValue = kv.second;
+            auto oldSelector = lastFilter[std::get<STYLE_KEY>(kv)].first;
+            auto newSelector = std::get<SELECTOR>(style);
+            auto oldValue = lastFilter[std::get<STYLE_KEY>(kv)].second;
+            auto newValue = std::get<STYLE_VALUE>(kv);
             // tag's style arrtirbute style have first priority
             if (oldSelector.data() == nullptr) {
                 return ;
             }
-            // have important
+            // have '!important'
             if (oldValue.endsWith(S_kImportant)) {
                 return ;
             } else if (newValue.endsWith(S_kImportant)) {
-                lastFilter[kv.first] = {style.selector, kv.second};
+                lastFilter[std::get<STYLE_KEY>(kv)] = {std::get<SELECTOR>(style), std::get<STYLE_VALUE>(kv)};
                 return ;
             }
             // weight
             if (newSelector->weight() > oldSelector->weight()) {
-                lastFilter[kv.first] = {style.selector, kv.second};
+                lastFilter[std::get<STYLE_KEY>(kv)] = {std::get<SELECTOR>(style), std::get<STYLE_VALUE>(kv)};
             }
             // order
             return ;
