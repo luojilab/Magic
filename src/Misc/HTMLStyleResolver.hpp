@@ -13,6 +13,7 @@
 #include <QList>
 #include <QMap>
 #include <QSharedPointer>
+#include <QWriteLocker>
 #include "Selector.hpp"
 
 using GumboNode = struct GumboInternalNode;
@@ -27,8 +28,8 @@ public:
     
 private:
     QList<const GumboNode *>getCSSTagsInorder(const GumboNode *root);
-    SelectorListType getTagSelectors(const GumboNode *);
-    SelectorListType getLinkTagSelectors(const GumboNode *);
+    SelectorListType getTagSelectors(const GumboNode *, const QString& htmlDir);
+    SelectorListType getLinkTagSelectors(const GumboNode *, const QString& htmlDir);
     SelectorListType getStyleTagSelectors(const GumboNode *);
     GumboNode* getRootOfTree(const GumboNode*);
     HTMLTagStylesType scanCSSRule(const QString& css);
@@ -37,7 +38,7 @@ private:
 private:
     using SelectorCacheType = QMap<QString, QList<QSharedPointer<future::Selector> > >;
     SelectorCacheType m_cache;
-    QString m_currentHTMLDir;
+    QReadWriteLock m_lock;
 };
 
 #endif /* HTMLStyleResolver_hpp */

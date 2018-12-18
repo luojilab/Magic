@@ -32,13 +32,13 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
         return styles;
     }
     
-    m_currentHTMLDir = QFileInfo(htmlRes->GetFullPath()).dir().absolutePath() + "/";
+    QString currentHTMLDir = QFileInfo(htmlRes->GetFullPath()).dir().absolutePath() + "/";
     
     GumboNode* root = getRootOfTree(node);
     QList<const GumboNode *>cssTags = getCSSTagsInorder(root);
     SelectorListType allSelectors;
     for (const GumboNode* styleNode : cssTags) {
-        allSelectors.append(getTagSelectors(styleNode));
+        allSelectors.append(getTagSelectors(styleNode, currentHTMLDir));
     }
     if (allSelectors.empty()) {
         return styles;
@@ -117,7 +117,7 @@ QList<const GumboNode *> HTMLStyleResolver::getCSSTagsInorder(const GumboNode *r
     return tags;
 }
 
-SelectorListType HTMLStyleResolver::getTagSelectors(const GumboNode *node) {
+SelectorListType HTMLStyleResolver::getTagSelectors(const GumboNode *node, const QString& htmlDir) {
     QList<QSharedPointer<future::Selector> >selectors;
     if (!node) {
         return selectors;
@@ -127,7 +127,7 @@ SelectorListType HTMLStyleResolver::getTagSelectors(const GumboNode *node) {
     }
     switch (node->v.element.tag) {
         case GUMBO_TAG_LINK: {
-            selectors = getLinkTagSelectors(node);
+            selectors = getLinkTagSelectors(node, htmlDir);
             break;
         }
         case GUMBO_TAG_STYLE: {
@@ -141,7 +141,7 @@ SelectorListType HTMLStyleResolver::getTagSelectors(const GumboNode *node) {
     return selectors;
 }
 
-SelectorListType HTMLStyleResolver::getLinkTagSelectors(const GumboNode *node) {
+SelectorListType HTMLStyleResolver::getLinkTagSelectors(const GumboNode *node, const QString& htmlDir) {
     SelectorListType selectors;
     if (!node ||
         node->type != GUMBO_NODE_ELEMENT ||
@@ -153,10 +153,13 @@ SelectorListType HTMLStyleResolver::getLinkTagSelectors(const GumboNode *node) {
     }
     QString href = getNodeAttribute(node, S_kHref);
     if (!href.startsWith("/")) {
-        href = QDir::cleanPath(m_currentHTMLDir + href);
+        href = QDir::cleanPath(htmlDir + href);
     }
-    if (m_cache.contains(href)) {
-        return m_cache[href];
+    {
+        QReadLocker locker(&m_lock);
+        if (m_cache.contains(href)) {
+            return m_cache[href];
+        }
     }
     if (!QFileInfo::exists(href)) {
         return selectors;
@@ -168,7 +171,11 @@ SelectorListType HTMLStyleResolver::getLinkTagSelectors(const GumboNode *node) {
         selectors.push_back(QSharedPointer<future::Selector>(s));
     }
     if (!selectors.empty()) {
-        m_cache[href] = selectors;
+        {
+            QWriteLocker locker(&m_lock);
+            m_cache[href] = selectors;
+            
+        }
     }
     return selectors;
 }
