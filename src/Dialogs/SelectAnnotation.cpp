@@ -28,27 +28,58 @@ SOFTWARE.
 
 #include "SelectAnnotation.h"
 #include "ui_SelectAnnotation.h"
-#include "ViewEditors/CodeViewEditor.h"
+#include "ViewEditors/CodeViewEditor.h" // QPlainTextEdit::insertPlainText()
+#include "MainUI/BookBrowser.h"         // BookBrowser::Refresh()
+#include "Misc/GumboInterface.h"        // gumbo::get_all_nodes_with_tag()
+#include "gumbo.h"                      // gumbo_get_attribute()
 
-const QString S_dedaultIconSrc = QString("../Images/AnnoIcon0.png");
-const QString S_annoPre = QString("<img class=\"epub-footnote\" src=\"");
-const QString S_annoInf = QString("\" alt=\"");
-const QString S_annoSuf = QString("\" />");
+#include <QSvgRenderer>                 // Render SVG graph
+#include <QColorDialog>                 // QColorDialog::getColor()
+#include <QFile>                        // Read SVG file
+#include <QByteArray>                   // Store and modify SVG data
+#include <QMessageBox>                  // QMessageBox::Warning()
 
-SelectAnnotation::SelectAnnotation(/* QString href,
-                                   HTMLResource *htmlResource,
-                                   QList<Resource *> resources,
-                                   QSharedPointer<Book> book, */
+const QString S_iconSvgSrc = ":icon/AnnoIcon.svg";
+const QString S_iconSaveName = "AnnoIcon0.png";
+const QString S_annotationStylesheetPath = ":icon/AnnotationStyles.css";
+const QString S_srcBgColor = "#000000";
+const QString S_srcFgColor = "#FFFFFF";
+const QSize S_iconSize(72, 72);
+const QString S_defaultIconSrc = "../Images/AnnoIcon0.png";
+const QString S_annoPre = "<img class=\"epub-footnote\" src=\"";
+const QString S_annoInf = "\" alt=\"";
+const QString S_annoSuf = "\" />";
+const QString S_annoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
+const QString S_annoTagsToRemove = "(b|i|u|a|br|strong|em|span|p|sup|sub|div)";
+const QString S_rePre0 = "<";
+const QString S_rePre1 = "</";
+const QString S_reSuf0 = ">";
+const QString S_reSuf1 = " (\\w|\\s|\"|=)+>";
+const char *S_annoSelector = "img.epub-footnote";
+const char *S_annoStyle = "\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align:super;\n    padding: 0 5px;\n}\n";
+
+QString SelectAnnotation::S_lastBgColor = "#998181";
+QString SelectAnnotation::S_lastFgColor = "#FFFFFF";
+
+SelectAnnotation::SelectAnnotation(QSharedPointer<Book> book,
+                                   BookBrowser *bookBrowser,
+                                   TabManager *tabManager,
+                                   CodeViewEditor *codeView,
                                    QWidget *parent)
     : QDialog(parent),
-      ui(new Ui::SelectAnnotation),
-      /* m_HTMLResource(htmlResource),
-      m_Resources(resources),
-      m_Book(book), */
-      m_AnnoText(QString()),
-      m_AnnoIcon(S_dedaultIconSrc)
+      m_iconSrc(S_defaultIconSrc),
+      m_bgColor(S_lastBgColor),
+      m_fgColor(S_lastFgColor),
+      m_iconImg(S_iconSize, QImage::Format_ARGB32),
+      m_painter(&m_iconImg),
+      m_book(book),
+      m_bookBroswer(bookBrowser),
+      m_tabManager(tabManager),
+      m_codeView(codeView),
+      ui(new Ui::SelectAnnotation)
 {
-    ui->setupUi(this);
+    initSvg();
+    initUI();
     
     connectSignalsSlots();
 }
@@ -58,6 +89,7 @@ SelectAnnotation::~SelectAnnotation()
     delete ui;
 }
 
+// Static function used in MainWindow::insertAnnotation.
 int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView)
 {
     QString annotation = S_annoPre + annoIcon + S_annoInf + annoText + S_annoSuf;
@@ -68,12 +100,219 @@ int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &a
     return 0;
 }
 
-void SelectAnnotation::getInput()
+// Read SVG resource to QByteArray.
+void SelectAnnotation::initSvg()
 {
-    m_AnnoText = ui->annoTextEdit->toPlainText();
+    // Read SVG file and convert to QByteArray.
+    QFile file(S_iconSvgSrc);
+    file.open(QIODevice::ReadOnly);
+    m_svgBytes = file.readAll();
+    file.close();
+    m_svgBytes.replace(S_srcBgColor, m_bgColor.toUtf8());
+    m_svgBytes.replace(S_srcFgColor, m_fgColor.toUtf8());
+}
+
+void SelectAnnotation::initUI()
+{
+    ui->setupUi(this);
+
+    m_graphScene.setBackgroundBrush(Qt::white);
+    ui->iconView->setScene(&m_graphScene);
+    
+    // Render default icon.
+    renderIcon();
+}
+
+void SelectAnnotation::inputText()
+{
+    m_annoText = ui->annoTextEdit->toPlainText();
+    
+    // Delete inline tags in text.
+    m_annoText.remove(QRegularExpression(S_rePre0 + S_annoTagsToRemove + S_reSuf0));
+    m_annoText.remove(QRegularExpression(S_rePre1 + S_annoTagsToRemove + S_reSuf0));
+    m_annoText.remove(QRegularExpression(S_rePre0 + S_annoTagsToRemove + S_reSuf1));
+    
+    // Detect tags need manual deal
+    if (m_annoText.contains("<")) {
+        QMessageBox::warning(this, "Magic", "注释含有特殊标签，请手动处理。\nAnnotation contains special tag, need manual deal.");
+    }
+}
+
+void SelectAnnotation::selectColor(QString &colorMember, QPushButton *colorButton)
+{
+    QColor temp = QColorDialog::getColor();
+    if (temp.isValid()) {
+        colorMember = temp.name();
+        renderIcon();
+    }
+}
+
+// Using QSvgRenderer to render icon when colors change.
+void SelectAnnotation::renderIcon()
+{
+    // Initiate image with transparent pixels.
+    m_iconImg.fill(0x00000000);
+    
+    // Replace old colors with new colors.
+    if (S_lastBgColor != m_bgColor) {
+        m_svgBytes.replace(S_lastBgColor, m_bgColor.toUtf8());
+        S_lastBgColor = m_bgColor;
+    }
+    if (S_lastFgColor != m_fgColor) {
+        m_svgBytes.replace(S_lastFgColor, m_fgColor.toUtf8());
+        S_lastFgColor = m_fgColor;
+    }
+    
+    // Render new graph.
+    QSvgRenderer renderer;
+    renderer.load(m_svgBytes);
+    renderer.render(&m_painter);
+    m_graphScene.addPixmap(QPixmap::fromImage(m_iconImg));
+}
+
+// Add icon to the book resources.
+void SelectAnnotation::addIconFile()
+{
+    // Save image, format based on file extension.
+    m_iconImg.save(S_iconSaveName);
+    
+    // If the file already exists, delete the old one.
+    const QStringList currentFilenames = m_book->GetFolderKeeper()->GetAllFilenames();
+    if (currentFilenames.contains(S_iconSaveName, Qt::CaseSensitive )) {
+        Resource *oldFile = m_book->GetFolderKeeper()->GetResourceByFilename(S_iconSaveName);
+        if (oldFile) {
+            oldFile->Delete();
+        } else {
+            QMessageBox::warning(this, tr("Magic"), tr("未找到文件。\nFile not found."));
+        }
+    }
+    
+    // Add icon file to the book.
+    Resource *iconImg = m_book->GetFolderKeeper()->AddContentFileToFolder(S_iconSaveName);
+    if (!iconImg) {
+        QMessageBox::warning(this, tr("Magic"), tr("添加图标文件失败。\nAdding icon file failed."));
+        return;
+    }
+    
+    // Refresh view to display newly added file.
+    m_bookBroswer->Refresh();
+}
+
+// Append the icon style to the end of linked stylesheet file.
+void SelectAnnotation::appendStyle()
+{
+    // Get html link nodes using Gumbo.
+    GumboInterface gumbo(m_codeView->toPlainText(), "HTML2.0");
+    const QList<GumboNode *> nodeList = gumbo.get_all_nodes_with_tag(GUMBO_TAG_LINK);
+    if (nodeList.isEmpty()) {
+        addStylesheet();
+        return;
+    }
+    
+    // Get filename of linked stylesheet
+    QString cssFilename;
+    bool hasCss = false;
+    for (auto node : nodeList) {
+        GumboVector attributes = node->v.element.attributes;
+        const QString rel = gumbo_get_attribute(&attributes, "rel")->value;
+        if (rel.isEmpty() || rel != "stylesheet") {
+            continue;
+        }
+        const QString cssFilePath = gumbo_get_attribute(&attributes, "href")->value;
+        if (cssFilePath.isEmpty()) {
+            continue;
+        }
+        cssFilename = cssFilePath.split('/').back();
+        const QStringList currentFilenames = m_book->GetFolderKeeper()->GetAllFilenames();
+        if (currentFilenames.contains(cssFilename, Qt::CaseSensitive )) {
+            hasCss = true;
+            break;
+        }
+    }
+    
+    if (!hasCss) {
+        addStylesheet();
+        return;
+    }
+    
+    // Get the stylesheet document.
+    CSSResource *css = qobject_cast<CSSResource *>(m_book->GetFolderKeeper()->GetResourceByFilename(cssFilename));
+    if (!css) {
+        QMessageBox::warning(this, "Magic", "文档链接的css文件不存在。\nThe CSS file this HTML linked to does not exsist.");
+    }
+    QTextDocument &cssDoc = css->GetTextDocumentForWriting();
+    if (cssDoc.isEmpty()) { // The CSS file is not open
+        QFile cssFile(css->GetFullPath());
+        cssFile.open(QIODevice::ReadWrite);
+        // Check whether the style already exists
+        const QByteArray currentStyles = cssFile.readAll();
+        if (currentStyles.contains(S_annoSelector)) {
+            return;
+        }
+        
+        // Append the style to the end of the file
+        if (cssFile.write(S_annoStyle) == -1) {
+            QMessageBox::warning(this, "Magic", "写入CSS文件失败。\nWrite CSS file failed.");
+        }
+        cssFile.close();
+        //m_tabManager->OpenResource(css);
+    } else {
+        // Check if there already exists the style of annotation.
+        if (!cssDoc.find(S_annoSelector).isNull()) {
+            return;
+        }
+        
+        // Append the style to the end of the stylesheet.
+        QString currentStyles = cssDoc.toPlainText();
+        if (currentStyles.isEmpty()) {
+            QMessageBox::warning(this, "Magic", "读取CSS失败。Read CSS file failed.");
+            return;
+        }
+        cssDoc.setPlainText(currentStyles.append(S_annoStyle));
+    }
+    
+    emit css->ResourceUpdatedOnDisk();
+}
+
+void SelectAnnotation::addStylesheet()
+{
+    Resource *annoStylesheet = m_book->GetFolderKeeper()->AddContentFileToFolder(S_annotationStylesheetPath);
+    if (!annoStylesheet) {
+        QMessageBox::warning(this, tr("Magic"), tr("添加样式文件失败。\nAdding CSS file failed."));
+        return;
+    }
+    addStylesheetLink();
+    
+    // Refresh view to display newly added file.
+    m_bookBroswer->Refresh();
+}
+
+void SelectAnnotation::addStylesheetLink()
+{
+    // Store the initial cursor position to recover later.
+    const QTextCursor initialCursor = m_codeView->textCursor();
+    
+    // Determine whether the stylesheet link is already added.
+    bool linkFound = m_codeView->find(S_annoStyleLink, QTextDocument::FindBackward);
+    if (!linkFound) {
+        bool headFound = m_codeView->find("</head>", QTextDocument::FindBackward);
+        if (!headFound) {
+            QMessageBox::warning(this, tr("Magic"), tr("未找到head标签。\nTag head not found."));
+            return;
+        }
+        
+        m_codeView->textCursor().insertText(S_annoStyleLink + tr("\n</head>"));
+    }
+    
+    // Recover the cursor position.
+    m_codeView->setTextCursor(initialCursor);
 }
 
 void SelectAnnotation::connectSignalsSlots()
 {
-    connect(this, SIGNAL(accepted()), this, SLOT(getInput()));
+    connect(ui->backgroundColor, SIGNAL(clicked()), this, SLOT(selectBgColor()));
+    connect(ui->foregroundColor, SIGNAL(clicked()), this, SLOT(selectFgColor()));
+    connect(this, SIGNAL(accepted()), this, SLOT(inputText()));
+    connect(this, SIGNAL(accepted()), this, SLOT(addIconFile()));
+    connect(this, SIGNAL(accepted()), this, SLOT(appendStyle()));
 }
