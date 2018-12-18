@@ -57,7 +57,7 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
     }
     const int SELECTOR = 0, STYLE_RULES_MAP = 1;
     const int STYLE_KEY = 0, STYLE_VALUE = 1;
-    QMap<QString, QPair<QSharedPointer<future::Selector>, QString> >lastFilter;
+    QMap<QString, std::pair<QSharedPointer<future::Selector>, QString> >lastFilter;
     auto tagStyleAttributes = scanCSSRule(getNodeAttribute(node, S_kStyle)).toStdMap();
     std::for_each(tagStyleAttributes.begin(), tagStyleAttributes.end(), [&](const std::pair<QString, QString>& kv) {
         lastFilter[std::get<STYLE_KEY>(kv)] = {QSharedPointer<future::Selector>(nullptr), std::get<STYLE_VALUE>(kv)};
@@ -69,9 +69,9 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
                 lastFilter[std::get<STYLE_KEY>(kv)] = {std::get<SELECTOR>(style), std::get<STYLE_VALUE>(kv)};
                 return;
             }
-            auto oldSelector = lastFilter[std::get<STYLE_KEY>(kv)].first;
+            auto oldSelector = std::get<SELECTOR>(lastFilter.value(std::get<STYLE_KEY>(kv)));
             auto newSelector = std::get<SELECTOR>(style);
-            auto oldValue = lastFilter[std::get<STYLE_KEY>(kv)].second;
+            auto oldValue = std::get<STYLE_VALUE>(lastFilter.value(std::get<STYLE_KEY>(kv)));
             auto newValue = std::get<STYLE_VALUE>(kv);
             // tag's style arrtirbute style have first priority
             if (oldSelector.data() == nullptr) {
@@ -93,9 +93,8 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
         });
     });
     auto stdMap = lastFilter.toStdMap();
-    std::for_each(stdMap.begin(), stdMap.end(), [&](const std::pair<QString, QPair<QSharedPointer<future::Selector>, QString> >& ele) {
-        styles[ele.first] = styles[ele.second.second];
-        printf("%s:%s\n",ele.first.toUtf8().data(), ele.second.second.toUtf8().data());
+    std::for_each(stdMap.begin(), stdMap.end(), [&](const std::pair<QString, std::pair<QSharedPointer<future::Selector>, QString> >& ele) {
+        styles[std::get<STYLE_KEY>(ele)] = styles[std::get<STYLE_VALUE>(std::get<STYLE_RULES_MAP>(ele))];
     });
     return styles;
 }
