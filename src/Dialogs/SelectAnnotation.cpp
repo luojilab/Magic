@@ -50,6 +50,11 @@ const QString S_annoPre = "<img class=\"epub-footnote\" src=\"";
 const QString S_annoInf = "\" alt=\"";
 const QString S_annoSuf = "\" />";
 const QString S_annoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
+const QString S_annoTagsToRemove = "(b|i|u|a|br|strong|em|span|p|sup|sub|div)";
+const QString S_rePre0 = "<";
+const QString S_rePre1 = "</";
+const QString S_reSuf0 = ">";
+const QString S_reSuf1 = " (\\w|\\s|\"|=)+>";
 const char *S_annoSelector = "img.epub-footnote";
 const char *S_annoStyle = "\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align:super;\n    padding: 0 5px;\n}\n";
 
@@ -121,7 +126,16 @@ void SelectAnnotation::initUI()
 void SelectAnnotation::inputText()
 {
     m_annoText = ui->annoTextEdit->toPlainText();
-    // TODO: delete tags in text.
+    
+    // Delete inline tags in text.
+    m_annoText.remove(QRegularExpression(S_rePre0 + S_annoTagsToRemove + S_reSuf0));
+    m_annoText.remove(QRegularExpression(S_rePre1 + S_annoTagsToRemove + S_reSuf0));
+    m_annoText.remove(QRegularExpression(S_rePre0 + S_annoTagsToRemove + S_reSuf1));
+    
+    // Detect tags need manual deal
+    if (m_annoText.contains("<")) {
+        QMessageBox::warning(this, "Magic", "注释含有特殊标签，请手动处理。\nAnnotation contains special tag, need manual deal.");
+    }
 }
 
 void SelectAnnotation::selectColor(QString &colorMember, QPushButton *colorButton)
@@ -200,7 +214,8 @@ void SelectAnnotation::appendStyle()
     bool hasCss = false;
     for (auto node : nodeList) {
         GumboVector attributes = node->v.element.attributes;
-        if (gumbo_get_attribute(&attributes, "rel")->value != QString("stylesheet")) {
+        const QString rel = gumbo_get_attribute(&attributes, "rel")->value;
+        if (rel.isEmpty() || rel != "stylesheet") {
             continue;
         }
         const QString cssFilePath = gumbo_get_attribute(&attributes, "href")->value;
