@@ -13,10 +13,8 @@
 #include <QList>
 #include <QMap>
 #include <QSharedPointer>
+#include "Selector.hpp"
 
-namespace future {
-    class Selector;
-};
 using GumboNode = struct GumboInternalNode;
 using HTMLTagStylesType = QMap<QString, QString>;
 using SelectorListType = QList<QSharedPointer<future::Selector> >;
@@ -40,6 +38,11 @@ private:
     using SelectorCacheType = QMap<QString, QList<QSharedPointer<future::Selector> > >;
     SelectorCacheType m_cache;
     QString m_currentHTMLDir;
+private:
+    struct StyleContainer {
+        QSharedPointer<future::Selector> selector;
+        HTMLTagStylesType styleRules;
+    };
 };
 
 #endif /* HTMLStyleResolver_hpp */

@@ -10,7 +10,6 @@
 #include "ResourceObjects/HTMLResource.h"
 #include "HTMLStyleResolver.hpp"
 #include "GumboInterface.h"
-#include "Selector.hpp"
 #include "CSSParser.hpp"
 #include "HTMLCSSRefAdaptor.h"
 
@@ -18,6 +17,7 @@ const char* S_kStyle = "style";
 const char* S_kRel = "rel";
 const char* S_kStylesheet = "stylesheet";
 const char* S_kHref = "href";
+const char* S_kImportant = "!important";
 HTMLStyleResolver::HTMLStyleResolver() {
 }
 
@@ -37,24 +37,64 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
     GumboNode* root = getRootOfTree(node);
     QList<const GumboNode *>cssTags = getCSSTagsInorder(root);
     SelectorListType allSelectors;
-    SelectorListType filterSelectors;
     for (const GumboNode* styleNode : cssTags) {
         allSelectors.append(getTagSelectors(styleNode));
     }
     if (allSelectors.empty()) {
         return styles;
     }
+    std::list<StyleContainer> filterStyles;
     for (auto selector : allSelectors) {
         GumboNode *internalNode = (GumboNode *)node;
         future::HTMLCSSRefAdaptor::GumboArray nodesArray = &internalNode;
         int sizeTag = 1;
         if (future::HTMLCSSRefAdaptor::nodeAdaptToSelector(&nodesArray, selector.data(), &sizeTag)) {
-            filterSelectors.push_back(selector);
+            HTMLTagStylesType styleRules = scanCSSRule(selector->getRuleData().c_str());
+            if (!styleRules.empty()) {
+                filterStyles.push_back({selector, styleRules});
+            }
         }
     }
-    for (auto selector : filterSelectors) {
-        // last filter
-    }
+    QMap<QString, QPair<QSharedPointer<future::Selector>, QString> >lastFilter;
+    auto tagStyleAttributes = scanCSSRule(getNodeAttribute(node, S_kStyle)).toStdMap();
+    std::for_each(tagStyleAttributes.begin(), tagStyleAttributes.end(), [&](const std::pair<QString, QString>& kv) {
+        lastFilter[kv.first] = {QSharedPointer<future::Selector>(nullptr), kv.second};
+    });
+    std::for_each(filterStyles.rbegin(), filterStyles.rend(), [&](const StyleContainer& style) {
+        auto rules = style.styleRules.toStdMap();
+        std::for_each(rules.begin(), rules.end(), [&](const std::pair<QString, QString>& kv) {
+            if (!lastFilter.contains(kv.first)) {
+                lastFilter[kv.first] = {style.selector, kv.second};
+                return;
+            }
+            auto oldSelector = lastFilter[kv.first].first;
+            auto newSelector = style.selector;
+            auto oldValue = lastFilter[kv.first].second;
+            auto newValue = kv.second;
+            // tag's style arrtirbute style have first priority
+            if (oldSelector.data() == nullptr) {
+                return ;
+            }
+            // have important
+            if (oldValue.endsWith(S_kImportant)) {
+                return ;
+            } else if (newValue.endsWith(S_kImportant)) {
+                lastFilter[kv.first] = {style.selector, kv.second};
+                return ;
+            }
+            // weight
+            if (newSelector->weight() > oldSelector->weight()) {
+                lastFilter[kv.first] = {style.selector, kv.second};
+            }
+            // order
+            return ;
+        });
+    });
+    auto stdMap = lastFilter.toStdMap();
+    std::for_each(stdMap.begin(), stdMap.end(), [&](const std::pair<QString, QPair<QSharedPointer<future::Selector>, QString> >& ele) {
+        styles[ele.first] = styles[ele.second.second];
+        printf("%s:%s\n",ele.first.toUtf8().data(), ele.second.second.toUtf8().data());
+    });
     return styles;
 }
 
