@@ -38,6 +38,7 @@ SOFTWARE.
 #include "BookManipulation/Book.h"
 #include "MainUI/MainWindow.h"
 #include "ViewEditors/CodeViewEditor.h"
+#include "Tabs/TabManager.h"
 
 namespace Ui
 {
@@ -48,18 +49,14 @@ class SelectAnnotation;
 // 1. Open a dialog to get annotation text.
 // 2. A static function to insert annotation code.
 // 3. get foreground and background colors to generate icon.
-// TODO: 4. Detect and replace selected superscript with corresponding footnote.
-// TODO: 5. Automatically detect footnotes and replace in-text references.
 class SelectAnnotation : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SelectAnnotation(/* QString &href,
-                              HTMLResource *htmlResource,
-                              QList<Resource *> &resources, */
-                              QSharedPointer<Book> book,
+    explicit SelectAnnotation(QSharedPointer<Book> book,
                               BookBrowser *bookBrowser,
+                              TabManager *tabManager,
                               CodeViewEditor *codeView,
                               QWidget *parent = 0);
     ~SelectAnnotation();
@@ -73,14 +70,16 @@ public:
 private slots:
     void selectBgColor() { selectColor(m_bgColor, ui->backgroundColor); }
     void selectFgColor() { selectColor(m_fgColor, ui->foregroundColor); }
-    void getInput();
+    void inputText();
     void addIconFile();
+    void appendStyle();
 
 private:
     void initSvg();
     void initUI();
     void selectColor(QString &colorMemeber, QPushButton *colorButtion);
     void renderIcon();
+    void addStylesheet();
     void addStylesheetLink();
     void connectSignalsSlots();
 
@@ -93,19 +92,15 @@ private:
     QPainter m_painter;
     QGraphicsScene m_graphScene;
 
-    // Resources for future work.
-    /* HTMLResource *m_HTMLResource;
-    QList<Resource *> &m_Resources; */
     QSharedPointer<Book> m_book;
     BookBrowser *m_bookBroswer;
+    TabManager *m_tabManager;
     CodeViewEditor *m_codeView;
 
     Ui::SelectAnnotation *ui;
     
     static QString S_lastBgColor;
     static QString S_lastFgColor;
-    static bool S_annoIconAdded;
-    static bool S_annoStylesheetAdded;
 };
 
 #endif // SELECTANNOTATION_H
