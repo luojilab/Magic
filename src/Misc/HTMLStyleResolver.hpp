@@ -19,6 +19,8 @@
 using GumboNode = struct GumboInternalNode;
 using HTMLTagStylesType = QMap<QString, QString>;
 using SelectorListType = QList<QSharedPointer<future::Selector> >;
+using CSSSelectorStyleRuleListType = std::list<std::pair<QSharedPointer<future::Selector>, HTMLTagStylesType> >;
+using SelectorStylesListType = QMap<QString, std::pair<QSharedPointer<future::Selector>, QString> >;
 class HTMLResource;
 class HTMLStyleResolver {
 public:
@@ -28,6 +30,7 @@ public:
     
 private:
     QList<const GumboNode *>getCSSTagsInorder(const GumboNode *root);
+    HTMLTagStylesType filterCSSStyles(const CSSSelectorStyleRuleListType& candidateStyle, const SelectorStylesListType& initialList);
     SelectorListType getTagSelectors(const GumboNode *, const QString& htmlDir);
     SelectorListType getLinkTagSelectors(const GumboNode *, const QString& htmlDir);
     SelectorListType getStyleTagSelectors(const GumboNode *);

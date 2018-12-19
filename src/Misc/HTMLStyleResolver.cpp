@@ -55,14 +55,21 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
             }
         }
     }
-    const int SELECTOR = 0, STYLE_RULES_MAP = 1;
     const int STYLE_KEY = 0, STYLE_VALUE = 1;
-    QMap<QString, std::pair<QSharedPointer<future::Selector>, QString> >lastFilter;
+    QMap<QString, std::pair<QSharedPointer<future::Selector>, QString> >initialStyle;
     auto tagStyleAttributes = scanCSSRule(getNodeAttribute(node, S_kStyle)).toStdMap();
     std::for_each(tagStyleAttributes.begin(), tagStyleAttributes.end(), [&](const std::pair<QString, QString>& kv) {
-        lastFilter[std::get<STYLE_KEY>(kv)] = {QSharedPointer<future::Selector>(nullptr), std::get<STYLE_VALUE>(kv)};
+        initialStyle[std::get<STYLE_KEY>(kv)] = {QSharedPointer<future::Selector>(nullptr), std::get<STYLE_VALUE>(kv)};
     });
-    std::for_each(filterStyles.rbegin(), filterStyles.rend(), [&](const std::pair<QSharedPointer<future::Selector>, HTMLTagStylesType>& style) {
+    return filterCSSStyles(filterStyles, initialStyle);
+}
+
+HTMLTagStylesType HTMLStyleResolver::filterCSSStyles(const CSSSelectorStyleRuleListType& candidateStyle, const SelectorStylesListType& initialList) {
+    HTMLTagStylesType styles;
+    SelectorStylesListType lastFilter(initialList);
+    const int SELECTOR = 0, STYLE_RULES_MAP = 1;
+    const int STYLE_KEY = 0, STYLE_VALUE = 1;
+    std::for_each(candidateStyle.rbegin(), candidateStyle.rend(), [&](const std::pair<QSharedPointer<future::Selector>, HTMLTagStylesType>& style) {
         auto rules = std::get<STYLE_RULES_MAP>(style).toStdMap();
         std::for_each(rules.begin(), rules.end(), [&](const std::pair<QString, QString>& kv) {
             if (!lastFilter.contains(std::get<STYLE_KEY>(kv))) {
