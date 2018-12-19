@@ -331,6 +331,13 @@ void SelectCharacter::SetList()
                              << QString::fromUtf8("\xcf\x92")        << ""           << "&upsih;"    << "Greek Upsilon with hook symbol"
                              << QString::fromUtf8("\xe2\x84\x98")    << ""           << "&weierp;"   << "script capital P"
                              << QString::fromUtf8("\xc2\xa5")        << ""           << "&yen;"      << "yen sign"
+                             << QString::fromUtf8("\xe2\x97\x80")    << ""           << ""           << "black left-pointing triangle"
+                             << QString::fromUtf8("\xe2\x96\xb6")    << ""           << ""           << "black right-pointing triangle"
+                             << QString::fromUtf8("\xe2\x96\xb2")    << ""           << ""           << "black up-pointing triangle"
+                             << QString::fromUtf8("\xe2\x96\xbc")    << ""           << ""           << "black down-pointing triangle"
+                             << QString::fromUtf8("\xe2\x97\x86")    << ""           << ""           << "black diamond"
+                             << QString::fromUtf8("\xe2\x97\x87")    << ""           << ""           << "white diamond"
+                             << QString::fromUtf8("\xe2\x97\x8f")    << ""           << ""           << "black circle"
                              ;
     AddGrid(spaces, spaces.count());
     AddGrid(characters, 12);
