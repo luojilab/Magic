@@ -54,6 +54,7 @@ public:
 
 	virtual bool isBaseSelector() = 0;
 	virtual int weight() = 0;
+    virtual bool operator == (Selector *) = 0;
 
 	virtual std::string description();
 protected:

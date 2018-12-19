@@ -14,6 +14,14 @@ namespace future {
         SignType otherType = other->getSignType();
         return m_SignType == Concat && otherType != Concat;
     }
+    
+    bool SignSelector::operator==(Selector *other) {
+        SignSelector* otherSelector = nullptr;
+        if (!(otherSelector = dynamic_cast<SignSelector *>(other))) {
+            return false;
+        }
+        return m_SignType == otherSelector->m_SignType;
+    }
 
     bool SignSelector::isBaseSelector()
     {

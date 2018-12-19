@@ -33,6 +33,7 @@ namespace future {
             return m_SignType;
         }
         bool operator >(SignSelector *);
+        bool operator == (Selector *);
         bool isBaseSelector();
         int weight();
     private:

@@ -171,6 +171,55 @@ namespace future {
         return m_combineType;
     }
     
+    bool CombineSelector::operator==(Selector * other) {
+        CombineSelector* otherSelector = dynamic_cast<CombineSelector *>(other);
+        if (!otherSelector) {
+            return false;
+        }
+        std::list<Selector *>currentList;
+        std::list<Selector *>otherList;
+        if (m_normalSiblingList.size() == 2) {
+            otherList = otherSelector->m_normalSiblingList;
+            if (otherList.size() != 2) {
+                return false;
+            }
+            currentList = m_normalSiblingList;
+        }
+        if (m_instanceSiblingList.size() == 2) {
+            otherList = otherSelector->m_instanceSiblingList;
+            if (otherList.size() != 2) {
+                return false;
+            }
+            currentList = m_instanceSiblingList;
+        }
+        if (m_instanceInhericalList.size() == 2) {
+            otherList = otherSelector->m_instanceInhericalList;
+            if (otherList.size() != 2) {
+                return false;
+            }
+            currentList = m_instanceInhericalList;
+        }
+        if (m_normalInhericalList.size() == 2) {
+            otherList = otherSelector->m_normalInhericalList;
+            if (otherList.size() != 2) {
+                return false;
+            }
+            currentList = m_normalInhericalList;
+        }
+        if (currentList.empty()) {
+            return false;
+        }
+        auto currentIt = currentList.begin();
+        auto currentEnd = currentList.end();
+        auto otherIt = otherList.begin();
+        while(currentIt != currentEnd) {
+            if (*currentIt++ != *otherIt++) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     std::string CombineSelector::description()
     {
         std::string relation = "no relation";

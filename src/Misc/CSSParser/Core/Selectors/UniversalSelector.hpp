@@ -22,6 +22,7 @@ namespace future {
             m_selectorType = Selector::UniversalSelector;
         }
         bool isBaseSelector();
+        virtual bool operator == (Selector *);
         virtual std::string description();
         int weight();
     };

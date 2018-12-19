@@ -20,6 +20,14 @@ namespace future {
 		return 100;
 	}
     
+    bool IdSelector::operator==(Selector *other) {
+        IdSelector* otherSelector = nullptr;
+        if (!(otherSelector = dynamic_cast<IdSelector *>(other))) {
+            return false;
+        }
+        return m_id == otherSelector->m_id;
+    }
+    
     std::string IdSelector::description()
     {
         return "IdSelector (id is " + m_id + ")\n";

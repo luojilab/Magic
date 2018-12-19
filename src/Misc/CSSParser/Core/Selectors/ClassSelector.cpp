@@ -20,6 +20,14 @@ namespace future {
 		return 10;
 	}
     
+    bool ClassSelector::operator == (Selector * other) {
+        ClassSelector *otherSelector = nullptr;
+        if (!(otherSelector = dynamic_cast<ClassSelector *>(other))) {
+            return false;
+        }
+        return m_class == otherSelector->m_class;
+    }
+    
     std::string ClassSelector::description()
     {
         return "Class Selector (Class name is \"" + m_class + "\")";

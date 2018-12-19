@@ -38,6 +38,25 @@ namespace future {
     	return w;
     }
     
+    bool SequenceSelector::operator==(Selector *other) {
+        SequenceSelector* otherSelector = dynamic_cast<SequenceSelector *>(other);
+        if (!otherSelector) {
+            return false;
+        }
+        if (otherSelector->m_selectors.size() != m_selectors.size()) {
+            return false;
+        }
+        auto current_it = m_selectors.begin();
+        auto current_end = m_selectors.begin();
+        auto other_it = otherSelector->m_selectors.begin();
+        while (current_it != current_end) {
+            if (*current_it++ != *other_it++) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     std::string SequenceSelector::description()
     {
         std::string desc = "SequenceSelector:[\n";

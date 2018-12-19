@@ -60,6 +60,7 @@ namespace future {
         	return m_normalInhericalList;
 		}
         
+        virtual bool operator == (Selector *);
         virtual std::string description();
 
     private:

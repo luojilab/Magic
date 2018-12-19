@@ -59,4 +59,14 @@ namespace future {
         }
         return "AttributeSelector: " + m_key + " " + relation + " " + m_value;
     }
+    
+    bool AttributeSelector::operator==(Selector *other) {
+        AttributeSelector* otherSelector = NULL;
+        if (!(otherSelector = dynamic_cast<AttributeSelector *>(other))) {
+            return false;
+        }
+        return (otherSelector->m_key == m_key &&
+        otherSelector->m_value == m_value &&
+        otherSelector->m_filterRule == m_filterRule);
+    }
 }

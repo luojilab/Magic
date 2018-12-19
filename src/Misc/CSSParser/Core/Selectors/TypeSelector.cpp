@@ -20,6 +20,14 @@ namespace future {
 		return 1;
 	}
     
+    bool TypeSelector::operator==(Selector *other) {
+        TypeSelector* otherSelector = nullptr;
+        if (!(otherSelector = dynamic_cast<TypeSelector *>(other))) {
+            return false;
+        }
+        return m_typeName == otherSelector->m_typeName;
+    }
+    
     std::string TypeSelector::description()
     {
         return "TypeSelector: (type name is " + m_typeName + ")\n";

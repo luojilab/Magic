@@ -39,6 +39,31 @@ namespace future {
     	return w;
     }
     
+    bool GroupSelector::operator==(Selector *other) {
+        GroupSelector *otherSelector = dynamic_cast<GroupSelector *>(other);
+        if (!otherSelector) {
+            return false;
+        }
+        if (otherSelector->m_selectors.size() != m_selectors.size()) {
+            return false;
+        }
+        auto otherList = otherSelector->m_selectors;
+        for (Selector *s : m_selectors) {
+            Selector* removeSelector = nullptr;
+            for (Selector *others : otherList) {
+                if (others == s) {
+                    removeSelector = others;
+                }
+            }
+            if (removeSelector) {
+                otherList.remove(removeSelector);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     std::string GroupSelector::description()
     {
         std::string desc = "Group Selector:[\n";

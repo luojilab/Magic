@@ -47,6 +47,15 @@ namespace future {
         return m_data;
     }
     
+    bool PseudoSelector::operator==(Selector *other) {
+        PseudoSelector* otherSelector = dynamic_cast<PseudoSelector *>(other);
+        if (!otherSelector) {
+            return false;
+        }
+        return m_data == otherSelector->m_data &&
+        m_parameter == otherSelector->m_parameter;
+    }
+    
     std::string PseudoSelector::description()
     {
         std::string parament = "PseudoSelector: { pseudo name:" + m_data + "\n";

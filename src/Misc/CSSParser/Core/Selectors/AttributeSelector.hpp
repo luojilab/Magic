@@ -51,6 +51,7 @@ namespace future {
 
         bool isBaseSelector();
         int weight();
+        virtual bool operator == (Selector *);
         virtual std::string description();
     private:
         std::string m_key;

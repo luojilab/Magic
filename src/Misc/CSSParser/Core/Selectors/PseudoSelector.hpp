@@ -34,6 +34,11 @@ namespace future {
                     constant = 0;
                     sign = 0;
                 }
+                bool operator == (const polynomial& other) {
+                    return (other.sign == sign &&
+                    other.constant == constant &&
+                    other.coefficient == coefficient);
+                }
             }               polynomial;
             std::string     pString;
             int             pNumber;
@@ -43,6 +48,24 @@ namespace future {
                 type = ParameterType::NONE;
                 pNumber = 0;
                 pString = "";
+            }
+            bool operator == (Parameter *other) {
+                if (!other) {
+                    return false;
+                }
+                if (other->type == type &&
+                    (type == STRING || type == IDENT)) {
+                    return pString == other->pString;
+                }
+                if (other->type == type &&
+                    type == NUMBER) {
+                    return pNumber == other->pNumber;
+                }
+                if (other->type == type &&
+                    type == POLYNOMIAL) {
+                    return polynomial == other->polynomial;
+                }
+                return false;
             }
         };
     public:
@@ -64,6 +87,8 @@ namespace future {
         std::string getPseudoData();
 
         Parameter* getParameter();
+        
+        virtual bool operator == (Selector *);
         
         virtual std::string description();
     private:

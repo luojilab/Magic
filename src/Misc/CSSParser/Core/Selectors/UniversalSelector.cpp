@@ -20,6 +20,10 @@ namespace future {
 		return 0;
 	}
     
+    bool UniversalSelector::operator==(Selector *other) {
+        return dynamic_cast<UniversalSelector *>(other);
+    }
+    
     std::string UniversalSelector::description()
     {
         return "UniversalSelector";
