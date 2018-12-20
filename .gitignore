@@ -76,4 +76,6 @@ OpenCandy
 tags
 build
 lib/DDLayoutEngine/macos/*d.a
+lib/DDLayoutEngine/windows/*d.lib
+lib/DDLayoutEngine/windows/*d.dll
 
