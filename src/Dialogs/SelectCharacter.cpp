@@ -26,7 +26,8 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QApplication>
 #include <QtCore/QSignalMapper>
-#include <QMessageBox> // QMessageBox::warning
+#include <QMessageBox>  // QMessageBox::warning(), question()
+#include <QColorDialog> // QColorDialog::getColor()
 
 #include "Dialogs/SelectCharacter.h"
 #include "ResourceObjects/HTMLResource.h"
@@ -405,7 +406,21 @@ QString SelectCharacter::Selection()
 void SelectCharacter::SetSelectedCharacter(const QString &text)
 {
     bool isCtrl = QApplication::keyboardModifiers() & Qt::ControlModifier;
-    emit SelectedCharacter(text);
+    
+    // Choose whether to add character color.
+    QMessageBox::StandardButton useDefaultColor = QMessageBox::question(this, "Magic", "是否添加字符颜色？");
+    if (useDefaultColor == QMessageBox::No) {
+        emit SelectedCharacter(text);
+    } else {
+        QColor charColor = QColorDialog::getColor();
+        if (!charColor.isValid()) {
+            QMessageBox::warning(this, "Magic", "Invalid color.");
+            emit SelectedCharacter(text);
+        } else {
+            QString textWithColor = "<span style=\"color:" + charColor.name() + "\">" + text + "</span>";
+            emit SelectedCharacter(textWithColor);
+        }
+    }
 
     if (isCtrl) {
         accept();
