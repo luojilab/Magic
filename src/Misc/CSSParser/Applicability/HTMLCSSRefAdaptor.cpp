@@ -589,7 +589,7 @@ namespace future {
                     if (!afterMatch) {
                         continue;
                     }
-                    GumboNode* beforeNodes[*potentialSize];
+                    GumboNodesArray beforeNodes = new GumboNode*[*potentialSize];
                     BackupNodes(beforeNodes, elementA, *potentialSize);
                     int innnerLoopSize = *potentialSize;
                     for (int j = 0; j < innnerLoopSize; j++) {
@@ -612,6 +612,7 @@ namespace future {
                             }
                         }
                     }
+                    delete [] beforeNodes;
                 }
                 {
                     updateNextNodes(potentialNextNodes, nodeArrayPtr, potentialSize);
@@ -637,7 +638,7 @@ namespace future {
                     if (!afterMatch) {
                         continue;
                     }
-                    GumboNode* beforeNodes[*potentialSize];
+                    GumboNodesArray beforeNodes = new GumboNode*[*potentialSize];
                     BackupNodes(beforeNodes, elementA, *potentialSize);
                     int innnerLoopSize = *potentialSize;
                     for(int j = 0; j < innnerLoopSize; j ++) {
@@ -662,6 +663,7 @@ namespace future {
                             }
                         }
                     }
+                    delete [] beforeNodes;
                 }
                 {
                     updateNextNodes(potentialNextNodes, nodeArrayPtr, potentialSize);
@@ -688,7 +690,7 @@ namespace future {
                         continue;
                     }
                     int innerSize = *potentialSize;
-                    GumboNode* beforeNodes[innerSize];
+                    GumboNodesArray beforeNodes = new GumboNode*[innerSize];
                     BackupNodes(beforeNodes, elementA, innerSize);
                     for (int j = 0; j < innerSize; j++) {
                         parent = beforeNodes[j]->parent;
@@ -699,6 +701,7 @@ namespace future {
                             potentialNextNodes.push_back(parent);
                         }
                     }
+                    delete [] beforeNodes;
                 }
                 {
                     updateNextNodes(potentialNextNodes, nodeArrayPtr, potentialSize);
@@ -720,7 +723,7 @@ namespace future {
                         continue;
                     }
                     int innerSize = *potentialSize;
-                    GumboNode* beforeNodes[innerSize];
+                    GumboNodesArray beforeNodes = new GumboNode*[innerSize];
                     BackupNodes(beforeNodes, elementA, innerSize);
                     for (int j = 0; j < innerSize; j++) {
                         GumboNode* parent = beforeNodes[j]->parent;
@@ -734,6 +737,7 @@ namespace future {
                             parent = parent->parent;
                         }
                     }
+                    delete [] beforeNodes;
                 }
                 {
                     updateNextNodes(potentialNextNodes, nodeArrayPtr, potentialSize);
