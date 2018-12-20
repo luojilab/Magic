@@ -14,8 +14,8 @@ namespace future {
 
 class HTMLCSSRefAdaptor {
 public:
-    typedef GumboNode*** GumboArrayPtr;
-    typedef GumboNode** GumboArray;
+    typedef GumboNode*** GumboNodesArrayPtr;
+    typedef GumboNode** GumboNodesArray;
 	HTMLCSSRefAdaptor();
 	virtual ~HTMLCSSRefAdaptor();
     /**
@@ -25,7 +25,7 @@ public:
      * @param potentialSize the size of nodes array
      * @note the nodes can be changed after the comparing.
      */
-	static bool nodeAdaptToSelector(GumboArrayPtr nodes, Selector* selector, int *potentialSize);
+	static bool nodeAdaptToSelector(GumboNodesArrayPtr nodes, Selector* selector, int *potentialSize);
     
     /**
      * Clean all resource after the compare
@@ -33,15 +33,15 @@ public:
     static void CleanResource();
 
 private:
-	static bool nodeAdaptToIDSelector(GumboArrayPtr node, IdSelector* selector, int *potentialSize);
-	static bool nodeAdaptToClassSelector(GumboArrayPtr node, ClassSelector* selector, int *potentialSize);
-	static bool nodeAdaptToTypeSelector(GumboArrayPtr node, TypeSelector* selector, int *potentialSize);
-	static bool nodeAdaptToAttributeSelector(GumboArrayPtr node, AttributeSelector* selector, int *potentialSize);
-	static bool nodeAdaptToPseudoSelector(GumboArrayPtr node, PseudoSelector* selector, int *potentialSize);
-	static bool nodeAdaptToSequenceSelector(GumboArrayPtr node, SequenceSelector* selector, int *potentialSize);
-	static bool nodeAdaptToCombineSelector(GumboArrayPtr node, CombineSelector* selector, int *potentialSize);
-	static bool nodeAdaptToGroupSelector(GumboArrayPtr node, GroupSelector* selector, int *potentialSize);
-    static void updateNextNodes(const std::list<GumboNode *>&, GumboArrayPtr arrayPtr, int *size);
+	static bool nodeAdaptToIDSelector(GumboNodesArrayPtr node, IdSelector* selector, int *potentialSize);
+	static bool nodeAdaptToClassSelector(GumboNodesArrayPtr node, ClassSelector* selector, int *potentialSize);
+	static bool nodeAdaptToTypeSelector(GumboNodesArrayPtr node, TypeSelector* selector, int *potentialSize);
+	static bool nodeAdaptToAttributeSelector(GumboNodesArrayPtr node, AttributeSelector* selector, int *potentialSize);
+	static bool nodeAdaptToPseudoSelector(GumboNodesArrayPtr node, PseudoSelector* selector, int *potentialSize);
+	static bool nodeAdaptToSequenceSelector(GumboNodesArrayPtr node, SequenceSelector* selector, int *potentialSize);
+	static bool nodeAdaptToCombineSelector(GumboNodesArrayPtr node, CombineSelector* selector, int *potentialSize);
+	static bool nodeAdaptToGroupSelector(GumboNodesArrayPtr node, GroupSelector* selector, int *potentialSize);
+    static void updateNextNodes(const std::list<GumboNode *>&, GumboNodesArrayPtr arrayPtr, int *size);
 };
 
 }

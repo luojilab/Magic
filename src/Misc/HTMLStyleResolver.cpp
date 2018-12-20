@@ -46,7 +46,7 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
     std::list<std::pair<QSharedPointer<future::Selector>, HTMLTagStylesType> > filterStyles;
     for (auto selector : allSelectors) {
         GumboNode *internalNode = (GumboNode *)node;
-        future::HTMLCSSRefAdaptor::GumboArray nodesArray = &internalNode;
+        future::HTMLCSSRefAdaptor::GumboNodesArray nodesArray = &internalNode;
         int sizeTag = 1;
         if (future::HTMLCSSRefAdaptor::nodeAdaptToSelector(&nodesArray, selector.data(), &sizeTag)) {
             HTMLTagStylesType styleRules = scanCSSRule(selector->getRuleData().c_str());
