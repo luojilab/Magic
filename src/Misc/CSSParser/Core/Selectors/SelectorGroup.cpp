@@ -51,7 +51,7 @@ namespace future {
         for (Selector *s : m_selectors) {
             Selector* removeSelector = nullptr;
             for (Selector *others : otherList) {
-                if (others == s) {
+                if (*others == s) {
                     removeSelector = others;
                 }
             }

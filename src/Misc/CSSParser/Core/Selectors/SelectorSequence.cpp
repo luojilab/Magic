@@ -47,10 +47,12 @@ namespace future {
             return false;
         }
         auto current_it = m_selectors.begin();
-        auto current_end = m_selectors.begin();
+        auto current_end = m_selectors.end();
         auto other_it = otherSelector->m_selectors.begin();
         while (current_it != current_end) {
-            if (*current_it++ != *other_it++) {
+            if (**current_it++ == *other_it++) {
+                continue;
+            } else {
                 return false;
             }
         }

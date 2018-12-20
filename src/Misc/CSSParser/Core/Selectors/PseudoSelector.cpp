@@ -53,7 +53,7 @@ namespace future {
             return false;
         }
         return m_data == otherSelector->m_data &&
-        m_parameter == otherSelector->m_parameter;
+        *m_parameter == otherSelector->m_parameter;
     }
     
     std::string PseudoSelector::description()

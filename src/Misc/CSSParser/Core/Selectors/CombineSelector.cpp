@@ -213,7 +213,9 @@ namespace future {
         auto currentEnd = currentList.end();
         auto otherIt = otherList.begin();
         while(currentIt != currentEnd) {
-            if (*currentIt++ != *otherIt++) {
+            if (**currentIt++ == *otherIt++) {
+                continue;
+            } else {
                 return false;
             }
         }
