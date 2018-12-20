@@ -324,6 +324,8 @@ set( MISC_FILES
     Misc/PythonRoutines.cpp
     Misc/HTMLStyleResolver.hpp
     Misc/HTMLStyleResolver.cpp
+    Misc/CSSSelectorJudge.hpp
+    Misc/CSSSelectorJudge.cpp
     )
 
 set( MISC_EDITORS_FILES    
