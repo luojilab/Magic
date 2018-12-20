@@ -1814,6 +1814,16 @@ void MainWindow::InsertSpecialCharacter()
     m_SelectCharacter->activateWindow();
 }
 
+void MainWindow::refreshSelectCharacter()
+{
+    if (m_SelectCharacter && m_SelectCharacter->isVisible()) {
+        m_SelectCharacter->close();
+    }
+    delete m_SelectCharacter;
+    m_SelectCharacter = new SelectCharacter(this);
+    InsertSpecialCharacter();
+}
+
 void MainWindow::InsertId()
 {
     SaveTabData();
@@ -5176,7 +5186,6 @@ void MainWindow::ConnectSignalsToSlots()
     connect(m_SearchEditor, SIGNAL(ReplaceAllSelectedSearchRequest(QList<SearchEditorModel::searchEntry *>)),
             m_FindReplace,   SLOT(ReplaceAllSearch(QList<SearchEditorModel::searchEntry *>)));
     connect(m_ClipboardHistorySelector, SIGNAL(PasteRequest(const QString &)), this, SLOT(PasteTextIntoCurrentTarget(const QString &)));
-    connect(m_SelectCharacter, SIGNAL(SelectedCharacter(const QString &)), this, SLOT(PasteTextIntoCurrentTarget(const QString &)));
     connect(m_ClipEditor, SIGNAL(PasteSelectedClipRequest(QList<ClipEditorModel::clipEntry *>)),
             this,           SLOT(PasteClipEntriesIntoCurrentTarget(QList<ClipEditorModel::clipEntry *>)));
     connect(m_Clips,        SIGNAL(PasteClips(QList<ClipEditorModel::clipEntry *>)),
