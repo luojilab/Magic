@@ -135,7 +135,7 @@ void SelectAnnotation::inputText()
     
     // Detect tags need manual deal
     if (m_annoText.contains("<")) {
-        QMessageBox::warning(this, "Magic", "注释含有特殊标签，请手动处理。\nAnnotation contains special tag, need manual deal.");
+        QMessageBox::warning(this, "Magic", u8"注释含有特殊标签，请手动处理。\nAnnotation contains special tag, need manual deal.");
     }
 }
 
@@ -184,14 +184,14 @@ void SelectAnnotation::addIconFile()
         if (oldFile) {
             oldFile->Delete();
         } else {
-            QMessageBox::warning(this, tr("Magic"), tr("未找到文件。\nFile not found."));
+            QMessageBox::warning(this, tr("Magic"), tr(u8"未找到文件。\nFile not found."));
         }
     }
     
     // Add icon file to the book.
     Resource *iconImg = m_book->GetFolderKeeper()->AddContentFileToFolder(S_iconSaveName);
     if (!iconImg) {
-        QMessageBox::warning(this, tr("Magic"), tr("添加图标文件失败。\nAdding icon file failed."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"添加图标文件失败。\nAdding icon file failed."));
         return;
     }
     
@@ -239,7 +239,7 @@ void SelectAnnotation::appendStyle()
     // Get the stylesheet document.
     CSSResource *css = qobject_cast<CSSResource *>(m_book->GetFolderKeeper()->GetResourceByFilename(cssFilename));
     if (!css) {
-        QMessageBox::warning(this, "Magic", "文档链接的css文件不存在。\nThe CSS file this HTML linked to does not exsist.");
+        QMessageBox::warning(this, "Magic", u8"文档链接的css文件不存在。\nThe CSS file this HTML linked to does not exsist.");
     }
     QTextDocument &cssDoc = css->GetTextDocumentForWriting();
     if (cssDoc.isEmpty()) { // The CSS file is not open
@@ -254,7 +254,7 @@ void SelectAnnotation::appendStyle()
         
         // Append the style to the end of the file
         if (cssFile.write(S_annoStyle) == -1) {
-            QMessageBox::warning(this, "Magic", "写入CSS文件失败。\nWrite CSS file failed.");
+            QMessageBox::warning(this, "Magic", u8"写入CSS文件失败。\nWrite CSS file failed.");
         }
         cssFile.close();
 
@@ -267,7 +267,7 @@ void SelectAnnotation::appendStyle()
         
         // Append the style to the end of the stylesheet.
         if (currentStyles.isEmpty()) {
-            QMessageBox::warning(this, "Magic", "读取CSS失败。Read CSS file failed.");
+            QMessageBox::warning(this, "Magic", u8"读取CSS失败。Read CSS file failed.");
             return;
         }
         cssDoc.setPlainText(currentStyles.append(S_annoStyle));
@@ -280,7 +280,7 @@ void SelectAnnotation::addStylesheet()
 {
     Resource *annoStylesheet = m_book->GetFolderKeeper()->AddContentFileToFolder(S_annotationStylesheetPath);
     if (!annoStylesheet) {
-        QMessageBox::warning(this, tr("Magic"), tr("添加样式文件失败。\nAdding CSS file failed."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"添加样式文件失败。\nAdding CSS file failed."));
         return;
     }
     addStylesheetLink();
@@ -299,7 +299,7 @@ void SelectAnnotation::addStylesheetLink()
     if (!linkFound) {
         bool headFound = m_codeView->find("</head>", QTextDocument::FindBackward);
         if (!headFound) {
-            QMessageBox::warning(this, tr("Magic"), tr("未找到head标签。\nTag head not found."));
+            QMessageBox::warning(this, tr("Magic"), tr(u8"未找到head标签。\nTag head not found."));
             return;
         }
         
