@@ -2,10 +2,20 @@
 
 # Magic: an Ebook Editor
 
-[![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md) ![version](https://img.shields.io/badge/version-0.9.27-green.svg)
+[![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md) ![version](https://img.shields.io/badge/version-0.9.31-green.svg)
+
 [中文文档](./README-CH.md)
 
-[TOC]
+- [Overview](#overview)
+- [Features](#features)
+- [Get the Binary](#get-the-binary)
+- [Build](#build)
+    - [Build on macOS](#build-on-macos)
+    - [Build on Windows](#build-on-windows)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+- [Dependencies](#dependencies)
 
 ## Overview
 

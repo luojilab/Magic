@@ -2,11 +2,20 @@
 
 # Magic: EPUB编辑器
 
-[![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md) ![version](https://img.shields.io/badge/version-0.9.27-green.svg)
+[![LICENSE](https://img.shields.io/packagist/l/doctrine/orm.svg)](./LICENSE.md) ![version](https://img.shields.io/badge/version-0.9.31-green.svg)
 
 [English Document](./README.md)
 
-[TOC]
+- [概述](#%E6%A6%82%E8%BF%B0)
+- [特性](#%E7%89%B9%E6%80%A7)
+- [获取二进制文件](#%E8%8E%B7%E5%8F%96%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6)
+- [编译项目](#%E7%BC%96%E8%AF%91%E9%A1%B9%E7%9B%AE)
+    - [在macOS上编译工程](#%E5%9C%A8macos%E4%B8%8A%E7%BC%96%E8%AF%91%E5%B7%A5%E7%A8%8B)
+    - [在Windows上编译工程](#%E5%9C%A8windows%E4%B8%8A%E7%BC%96%E8%AF%91%E5%B7%A5%E7%A8%8B)
+- [代码贡献](#%E4%BB%A3%E7%A0%81%E8%B4%A1%E7%8C%AE)
+- [版权](#%E7%89%88%E6%9D%83)
+- [致谢](#%E8%87%B4%E8%B0%A2)
+- [依赖文件](#%E4%BE%9D%E8%B5%96%E6%96%87%E4%BB%B6)
 
 ## 概述
 
