@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 **
 **  Copyright (C) 2016 Kevin B. Hendricks, Stratford, Ontario Canada
 **  Copyright (C) 2012-2015 John Schember <john@nachtimwald.com>
@@ -1906,18 +1906,18 @@ void MainWindow::insertAnnotation()
 {
     FlowTab *flowTab = GetCurrentFlowTab();
     if (!flowTab || !flowTab->InsertHyperlinkEnabled()) { // Use check function from insertHyperlink.
-        QMessageBox::warning(this, tr("Magic"), tr("插入注释位置错误。\nYou cannot insert an annotation at this position."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"插入注释位置错误。\nYou cannot insert an annotation at this position."));
         return;
     }
     if (flowTab->GetViewState() == ViewState_BookView) {
-        QMessageBox::warning(this, tr("Magic"), tr("请在代码视图操作。\nYou should insert an annotation in codeview."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"请在代码视图操作。\nYou should insert an annotation in codeview."));
         CodeView();
         return;
     }
 
     CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
     if (!codeView) {
-        QMessageBox::warning(this, tr("Magic"), tr("代码视图编辑器获取失败。\nGet CodeViewEditor failed."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"代码视图编辑器获取失败。\nGet CodeViewEditor failed."));
         return;
     }
 
@@ -1932,12 +1932,12 @@ void MainWindow::insertAnnotation()
     QString annoIcon = selectAnnotation.getIcon();
 
     if (annoText.isEmpty()) {
-        QMessageBox::warning(this, tr("Magic"), tr("输入文本为空。\nInput text is empty."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"输入文本为空。\nInput text is empty."));
         return;
     }
 
     if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
-        QMessageBox::warning(this, tr("Magic"), tr("插入注释失败。\nInserting annotation fail."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"插入注释失败。\nInserting annotation fail."));
         return;
     }
 }
