@@ -32,6 +32,7 @@ SOFTWARE.
 #include "MainUI/BookBrowser.h"         // BookBrowser::Refresh()
 #include "Misc/GumboInterface.h"        // gumbo::get_all_nodes_with_tag()
 #include "gumbo.h"                      // gumbo_get_attribute()
+#include "Misc/CSSSelectorJudge.hpp"      // CSSSelectorJudge::selectorExists()
 
 #include <QSvgRenderer>                 // Render SVG graph
 #include <QColorDialog>                 // QColorDialog::getColor()
@@ -55,7 +56,7 @@ const QString S_rePre0 = "<";
 const QString S_rePre1 = "</";
 const QString S_reSuf0 = ">";
 const QString S_reSuf1 = " (\\w|\\s|\"|=)+>";
-const char *S_annoSelector = "img.epub-footnote";
+const char *S_annoSelector = "img.epub-footnote { }";
 const char *S_annoStyle = "\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align:super;\n    padding: 0 5px;\n}\n";
 
 QString SelectAnnotation::S_lastBgColor = "#998181";
@@ -244,9 +245,10 @@ void SelectAnnotation::appendStyle()
     if (cssDoc.isEmpty()) { // The CSS file is not open
         QFile cssFile(css->GetFullPath());
         cssFile.open(QIODevice::ReadWrite);
-        // Check whether the style already exists
+        
+        // Check selector existence using CSS parser
         const QByteArray currentStyles = cssFile.readAll();
-        if (currentStyles.contains(S_annoSelector)) {
+        if (CSSSelectorJudge::selectorExists(S_annoSelector, currentStyles)) {
             return;
         }
         
@@ -255,15 +257,15 @@ void SelectAnnotation::appendStyle()
             QMessageBox::warning(this, "Magic", "写入CSS文件失败。\nWrite CSS file failed.");
         }
         cssFile.close();
-        //m_tabManager->OpenResource(css);
+
     } else {
-        // Check if there already exists the style of annotation.
-        if (!cssDoc.find(S_annoSelector).isNull()) {
+        // Check selector existence using CSS parser
+        QString currentStyles = cssDoc.toPlainText();
+        if (CSSSelectorJudge::selectorExists(S_annoSelector, currentStyles)) {
             return;
         }
         
         // Append the style to the end of the stylesheet.
-        QString currentStyles = cssDoc.toPlainText();
         if (currentStyles.isEmpty()) {
             QMessageBox::warning(this, "Magic", "读取CSS失败。Read CSS file failed.");
             return;
