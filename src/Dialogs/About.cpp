@@ -47,7 +47,7 @@ About::About(QWidget *parent)
                            .arg(mo.captured(1).toInt())
                            .arg(mo.captured(2).toInt())
                            .arg(mo.captured(3).toInt());
-    ui.lbVersionDisplay->setText("0.9.27");
+    ui.lbVersionDisplay->setText("0.9.32");
     QString credits = "<h4>" + tr("Maintainer(s)") + "</h4>" +
                       "<ul>" +
                       "<li>Guoqiang Fu(1m0nster)</li>" +
