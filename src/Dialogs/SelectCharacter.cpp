@@ -408,7 +408,7 @@ void SelectCharacter::SetSelectedCharacter(const QString &text)
     bool isCtrl = QApplication::keyboardModifiers() & Qt::ControlModifier;
     
     // Choose whether to add character color.
-    QMessageBox::StandardButton useDefaultColor = QMessageBox::question(this, "Magic", "是否添加字符颜色？");
+    QMessageBox::StandardButton useDefaultColor = QMessageBox::question(this, "Magic", u8"是否添加字符颜色？");
     if (useDefaultColor == QMessageBox::No) {
         emit SelectedCharacter(text);
     } else {
@@ -437,11 +437,11 @@ void SelectCharacter::addCustomChar()
         return;
     }
     if (m_customChars.contains(c)) {
-        QMessageBox::warning(this, "Magic", "字符已存在。\nThis character already exists.");
+        QMessageBox::warning(this, "Magic", u8"字符已存在。\nThis character already exists.");
         return;
     }
     if (c.length() > 1) {
-        QMessageBox::warning(this, "Magic", "请添加单个字符。\nOnly single character allowed.");
+        QMessageBox::warning(this, "Magic", u8"请添加单个字符。\nOnly single character allowed.");
         return;
     }
     m_customChars << c;
