@@ -144,6 +144,8 @@ set( DIALOG_FILES
     Dialogs/SelectHyperlink.h
     Dialogs/SelectId.cpp
     Dialogs/SelectId.h
+    Dialogs/SelectAnnotation.cpp
+    Dialogs/SelectAnnotation.h
     Dialogs/SelectIndexTitle.cpp
     Dialogs/SelectIndexTitle.h
     Dialogs/SelectFiles.cpp
@@ -320,6 +322,10 @@ set( MISC_FILES
     Misc/GumboInterface.cpp
     Misc/PythonRoutines.h
     Misc/PythonRoutines.cpp
+    Misc/HTMLStyleResolver.hpp
+    Misc/HTMLStyleResolver.cpp
+    Misc/CSSSelectorJudge.hpp
+    Misc/CSSSelectorJudge.cpp
     )
 
 set( MISC_EDITORS_FILES    
@@ -433,6 +439,7 @@ set( UI_FILES
     Form_Files/SelectCharacter.ui
     Form_Files/SelectHyperlink.ui
     Form_Files/SelectId.ui
+    Form_Files/SelectAnnotation.ui
     Form_Files/SelectIndexTitle.ui
     Form_Files/SelectFiles.ui
     Form_Files/MetaEditor.ui 
@@ -509,6 +516,15 @@ file( GLOB PLUGIN_FILES_PYTHON Resource_Files/plugin_launchers/python/* )
 
 file( GLOB EXAMPLE_FILES Resource_Files/examples/* )
 
+# CSSParser files
+file (GLOB_RECURSE CSSPARSER_SOURCE_FILES Misc/CSSParser/*.cpp )
+file (GLOB_RECURSE CSSPARSER_HEADER_FILES Misc/CSSParser/*.h Misc/CSSParser/*.hpp )
+set ( CSSPARSER_ALL_FILES ${CSSPARSER_SOURCE_FILES} ${CSSPARSER_HEADER_FILES} )
+FOREACH( file in ${CSSPARSER_HEADER_FILES} )
+	get_filename_component(HEADER_DIR ${file} DIRECTORY)
+	include_directories(BEFORE ${HEADER_DIR})
+ENDFOREACH()
+
 qt_wrap_cpp( ${PROJECT_NAME} MOC_CPP ${LAYOUT_HEADER_FILES} )
 
 set( LINUX_DESKTOP_FILE
@@ -554,7 +570,7 @@ if ( NOT DEFINED INSTALL_BUNDLED_DICTS )
     set ( INSTALL_BUNDLED_DICTS 1 )
 endif()
 
-set( RAW_SOURCES ${MAIN_FILES} ${TAB_FILES} ${SOURCEUPDATE_FILES} ${BOOK_MANIPULATION_FILES} ${RESOURCE_OBJECT_FILES} ${DIALOG_FILES} ${EXPORTER_FILES} ${IMPORTER_FILES} ${MISC_FILES} ${MISC_EDITORS_FILES} ${SPCRE_FILES} ${VIEW_EDITOR_FILES} ${MAINUI_FILES} ${LAYOUT_ENGINE_FILES} )
+set( RAW_SOURCES ${MAIN_FILES} ${TAB_FILES} ${SOURCEUPDATE_FILES} ${BOOK_MANIPULATION_FILES} ${RESOURCE_OBJECT_FILES} ${DIALOG_FILES} ${EXPORTER_FILES} ${IMPORTER_FILES} ${MISC_FILES} ${MISC_EDITORS_FILES} ${SPCRE_FILES} ${VIEW_EDITOR_FILES} ${MAINUI_FILES} ${LAYOUT_ENGINE_FILES} ${CSSPARSER_ALL_FILES} )
 
 #############################################################################
 
@@ -589,6 +605,7 @@ source_group( "Tabs"              FILES ${TAB_FILES} )
 source_group( "MainUI"            FILES ${MAINUI_FILES} )
 source_group( "Main Files"        FILES ${MAIN_FILES} )
 source_group( "Source Updates"    FILES ${SOURCEUPDATE_FILES} )
+source_group( "CSSParser" FILES ${CSSPARSER_ALL_FILES} )
 
 
 #############################################################################

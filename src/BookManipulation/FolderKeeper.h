@@ -65,6 +65,13 @@ public:
      * @param parent The object's parent.
      */
     FolderKeeper(QObject *parent = NULL);
+    
+    /**
+     * Constructor.
+     *
+     * @param mainDirPath The working dir.
+     */
+    FolderKeeper(QObject *parent, const QString& mainDirPath);
 
     /**
      *  Destructor.
@@ -228,6 +235,8 @@ public:
      */
     void SuspendWatchingResources();
     void ResumeWatchingResources();
+    
+    void AddReferenceToTempFolder(std::shared_ptr<TempFolder> folder);
 
 signals:
 
@@ -328,7 +337,7 @@ private:
     /**
      * The main temp folder where files are stored.
      */
-    TempFolder m_TempFolder;
+    std::shared_ptr<TempFolder> m_TempFolder;
 
     /**
      * Watches the files on disk for any changes in case the resources have been modified from outside Sigil.

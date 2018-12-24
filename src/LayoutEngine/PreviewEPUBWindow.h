@@ -20,7 +20,7 @@ class PreviewEPUBWindow : public QWidget {
 public:
 	PreviewEPUBWindow(QWidget *parent, const std::string& bundlePath, const std::string& epubPath, const QSize& defaultSize);
 	~PreviewEPUBWindow();
-	void reloadEPUB(const std::string& bundlePath = "", const std::string& epubPath = "", const QSize& defaultSize = QSize(0, 0));
+	void reloadEPUB(const std::string& bundlePath = "", const std::string& epubPath = "", const std::string& jumpHtmlFilePath = "", const QSize& defaultSize = QSize(0, 0));
 	QStandardItemModel *getBookContentList() { return m_bookContents; };
 
 private:
@@ -48,11 +48,11 @@ private:
 		{ 3,"rgb(52,55,59);" }
 	};
 	bool m_isNightMode{ false };
-	bool m_canChangeTOC{ true };
     bool m_selectionStart{ false };
     bool m_haveSelction{ false };
 
 private:
+    void closeBase();
 	void generateNavigatorTreeModel(QList<std::shared_ptr<BookContents>>);
 	void changeBGColor(int color, bool isNightMode = false);
     void bookViewCoreInitial();

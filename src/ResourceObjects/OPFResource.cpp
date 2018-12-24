@@ -49,7 +49,7 @@
 
 #include "sigil_constants.h"
 
-static const QString SIGIL_VERSION_META_NAME  = "Sigil version";
+static const QString SIGIL_VERSION_META_NAME  = "Magic version";
 static const QString OPF_XML_NAMESPACE        = "http://www.idpf.org/2007/opf";
 static const QString FALLBACK_MIMETYPE        = "text/plain";
 static const QString ITEM_ELEMENT_TEMPLATE    = "<item id=\"%1\" href=\"%2\" media-type=\"%3\"/>";
@@ -132,7 +132,9 @@ OPFResource::OPFResource(const QString &mainfolder, const QString &fullfilepath,
     // Make sure the file exists on disk.
     // Among many reasons, this also solves the problem
     // with the Book Browser not displaying an icon for this resource.
-    SaveToDisk();
+    if (!QFileInfo::exists(fullfilepath)) {
+        SaveToDisk();
+    }
 }
 
 
@@ -363,7 +365,7 @@ void OPFResource::AddSigilVersionMeta()
     }
     MetaEntry me;
     me.m_name = "meta";
-    me.m_atts[QString("name")] = QString("Sigil version");
+    me.m_atts[QString("name")] = QString("Magic version");
     me.m_atts[QString("content")] = QString(SIGIL_VERSION);
     p.m_metadata.append(me);
     UpdateText(p);

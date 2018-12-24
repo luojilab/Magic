@@ -324,6 +324,8 @@ public:
      * Return hash of ids keyed on filename.
      */
     static QHash<QString, QStringList> GetIDsInAllFiles(const QList<HTMLResource *> &html_resources);
+    
+    void createFoldkeeper(const QString& mainfolder);
 
 public slots:
 

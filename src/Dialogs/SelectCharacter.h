@@ -51,10 +51,12 @@ public slots:
 
 signals:
     void SelectedCharacter(const QString &text);
+    void newCharAdded();
 
 private slots:
     void WriteSettings();
     void SetSelectedCharacter(const QString &text);
+    void addCustomChar();
 
 private:
 
@@ -66,6 +68,8 @@ private:
 
     QSignalMapper *m_buttonMapper;
     SettingsStore::SpecialCharacterAppearance m_SpecialCharacterAppearance;
+    
+    QStringList m_customChars;
 
     Ui::SelectCharacter ui;
 };

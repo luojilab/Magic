@@ -87,7 +87,9 @@ NCXResource::NCXResource(const QString &mainfolder, const QString &fullfilepath,
     // Make sure the file exists on disk.
     // Among many reasons, this also solves the problem
     // with the Book Browser not displaying an icon for this resource.
-    SaveToDisk();
+    if (!QFileInfo::exists(fullfilepath)) {
+        SaveToDisk();
+    }
 }
 
 

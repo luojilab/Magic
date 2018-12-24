@@ -1800,10 +1800,10 @@ void BookBrowser::AddCopyrightPage()
     // Open the new file in a tab
     emit ResourceActivated(new_html_resource);
     emit BookContentModified();
-    Refresh();
     
     // rename
     m_OPFModel->RenameResource(new_html_resource, copyrightFileName);
+    Refresh();
 }
 
 void BookBrowser::AddFullScreenPage()

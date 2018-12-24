@@ -6,5 +6,7 @@
     <file>app_icon_128.png</file>
     <file>app_icon_256.png</file>
     <file>app_icon_512.png</file>
+    <file>AnnoIcon.svg</file>
+    <file>AnnotationStyles.css</file>
   </qresource>
 </RCC>

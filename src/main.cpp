@@ -246,8 +246,8 @@ int main(int argc, char *argv[])
         app.addLibraryPath("imageformats");
         // Set application information for
         // easier use of QSettings classes
-        QCoreApplication::setOrganizationName("Deodao");
-        QCoreApplication::setOrganizationDomain("sigil-ebook.com");
+        QCoreApplication::setOrganizationName("luojilab");
+        QCoreApplication::setOrganizationDomain("luojilab.com");
         QCoreApplication::setApplicationName("Magic");
         QCoreApplication::setApplicationVersion(SIGIL_VERSION);
 

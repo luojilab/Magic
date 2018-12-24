@@ -67,6 +67,7 @@
 #include "Dialogs/SelectHyperlink.h"
 #include "Dialogs/SelectId.h"
 #include "Dialogs/SelectIndexTitle.h"
+#include "Dialogs/SelectAnnotation.h"
 #include "Exporters/ExportEPUB.h"
 #include "Exporters/ExporterFactory.h"
 #include "Importers/ImporterFactory.h"
@@ -117,7 +118,7 @@ static const int ZOOM_SLIDER_MIN    = 0;
 static const int ZOOM_SLIDER_MAX    = 1000;
 static const int ZOOM_SLIDER_MIDDLE = 500;
 static const int ZOOM_SLIDER_WIDTH  = 140;
-static const QString S_APP_NAME = "ETypesetting";
+static const QString S_APP_NAME = "Magic";
 
 static const QString DONATE         = "http://sigil-ebook.com/donate";
 static const QString SIGIL_WEBSITE  = "http://sigil-ebook.com";
@@ -671,8 +672,9 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    m_willClose = true;
     if (MaybeSaveDialogSaysProceed()) {
-        ShowMessageOnStatusBar(tr("Sigil is closing..."));
+        ShowMessageOnStatusBar(tr("Magic is closing..."));
         WriteSettings();
         KeyboardShortcutManager *sm = KeyboardShortcutManager::instance();
         sm->removeActionsOf(this);
@@ -718,6 +720,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
         event->accept();
     } else {
+        m_willClose = false;
         event->ignore();
     }
 }
@@ -1811,6 +1814,16 @@ void MainWindow::InsertSpecialCharacter()
     m_SelectCharacter->activateWindow();
 }
 
+void MainWindow::refreshSelectCharacter()
+{
+    if (m_SelectCharacter && m_SelectCharacter->isVisible()) {
+        m_SelectCharacter->close();
+    }
+    delete m_SelectCharacter;
+    m_SelectCharacter = new SelectCharacter(this);
+    InsertSpecialCharacter();
+}
+
 void MainWindow::InsertId()
 {
     SaveTabData();
@@ -1885,6 +1898,47 @@ void MainWindow::InsertHyperlink()
         if (!flow_tab->InsertHyperlink(target)) {
             QMessageBox::warning(this, tr("Magic"), tr("You cannot insert a link at this position."));
         }
+    }
+}
+
+// Insert an img with text in "alt" to display annotations on devices.
+void MainWindow::insertAnnotation()
+{
+    FlowTab *flowTab = GetCurrentFlowTab();
+    if (!flowTab || !flowTab->InsertHyperlinkEnabled()) { // Use check function from insertHyperlink.
+        QMessageBox::warning(this, tr("Magic"), tr(u8"插入注释位置错误。\nYou cannot insert an annotation at this position."));
+        return;
+    }
+    if (flowTab->GetViewState() == ViewState_BookView) {
+        QMessageBox::warning(this, tr("Magic"), tr(u8"请在代码视图操作。\nYou should insert an annotation in codeview."));
+        CodeView();
+        return;
+    }
+
+    CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
+    if (!codeView) {
+        QMessageBox::warning(this, tr("Magic"), tr(u8"代码视图编辑器获取失败。\nGet CodeViewEditor failed."));
+        return;
+    }
+
+    // Open a dialog to get text and icon input.
+    SelectAnnotation selectAnnotation(m_Book, m_BookBrowser, m_TabManager, codeView, this);
+
+    if (selectAnnotation.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    QString annoText = selectAnnotation.getText();
+    QString annoIcon = selectAnnotation.getIcon();
+
+    if (annoText.isEmpty()) {
+        QMessageBox::warning(this, tr("Magic"), tr(u8"输入文本为空。\nInput text is empty."));
+        return;
+    }
+
+    if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
+        QMessageBox::warning(this, tr("Magic"), tr(u8"插入注释失败。\nInserting annotation fail."));
+        return;
     }
 }
 
@@ -3016,6 +3070,7 @@ void MainWindow::SetStateActionsBookView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(true);
     ui.actionInsertHyperlink->setEnabled(true);
+    ui.actionInsertAnnotation->setEnabled(true);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3088,6 +3143,7 @@ void MainWindow::SetStateActionsCodeView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(true);
     ui.actionInsertHyperlink->setEnabled(true);
+    ui.actionInsertAnnotation->setEnabled(true);
     ui.actionInsertClosingTag->setEnabled(true);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3177,6 +3233,7 @@ void MainWindow::SetStateActionsRawView()
     ui.actionInsertSpecialCharacter->setEnabled(true);
     ui.actionInsertId->setEnabled(false);
     ui.actionInsertHyperlink->setEnabled(false);
+    ui.actionInsertAnnotation->setEnabled(false);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3249,6 +3306,7 @@ void MainWindow::SetStateActionsStaticView()
     ui.actionInsertSpecialCharacter->setEnabled(false);
     ui.actionInsertId->setEnabled(false);
     ui.actionInsertHyperlink->setEnabled(false);
+    ui.actionInsertAnnotation->setEnabled(false);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(false);
     ui.actionRedo->setEnabled(false);
@@ -3776,7 +3834,7 @@ void MainWindow::changePreviewContent()
 	}
     if (m_previewEPUBDock && m_previewEPUBDock->isVisible()) {
 		m_previewEPUBDock->close();
-		layout(iPhone5);
+		//layout(iPhone5);
     }
     if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
 		m_previewerToHTML->close();
@@ -3799,6 +3857,7 @@ void MainWindow::ResourcesAddedOrDeleted()
 void MainWindow::CreateNewBook()
 {
     QSharedPointer<Book> new_book = QSharedPointer<Book>(new Book());
+    new_book->createFoldkeeper("");
     new_book->CreateEmptyHTMLFile();
     QString version = new_book->GetConstOPF()->GetEpubVersion();
     if (version.startsWith('3')) {
@@ -3879,7 +3938,7 @@ bool MainWindow::LoadFile(const QString &fullfilepath, bool is_internal)
         QApplication::restoreOverrideCursor();
         Utility::DisplayStdErrorDialog(
             tr("The creator of this file has encrypted it with DRM. "
-               "Sigil cannot open such files."));
+               "Magic cannot open such files."));
     } catch (EPUBLoadParseError epub_load_error) {
         ShowMessageOnStatusBar();
         QApplication::restoreOverrideCursor();
@@ -3927,7 +3986,7 @@ bool MainWindow::SaveFile(const QString &fullfilepath, bool update_current_filen
         if (!SUPPORTED_SAVE_TYPE.contains(extension)) {
             ShowMessageOnStatusBar();
             Utility::DisplayStdErrorDialog(
-                tr("Sigil cannot save files of type \"%1\".\n"
+                tr("Magic cannot save files of type \"%1\".\n"
                    "Please choose a different format.")
                 .arg(extension)
             );
@@ -4307,7 +4366,7 @@ void MainWindow::PlatformSpecificTweaks()
     sizeMenuIcons();
 }
 
-void MainWindow::layout(PreviewPhoneType type) {
+void MainWindow::layout(PreviewPhoneType type, bool landscape) {
     if (m_epubPreviewer && m_epubPreviewer->isVisible()) {
         QMessageBox::information(this, "", u8"请先关闭当前预览窗口", QMessageBox::Ok);
         return;
@@ -4321,7 +4380,7 @@ void MainWindow::layout(PreviewPhoneType type) {
 	}
     
     float ratio = QApplication::screens()[0]->devicePixelRatio() >= 2 ? 1 : 0.87;
-	QSize d_size = m_previewPhoneSizeMap[type];
+    QSize d_size = landscape ? QSize(m_previewPhoneSizeMap[type].height(), m_previewPhoneSizeMap[type].width()) : m_previewPhoneSizeMap[type];
     int screenHeight = QApplication::desktop()->screenGeometry().size().height();
     float height = d_size.height() / ratio > screenHeight ? screenHeight - 100 : d_size.height() / ratio;
     float width = (float(d_size.width()) / d_size.height()) * height / ratio;
@@ -4368,7 +4427,7 @@ void MainWindow::layout(PreviewPhoneType type) {
     m_previewerToEpubContainer->setStyleSheet("background-color:;"); // used for relayout the view;
     //update content
 	std::string emptyStr = "";
-    m_epubPreviewer->reloadEPUB(emptyStr, m_CurrentFilePath.toStdString(), QSize(width, height));
+    m_epubPreviewer->reloadEPUB(emptyStr, m_CurrentFilePath.toStdString(), "", QSize(width, height));
 	m_previewEPUBDock->show();
 	m_epubPreviewer->setFocus();
 }
@@ -4501,6 +4560,7 @@ void MainWindow::ExtendUI()
     sm->registerAction(this, ui.actionInsertSpecialCharacter, "MainWindow.InsertSpecialCharacter");
     sm->registerAction(this, ui.actionInsertId, "MainWindow.InsertId");
     sm->registerAction(this, ui.actionInsertHyperlink, "MainWindow.InsertHyperlink");
+    sm->registerAction(this, ui.actionInsertAnnotation, "MainWindow.insertAnnotation");
     sm->registerAction(this, ui.actionMarkForIndex, "MainWindow.MarkForIndex");
     sm->registerAction(this, ui.actionSplitSection, "MainWindow.SplitSection");
     sm->registerAction(this, ui.actionInsertSGFSectionMarker, "MainWindow.InsertSGFSectionMarker");
@@ -4949,6 +5009,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionInsertSpecialCharacter, SIGNAL(triggered()), this, SLOT(InsertSpecialCharacter()));
     connect(ui.actionInsertId,        SIGNAL(triggered()),  this,   SLOT(InsertId()));
     connect(ui.actionInsertHyperlink, SIGNAL(triggered()),  this,   SLOT(InsertHyperlink()));
+    connect(ui.actionInsertAnnotation, SIGNAL(triggered()), this, SLOT(insertAnnotation()));
     connect(ui.actionPreferences,     SIGNAL(triggered()), this, SLOT(PreferencesDialog()));
     // Search
     connect(ui.actionFind,             SIGNAL(triggered()), this, SLOT(Find()));
@@ -5000,6 +5061,7 @@ void MainWindow::ConnectSignalsToSlots()
 	connect(ui.actionIPhoneX, SIGNAL(triggered()), this, SLOT(previewForIphoneX()));
 	connect(ui.actionXiaoMi, SIGNAL(triggered()), this, SLOT(previewForXiaoMi()));
 	connect(ui.actionIPad, SIGNAL(triggered()), this, SLOT(previewForIpad()));
+    connect(ui.actionIPad_landscape, SIGNAL(triggered()), this, SLOT(previewForIpadLandscape()));
 	connect(ui.actionIPhone5_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone5()));
 	connect(ui.actionIPhone6_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone6()));
 	connect(ui.actionIPhone6P_inTime, SIGNAL(triggered()), this, SLOT(previewIntimeForIphone6P()));
@@ -5124,7 +5186,6 @@ void MainWindow::ConnectSignalsToSlots()
     connect(m_SearchEditor, SIGNAL(ReplaceAllSelectedSearchRequest(QList<SearchEditorModel::searchEntry *>)),
             m_FindReplace,   SLOT(ReplaceAllSearch(QList<SearchEditorModel::searchEntry *>)));
     connect(m_ClipboardHistorySelector, SIGNAL(PasteRequest(const QString &)), this, SLOT(PasteTextIntoCurrentTarget(const QString &)));
-    connect(m_SelectCharacter, SIGNAL(SelectedCharacter(const QString &)), this, SLOT(PasteTextIntoCurrentTarget(const QString &)));
     connect(m_ClipEditor, SIGNAL(PasteSelectedClipRequest(QList<ClipEditorModel::clipEntry *>)),
             this,           SLOT(PasteClipEntriesIntoCurrentTarget(QList<ClipEditorModel::clipEntry *>)));
     connect(m_Clips,        SIGNAL(PasteClips(QList<ClipEditorModel::clipEntry *>)),
@@ -5185,13 +5246,23 @@ void MainWindow::ConnectSignalsToSlots()
 }
 
 void MainWindow::fileSavedSuccessAction() {
-	if (m_previewerToHTML && m_previewerToHTML->isVisible()) {
+	if (m_previewerToHTML && m_previewerToHTML->isVisible() && !m_willClose) {
         if (dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource())) {
             m_previewerToHTML->reloadHTML(m_TabManager->GetCurrentContentTab()->GetLoadedResource()->GetFullPath().toStdString(), true, QSize(0,0));
         } else {
             m_previewerToHTML->reloadHTML("", true, QSize(0,0));
         }
+        return;
 	}
+    if (m_previewEPUBDock && m_previewEPUBDock->isVisible() && !m_willClose) {
+        HTMLResource* htmlRes = dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource());
+        std::string jumpPath("");
+        if (htmlRes) {
+            jumpPath = htmlRes->GetRelativePathToRoot().toStdString();
+        }
+        m_epubPreviewer->reloadEPUB("", m_CurrentFilePath.toStdString(), jumpPath);
+        return;
+    }
 }
 
 void MainWindow::MakeTabConnections(ContentTab *tab)

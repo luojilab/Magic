@@ -36,11 +36,11 @@ class LayoutEngine: public QObject {
     
 public:
     ENGINE_EXPORT static LayoutEngine* GetEngine();
-	ENGINE_EXPORT static bool isEngineReady();
-	ENGINE_EXPORT static void ReleaseLayoutEngine();
-	ENGINE_EXPORT static void SetViewTopMargin(qint32 topMargin);
-	ENGINE_EXPORT static void SetViewBottomMargin(qint32 bottomMargin);
-
+    ENGINE_EXPORT static bool isEngineReady();
+    ENGINE_EXPORT static void ReleaseLayoutEngine();
+    ENGINE_EXPORT static void SetViewTopMargin(qint32 topMargin);
+    ENGINE_EXPORT static void SetViewBottomMargin(qint32 bottomMargin);
+    
 public:
     
     ENGINE_EXPORT ~LayoutEngine();
@@ -48,9 +48,9 @@ public:
     
     ENGINE_EXPORT void openEpub(future_core::BookView* view, const std::string& filePath, const std::string& tokenStd, const std::string& uidStd, std::function<void(BookReader*, int)>callback);
     
-	ENGINE_EXPORT void gotoChapterByFileName(BookReader *bookModel, const QString& fileName);
+    ENGINE_EXPORT void gotoChapterByFileName(BookReader *bookModel, const QString& fileName);
     
-	ENGINE_EXPORT void closeEpub(BookReader *bookModel);
+    ENGINE_EXPORT void closeEpub(BookReader *bookModel, std::function<void()>cb);
     
     ENGINE_EXPORT void repaint(BookReader *bookModel);
     ENGINE_EXPORT void repaint(HTMLReader *htmlReader);
@@ -95,22 +95,22 @@ public:
     
     ENGINE_EXPORT void
     openHtml(future_core::HTMLViewQt *view, const std::string& htmlPath, const std::string& uniqueKey, std::function<void(HTMLReader*, int code)>callback);
-	ENGINE_EXPORT void closeHtml(HTMLReader *html);
-	ENGINE_EXPORT void setIsNightMode(bool);
+    ENGINE_EXPORT void closeHtml(HTMLReader *html);
+    ENGINE_EXPORT void setIsNightMode(bool);
     ENGINE_EXPORT QList<std::shared_ptr<BookContents>>getContentList(BookReader *bookModel);
-	ENGINE_EXPORT void setFontScale(BookReader *bookreader, float scaleFactor);
+    ENGINE_EXPORT void setFontScale(BookReader *bookModel, float scaleFactor);
     ENGINE_EXPORT void getSelectedText(BookReader* reader, std::function<void(const std::string &, const std::string, int, int)>);
     
     ENGINE_EXPORT void setSelectionBackgroundColor(const QColor &color);
     ENGINE_EXPORT void setCaretColor(const QColor &color);
-
+    
 private:
     LayoutEngine();
     void pageManpulate(BookReader *bookModel, std::function<void(void)>);
     void pageManpulate(HTMLReader *chapterReader, std::function<void(void)>);
     
 private:
-	bool m_isNightMode{ false };
+    bool m_isNightMode{ false };
     
 signals:
     void runOnMainthreadSignal(std::function<void(void)>);

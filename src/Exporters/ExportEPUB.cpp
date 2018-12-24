@@ -65,6 +65,11 @@ static const QString OEBPS_FOLDER_SUFFIX   = "/OEBPS";
 
 static const char * EPUB_MIME_DATA = "application/epub+zip";
 
+extern const QString CONTAINER_FILE_PATH;
+extern const QString OPF_FILE_PATH;
+extern const QString TOC_FILE_PATH;
+const QString ENCRYPTION_FILE_PATH = "META-INF/encryption.xml";
+
 
 // Constructor;
 // the first parameter is the location where the book
@@ -91,17 +96,18 @@ void ExportEPUB::WriteBook()
     if (m_Book->HasObfuscatedFonts()) {
         m_Book->GetOPF()->EnsureUUIDIdentifierPresent();
     }
+    QString workDir = m_Book->GetFolderKeeper()->GetFullPathToMainFolder();
 
     m_Book->GetOPF()->AddSigilVersionMeta();
     m_Book->GetOPF()->AddModificationDateMeta();
     m_Book->SaveAllResourcesToDisk();
-    TempFolder tempfolder;
-    CreatePublication(tempfolder.GetPath());
+    CreatePublication(workDir);
 
     if (m_Book->HasObfuscatedFonts()) {
-        ObfuscateFonts(tempfolder.GetPath());
+        ObfuscateFonts(workDir);
     }
 
+    TempFolder tempfolder;
     SaveFolderAsEpubToLocation(tempfolder.GetPath(), m_FullFilePath);
 }
 
@@ -110,7 +116,9 @@ void ExportEPUB::WriteBook()
 // (creates XHTML, CSS, OPF, NCX files etc.)
 void ExportEPUB::CreatePublication(const QString &fullfolderpath)
 {
-    Utility::CopyFiles(m_Book->GetFolderKeeper()->GetFullPathToMainFolder(), fullfolderpath);
+    if (fullfolderpath != m_Book->GetFolderKeeper()->GetFullPathToMainFolder()) {
+        Utility::CopyFiles(m_Book->GetFolderKeeper()->GetFullPathToMainFolder(), fullfolderpath);
+    }
 
     if (m_Book->HasObfuscatedFonts()) {
         CreateEncryptionXML(fullfolderpath + METAINF_FOLDER_SUFFIX);
@@ -121,6 +129,7 @@ void ExportEPUB::SaveFolderAsEpubToLocation(const QString &fullfolderpath, const
 {
     QString tempFile = fullfolderpath + "-tmp.epub";
     QDateTime timeNow = QDateTime::currentDateTime();
+    QString workDir = m_Book->GetFolderKeeper()->GetFullPathToMainFolder();
     zip_fileinfo fileInfo;
 #ifdef Q_OS_WIN32
     zlib_filefunc64_def ffunc;
@@ -158,12 +167,31 @@ void ExportEPUB::SaveFolderAsEpubToLocation(const QString &fullfolderpath, const
 
     zipCloseFileInZip(zfile);
     // Write all the files in our directory path to the archive.
-    QDirIterator it(fullfolderpath, QDir::Files | QDir::NoDotAndDotDot | QDir::Readable | QDir::Hidden, QDirIterator::Subdirectories);
+    QDirIterator it(workDir, QDir::Files | QDir::NoDotAndDotDot | QDir::Readable | QDir::Hidden, QDirIterator::Subdirectories);
 
+    QList<Resource *> resourceList = m_Book->GetFolderKeeper()->GetResourceList();
+    QMap<QString, bool> resourcePaths;
+    for (Resource *res : resourceList) {
+        auto s = res->GetFullPath().toStdString();
+        resourcePaths[res->GetFullPath()] = true;
+    }
+    
+    const QString containerPath = workDir + "/" + CONTAINER_FILE_PATH;  // META-INF/container.xml
+    const QString opfPath = workDir + "/" + OPF_FILE_PATH;              // OEBPS/content.opf
+    const QString tocPath = workDir + "/" + TOC_FILE_PATH;              // OEBPS/toc.ncx
+    const QString encPath = workDir + "/" + ENCRYPTION_FILE_PATH;       // META-INF/encryption.xml
     while (it.hasNext()) {
         it.next();
-        QString relpath = it.filePath().remove(fullfolderpath);
-
+        QString filePath = it.filePath();
+        QString relpath = it.filePath().remove(workDir);
+        if ( !resourcePaths[filePath] &&
+            opfPath != filePath &&
+            tocPath != filePath &&
+            encPath != filePath &&
+            containerPath != filePath ) {
+            continue;
+        }
+        
         while (relpath.startsWith("/")) {
             relpath = relpath.remove(0, 1);
         }

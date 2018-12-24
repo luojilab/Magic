@@ -35,6 +35,7 @@ ArchitecturesInstallIn64BitMode="${ISS_ARCH}"
 
 [Files]
 Source: "Magic\*"; DestDir: "{app}"; Flags: createallsubdirs recursesubdirs ignoreversion
+Source: vendor\vcredist2010.exe; DestDir: {tmp}
 Source: vendor\vcredist2015.exe; DestDir: {tmp}
 
 [Components]
@@ -83,6 +84,7 @@ Type: files; Name: "{app}\sigil-python3.exe"
 
 [Run]
 ; The following command detects whether or not the c++ runtime need to be installed.
+Filename: {tmp}\vcredist2010.exe; Parameters: "/passive /Q:a /c:""msiexec /qb /i vcredist2010.msi"" "; StatusMsg: Checking for VS 2010 RunTime ...
 Filename: {tmp}\vcredist2015.exe; Check: NeedsVC2015RedistInstall; Parameters: "/passive /Q:a /c:""msiexec /qb /i vcredist2015.msi"" "; StatusMsg: Checking for VS 2015 RunTime ...
 
 [Code]
