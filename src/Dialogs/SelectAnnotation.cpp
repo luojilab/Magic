@@ -34,6 +34,7 @@ SOFTWARE.
 #include "gumbo.h"                      // gumbo_get_attribute()
 #include "Misc/CSSSelectorJudge.hpp"      // CSSSelectorJudge::selectorExists()
 
+#include <utility>                      // pair<ColorMember, QString>
 #include <QSvgRenderer>                 // Render SVG graph
 #include <QColorDialog>                 // QColorDialog::getColor()
 #include <QFile>                        // Read SVG file
@@ -42,9 +43,12 @@ SOFTWARE.
 
 const QString S_iconSvgSrc = ":icon/AnnoIcon.svg";
 const QString S_iconSaveName = "AnnoIcon0.png";
-const QString S_annotationStylesheetPath = ":icon/AnnotationStyles.css";
+const QString S_annoStylesheetFilename = "AnnotationStyles.css";
+const QString S_annoStylesheetPath = ":icon/" + S_annoStylesheetFilename;
 const QString S_srcBgColor = "#000000";
 const QString S_srcFgColor = "#FFFFFF";
+const QString S_defaultBgColor = "#998181";
+const QString S_defaultFgColor = "#FFFFFF";
 const QSize S_iconSize(72, 72);
 const QString S_defaultIconSrc = "../Images/AnnoIcon0.png";
 const QString S_annoPre = "<img class=\"epub-footnote\" src=\"";
@@ -59,8 +63,8 @@ const QString S_reSuf1 = " (\\w|\\s|\"|=)+>";
 const char *S_annoSelector = "img.epub-footnote { }";
 const char *S_annoStyle = "\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align:super;\n    padding: 0 5px;\n}\n";
 
-QString SelectAnnotation::S_lastBgColor = "#998181";
-QString SelectAnnotation::S_lastFgColor = "#FFFFFF";
+QString SelectAnnotation::S_lastBgColor = S_defaultBgColor;
+QString SelectAnnotation::S_lastFgColor = S_defaultFgColor;
 
 SelectAnnotation::SelectAnnotation(QSharedPointer<Book> book,
                                    BookBrowser *bookBrowser,
@@ -71,6 +75,8 @@ SelectAnnotation::SelectAnnotation(QSharedPointer<Book> book,
       m_iconSrc(S_defaultIconSrc),
       m_bgColor(S_lastBgColor),
       m_fgColor(S_lastFgColor),
+      m_initialBgColor(S_lastBgColor),
+      m_initialFgColor(S_lastFgColor),
       m_iconImg(S_iconSize, QImage::Format_ARGB32),
       m_painter(&m_iconImg),
       m_book(book),
@@ -139,13 +145,55 @@ void SelectAnnotation::inputText()
     }
 }
 
-void SelectAnnotation::selectColor(QString &colorMember, QPushButton *colorButton)
+void SelectAnnotation::selectColor(const ColorMember cm)
 {
     QColor temp = QColorDialog::getColor();
-    if (temp.isValid()) {
-        colorMember = temp.name();
-        renderIcon();
+    if (!temp.isValid()) {
+        QMessageBox::warning(this, "Magic", "Invalid color.");
+        return;
     }
+    
+    if (cm == ColorMember::bgColor) {
+        m_iconColors.push(qMakePair(ColorMember::bgColor, m_bgColor));
+        m_bgColor = temp.name();
+    } else if (cm == ColorMember::fgColor) {
+        m_iconColors.push(qMakePair(ColorMember::fgColor, m_fgColor));
+        m_fgColor = temp.name();
+    } else {
+        QMessageBox::warning(this, "Magic", "Invalid color member.");
+    }
+    
+    renderIcon();
+}
+
+void SelectAnnotation::restoreDefaultColor()
+{
+    m_bgColor = S_defaultBgColor;
+    m_fgColor = S_defaultFgColor;
+    renderIcon();
+}
+
+void SelectAnnotation::restoreLastColor()
+{
+    if (m_iconColors.isEmpty()) {
+        QMessageBox::warning(this, "Magic", "This is the first color.");
+        return;
+    }
+    QPair<ColorMember, QString> lastColor = m_iconColors.pop();
+    if (lastColor.first == ColorMember::bgColor) {
+        m_bgColor = lastColor.second;
+    } else if (lastColor.first == ColorMember::fgColor) {
+        m_fgColor = lastColor.second;
+    } else {
+        QMessageBox::warning(this, "Magic", "Invalid color member.");
+    }
+    renderIcon();
+}
+
+void SelectAnnotation::restoreInitialColor()
+{
+    S_lastBgColor = m_initialBgColor;
+    S_lastFgColor = m_initialFgColor;
 }
 
 // Using QSvgRenderer to render icon when colors change.
@@ -253,7 +301,7 @@ void SelectAnnotation::appendStyle()
         }
         
         // Append the style to the end of the file
-        if (cssFile.write(S_annoStyle) == -1) {
+        if (cssFile.write(S_annoStyle) != 0 && cssFilename != S_annoStylesheetFilename) {
             QMessageBox::warning(this, "Magic", "写入CSS文件失败。\nWrite CSS file failed.");
         }
         cssFile.close();
@@ -278,7 +326,7 @@ void SelectAnnotation::appendStyle()
 
 void SelectAnnotation::addStylesheet()
 {
-    Resource *annoStylesheet = m_book->GetFolderKeeper()->AddContentFileToFolder(S_annotationStylesheetPath);
+    Resource *annoStylesheet = m_book->GetFolderKeeper()->AddContentFileToFolder(S_annoStylesheetPath);
     if (!annoStylesheet) {
         QMessageBox::warning(this, tr("Magic"), tr("添加样式文件失败。\nAdding CSS file failed."));
         return;
@@ -314,7 +362,10 @@ void SelectAnnotation::connectSignalsSlots()
 {
     connect(ui->backgroundColor, SIGNAL(clicked()), this, SLOT(selectBgColor()));
     connect(ui->foregroundColor, SIGNAL(clicked()), this, SLOT(selectFgColor()));
+    connect(ui->defaultColorButton, SIGNAL(clicked()), this, SLOT(restoreDefaultColor()));
+    connect(ui->lastColorButton, SIGNAL(clicked()), this, SLOT(restoreLastColor()));
     connect(this, SIGNAL(accepted()), this, SLOT(inputText()));
     connect(this, SIGNAL(accepted()), this, SLOT(addIconFile()));
     connect(this, SIGNAL(accepted()), this, SLOT(appendStyle()));
+    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(restoreInitialColor()));
 }

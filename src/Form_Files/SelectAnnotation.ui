@@ -65,18 +65,44 @@
          <number>10</number>
         </property>
         <item>
-         <widget class="QPushButton" name="backgroundColor">
-          <property name="text">
-           <string>背景色</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QPushButton" name="backgroundColor">
+            <property name="text">
+             <string>背景色</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
-         <widget class="QPushButton" name="foregroundColor">
-          <property name="text">
-           <string>前景色</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QPushButton" name="foregroundColor">
+            <property name="text">
+             <string>前景色</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="defaultColorButton">
+            <property name="text">
+             <string>默认颜色</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="lastColorButton">
+            <property name="text">
+             <string>撤消</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -85,7 +111,7 @@
     <item>
      <widget class="QPlainTextEdit" name="annoTextEdit">
       <property name="placeholderText">
-       <string>在此输入注释文本。Write Annotation Text Here.</string>
+       <string>在此输入注释文本（自动删除常见标签）</string>
       </property>
      </widget>
     </item>

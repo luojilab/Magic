@@ -40,6 +40,8 @@ SOFTWARE.
 #include "ViewEditors/CodeViewEditor.h"
 #include "Tabs/TabManager.h"
 
+enum ColorMember { bgColor, fgColor };
+
 namespace Ui
 {
 class SelectAnnotation;
@@ -68,8 +70,11 @@ public:
     static int insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView);
     
 private slots:
-    void selectBgColor() { selectColor(m_bgColor, ui->backgroundColor); }
-    void selectFgColor() { selectColor(m_fgColor, ui->foregroundColor); }
+    void selectBgColor() { selectColor(ColorMember::bgColor); }
+    void selectFgColor() { selectColor(ColorMember::fgColor); }
+    void restoreDefaultColor();
+    void restoreLastColor();
+    void restoreInitialColor();
     void inputText();
     void addIconFile();
     void appendStyle();
@@ -77,7 +82,8 @@ private slots:
 private:
     void initSvg();
     void initUI();
-    void selectColor(QString &colorMemeber, QPushButton *colorButtion);
+    void initColorStack();
+    void selectColor(const ColorMember);
     void renderIcon();
     void addStylesheet();
     void addStylesheetLink();
@@ -87,10 +93,13 @@ private:
     QString m_iconSrc;
     QString m_bgColor;
     QString m_fgColor;
+    QString m_initialBgColor; // Used to restore when cancel selected
+    QString m_initialFgColor;
     QImage m_iconImg;
     QByteArray m_svgBytes;
     QPainter m_painter;
     QGraphicsScene m_graphScene;
+    QStack<QPair<ColorMember, QString>> m_iconColors;
 
     QSharedPointer<Book> m_book;
     BookBrowser *m_bookBroswer;
