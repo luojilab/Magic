@@ -385,6 +385,8 @@ private:typedef enum {
 		void InsertFileDialog();
 
 		void InsertSpecialCharacter();
+    
+        void refreshSelectCharacter();
 
 		void InsertId();
 

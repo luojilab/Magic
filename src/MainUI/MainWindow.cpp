@@ -118,7 +118,7 @@ static const int ZOOM_SLIDER_MIN    = 0;
 static const int ZOOM_SLIDER_MAX    = 1000;
 static const int ZOOM_SLIDER_MIDDLE = 500;
 static const int ZOOM_SLIDER_WIDTH  = 140;
-static const QString S_APP_NAME = "ETypesetting";
+static const QString S_APP_NAME = "Magic";
 
 static const QString DONATE         = "http://sigil-ebook.com/donate";
 static const QString SIGIL_WEBSITE  = "http://sigil-ebook.com";
@@ -1814,6 +1814,16 @@ void MainWindow::InsertSpecialCharacter()
     m_SelectCharacter->activateWindow();
 }
 
+void MainWindow::refreshSelectCharacter()
+{
+    if (m_SelectCharacter && m_SelectCharacter->isVisible()) {
+        m_SelectCharacter->close();
+    }
+    delete m_SelectCharacter;
+    m_SelectCharacter = new SelectCharacter(this);
+    InsertSpecialCharacter();
+}
+
 void MainWindow::InsertId()
 {
     SaveTabData();
@@ -1896,18 +1906,18 @@ void MainWindow::insertAnnotation()
 {
     FlowTab *flowTab = GetCurrentFlowTab();
     if (!flowTab || !flowTab->InsertHyperlinkEnabled()) { // Use check function from insertHyperlink.
-        QMessageBox::warning(this, tr("Magic"), tr("插入注释位置错误。\nYou cannot insert an annotation at this position."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"插入注释位置错误。\nYou cannot insert an annotation at this position."));
         return;
     }
     if (flowTab->GetViewState() == ViewState_BookView) {
-        QMessageBox::warning(this, tr("Magic"), tr("请在代码视图操作。\nYou should insert an annotation in codeview."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"请在代码视图操作。\nYou should insert an annotation in codeview."));
         CodeView();
         return;
     }
 
     CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
     if (!codeView) {
-        QMessageBox::warning(this, tr("Magic"), tr("代码视图编辑器获取失败。\nGet CodeViewEditor failed."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"代码视图编辑器获取失败。\nGet CodeViewEditor failed."));
         return;
     }
 
@@ -1922,12 +1932,12 @@ void MainWindow::insertAnnotation()
     QString annoIcon = selectAnnotation.getIcon();
 
     if (annoText.isEmpty()) {
-        QMessageBox::warning(this, tr("Magic"), tr("输入文本为空。\nInput text is empty."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"输入文本为空。\nInput text is empty."));
         return;
     }
 
     if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
-        QMessageBox::warning(this, tr("Magic"), tr("插入注释失败。\nInserting annotation fail."));
+        QMessageBox::warning(this, tr("Magic"), tr(u8"插入注释失败。\nInserting annotation fail."));
         return;
     }
 }
@@ -5176,7 +5186,6 @@ void MainWindow::ConnectSignalsToSlots()
     connect(m_SearchEditor, SIGNAL(ReplaceAllSelectedSearchRequest(QList<SearchEditorModel::searchEntry *>)),
             m_FindReplace,   SLOT(ReplaceAllSearch(QList<SearchEditorModel::searchEntry *>)));
     connect(m_ClipboardHistorySelector, SIGNAL(PasteRequest(const QString &)), this, SLOT(PasteTextIntoCurrentTarget(const QString &)));
-    connect(m_SelectCharacter, SIGNAL(SelectedCharacter(const QString &)), this, SLOT(PasteTextIntoCurrentTarget(const QString &)));
     connect(m_ClipEditor, SIGNAL(PasteSelectedClipRequest(QList<ClipEditorModel::clipEntry *>)),
             this,           SLOT(PasteClipEntriesIntoCurrentTarget(QList<ClipEditorModel::clipEntry *>)));
     connect(m_Clips,        SIGNAL(PasteClips(QList<ClipEditorModel::clipEntry *>)),

@@ -271,7 +271,7 @@ namespace future {
     
     static const char* CLASSATTRIBUTE = "class";
     static const char* IDATTRIBUTE = "id";
-    std::list<HTMLCSSRefAdaptor::GumboArray> SMemoryBackup;
+    std::list<HTMLCSSRefAdaptor::GumboNodesArray> SMemoryBackup;
     HTMLCSSRefAdaptor::HTMLCSSRefAdaptor()
     {
     }
@@ -334,7 +334,7 @@ namespace future {
             std::string selectorClass = selector->getClassIdentifier();
             // A node may have multiClasses, so using substring relation
             AttributeSelector s(CLASSATTRIBUTE, selectorClass, AttributeSelector::Substring);
-            GumboArray elementA = nodesArray + i;
+            GumboNodesArray elementA = nodesArray + i;
             ret = nodeAdaptToAttributeSelector(&elementA, &s, &potential);
             if (ret) {
                 potentialNextNodes.push_back(nodesArray[i]);
@@ -358,7 +358,7 @@ namespace future {
             }
             std::string selectorId = selector->getIdIdentifier();
             AttributeSelector s(IDATTRIBUTE, selectorId, AttributeSelector::Equal);
-            GumboArray elementA = nodesArray + i;
+            GumboNodesArray elementA = nodesArray + i;
             bool ret = nodeAdaptToAttributeSelector(&elementA, &s, &potential);
             if (ret) {
                 potentialNextNodes.push_back(nodesArray[i]);
@@ -372,7 +372,7 @@ namespace future {
     bool HTMLCSSRefAdaptor::nodeAdaptToTypeSelector(GumboNode*** nodeArrayPtr, TypeSelector* selector, int *potentialSize)
     {
         bool ret = false;
-        GumboArray nodesArray = *nodeArrayPtr;
+        GumboNodesArray nodesArray = *nodeArrayPtr;
         std::list<GumboNode *>potentialNextNodes;
         for (int i = 0; i < *potentialSize; i++) {
             GumboNode* node = nodesArray[i];
@@ -404,7 +404,7 @@ namespace future {
     {
         bool ret = false;
         int loopSize = *potentialSize;
-        GumboArray nodesArray = *nodeArrayPtr;
+        GumboNodesArray nodesArray = *nodeArrayPtr;
         std::list<GumboNode *>potentialNextNodes;
         for (int i = 0; i < loopSize; i++) {
             GumboNode* node = nodesArray[i];
@@ -480,14 +480,14 @@ namespace future {
     
     bool HTMLCSSRefAdaptor::nodeAdaptToPseudoSelector(GumboNode ***nodePtr, PseudoSelector* selector, int *potentialSize)
     {
-        // TODO need finish
         bool ret = true;
-        GumboNode* nodesBackup[*potentialSize];
+        GumboNodesArray nodesBackup = new GumboNode*[*potentialSize];
         BackupNodes(nodesBackup, *nodePtr, *potentialSize);
         int loopSize = *potentialSize;
         std::list<GumboNode *>potentialNextNodes;
         std::string pseudo = selector->getPseudoData();
         if (pseudo.empty()) {
+            delete [] nodesBackup;
             return false;
         }
         for (int i = 0; i < loopSize; i++) {
@@ -500,6 +500,7 @@ namespace future {
         }
         updateNextNodes(potentialNextNodes, nodePtr, potentialSize);
         ret = !potentialNextNodes.empty();
+        delete [] nodesBackup;
         return ret;
     }
     
@@ -507,7 +508,7 @@ namespace future {
     {
         bool ret = true;
         const int size = *potentialSize;
-        GumboNode* nodesBackup[size];
+        GumboNodesArray nodesBackup = new GumboNode*[size];
         BackupNodes(nodesBackup, *nodePtr, *potentialSize);
         int loopSize = *potentialSize;
         std::list<GumboNode *>potentialNextNodes;
@@ -516,7 +517,7 @@ namespace future {
             std::list<Selector *>::iterator it = ss.begin();
             std::list<Selector *>::iterator end = ss.end();
             while(it != end) {
-                GumboArray elementA = nodesBackup + i;
+                GumboNodesArray elementA = nodesBackup + i;
                 int *temp = new int(1);
                 ret = nodeAdaptToSelector(&elementA, *it++, temp) && ret;
                 delete temp;
@@ -530,13 +531,14 @@ namespace future {
         }
         updateNextNodes(potentialNextNodes, nodePtr, potentialSize);
         ret = !potentialNextNodes.empty();
+        delete [] nodesBackup;
         return ret;
     }
     
     bool HTMLCSSRefAdaptor::nodeAdaptToGroupSelector(GumboNode ***nodePtr, GroupSelector* selector, int *potentialSize)
     {
         bool ret = false;
-        GumboNode* nodesBackup[*potentialSize];
+        GumboNodesArray nodesBackup = new GumboNode*[*potentialSize];
         BackupNodes(nodesBackup, *nodePtr, *potentialSize);
         std::list<GumboNode *>potentialNextNodes;
         int loopSize = *potentialSize;
@@ -545,7 +547,7 @@ namespace future {
             std::list<Selector *>::iterator it = ss.begin();
             std::list<Selector *>::iterator end = ss.end();
             while(it != end) {
-                GumboArray elementA = nodesBackup + i;
+                GumboNodesArray elementA = nodesBackup + i;
                 int *temp = new int(1);
                 ret = nodeAdaptToSelector(&elementA, *it++, temp) || ret;
             }
@@ -555,6 +557,7 @@ namespace future {
         }
         updateNextNodes(potentialNextNodes, nodePtr, potentialSize);
         ret = !potentialNextNodes.empty();
+        delete [] nodesBackup;
         return ret;
     }
     
@@ -570,7 +573,7 @@ namespace future {
         }
         switch (selector->getCombineType()) {
             case CombineSelector::NormalSibling: {
-                GumboNode* nodesBackup[*potentialSize];
+                GumboNodesArray nodesBackup = new GumboNode*[*potentialSize];
                 BackupNodes(nodesBackup, *nodeArrayPtr, *potentialSize);
                 int outterLoopSize = *potentialSize;
                 std::list<GumboNode *>potentialNextNodes;
@@ -581,12 +584,12 @@ namespace future {
                     if (!parent || parent->type != GUMBO_NODE_ELEMENT) {
                         continue;
                     }
-                    GumboArray elementA = nodesBackup + i;
+                    GumboNodesArray elementA = nodesBackup + i;
                     afterMatch = nodeAdaptToSelector(&elementA, after, potentialSize);
                     if (!afterMatch) {
                         continue;
                     }
-                    GumboNode* beforeNodes[*potentialSize];
+                    GumboNodesArray beforeNodes = new GumboNode*[*potentialSize];
                     BackupNodes(beforeNodes, elementA, *potentialSize);
                     int innnerLoopSize = *potentialSize;
                     for (int j = 0; j < innnerLoopSize; j++) {
@@ -601,7 +604,7 @@ namespace future {
                             if (sibling->index_within_parent >= c_idx) {
                                 continue;
                             }
-                            GumboArray elementB = &sibling;
+                            GumboNodesArray elementB = &sibling;
                             int *temp = new int(1);
                             beforeMatch = nodeAdaptToSelector(&elementB, before, temp) || beforeMatch;
                             if (beforeMatch) {
@@ -609,16 +612,18 @@ namespace future {
                             }
                         }
                     }
+                    delete [] beforeNodes;
                 }
                 {
                     updateNextNodes(potentialNextNodes, nodeArrayPtr, potentialSize);
                 }
                 ret = !potentialNextNodes.empty();
+                delete [] nodesBackup;
                 return ret;
                 break;
             }
             case CombineSelector::InstanceSibling: {
-                GumboNode* nodesBackup[*potentialSize];
+                GumboNodesArray nodesBackup = new GumboNode*[*potentialSize];
                 BackupNodes(nodesBackup, *nodeArrayPtr, *potentialSize);
                 int outterLoopSize = *potentialSize;
                 std::list<GumboNode *>potentialNextNodes;
@@ -628,12 +633,12 @@ namespace future {
                     if (!parent || parent->type != GUMBO_NODE_ELEMENT) {
                         continue;
                     }
-                    GumboArray elementA = nodesBackup + i;
+                    GumboNodesArray elementA = nodesBackup + i;
                     afterMatch = nodeAdaptToSelector(&elementA, after, potentialSize);
                     if (!afterMatch) {
                         continue;
                     }
-                    GumboNode* beforeNodes[*potentialSize];
+                    GumboNodesArray beforeNodes = new GumboNode*[*potentialSize];
                     BackupNodes(beforeNodes, elementA, *potentialSize);
                     int innnerLoopSize = *potentialSize;
                     for(int j = 0; j < innnerLoopSize; j ++) {
@@ -646,7 +651,7 @@ namespace future {
                         for (unsigned int k = 0; k < children.length; k++) {
                             GumboNode* sibling = (GumboNode *)children.data[k];
                             if (sibling == node && lastElementNode) {
-                                GumboArray elementB = &lastElementNode;
+                                GumboNodesArray elementB = &lastElementNode;
                                 int *temp = new int(1);
                                 beforeMatch = nodeAdaptToSelector(&elementB, before, temp) || beforeMatch;
                                 if (beforeMatch) {
@@ -658,16 +663,18 @@ namespace future {
                             }
                         }
                     }
+                    delete [] beforeNodes;
                 }
                 {
                     updateNextNodes(potentialNextNodes, nodeArrayPtr, potentialSize);
                 }
                 ret = !potentialNextNodes.empty();
+                delete [] nodesBackup;
                 return ret;
                 break;
             }
             case CombineSelector::InstanceInherical: {
-                GumboNode* nodesBackup[*potentialSize];
+                GumboNodesArray nodesBackup = new GumboNode*[*potentialSize];
                 BackupNodes(nodesBackup, *nodeArrayPtr, *potentialSize);
                 int outterLoopSize = *potentialSize;
                 std::list<GumboNode *>potentialNextNodes;
@@ -677,49 +684,51 @@ namespace future {
                     if (!parent) {
                         continue;
                     }
-                    GumboArray elementA = nodesBackup + i;
+                    GumboNodesArray elementA = nodesBackup + i;
                     afterMatch = nodeAdaptToSelector(&elementA, after, potentialSize);
                     if (!afterMatch) {
                         continue;
                     }
                     int innerSize = *potentialSize;
-                    GumboNode* beforeNodes[innerSize];
+                    GumboNodesArray beforeNodes = new GumboNode*[innerSize];
                     BackupNodes(beforeNodes, elementA, innerSize);
                     for (int j = 0; j < innerSize; j++) {
                         parent = beforeNodes[j]->parent;
-                        GumboArray elementB = &parent;
+                        GumboNodesArray elementB = &parent;
                         int *temp = new int(1);
                         beforeMatch = nodeAdaptToSelector(&elementB, before, temp);
                         if (beforeMatch) {
                             potentialNextNodes.push_back(parent);
                         }
                     }
+                    delete [] beforeNodes;
                 }
                 {
                     updateNextNodes(potentialNextNodes, nodeArrayPtr, potentialSize);
                 }
                 ret = !potentialNextNodes.empty();
+                delete [] nodesBackup;
                 return ret;
                 break;
             }
             case CombineSelector::NormalInherical: {
-                GumboNode* nodesBackup[*potentialSize];
+                GumboNodesArray nodesBackup = new GumboNode*[*potentialSize];
                 BackupNodes(nodesBackup, *nodeArrayPtr, *potentialSize);
                 int outterLoopSize = *potentialSize;
                 std::list<GumboNode *>potentialNextNodes;
                 for (int i = 0; i < outterLoopSize; i++) {
-                    GumboArray elementA = nodesBackup + i;
+                    GumboNodesArray elementA = nodesBackup + i;
                     afterMatch = nodeAdaptToSelector(&elementA, after, potentialSize);
                     if (!afterMatch) {
                         continue;
                     }
                     int innerSize = *potentialSize;
-                    GumboNode* beforeNodes[innerSize];
+                    GumboNodesArray beforeNodes = new GumboNode*[innerSize];
                     BackupNodes(beforeNodes, elementA, innerSize);
                     for (int j = 0; j < innerSize; j++) {
                         GumboNode* parent = beforeNodes[j]->parent;
                         while(parent) {
-                            GumboArray elementB = &parent;
+                            GumboNodesArray elementB = &parent;
                             int *temp = new int(1);
                             beforeMatch = nodeAdaptToSelector(&elementB, before, temp);
                             if (beforeMatch) {
@@ -728,11 +737,13 @@ namespace future {
                             parent = parent->parent;
                         }
                     }
+                    delete [] beforeNodes;
                 }
                 {
                     updateNextNodes(potentialNextNodes, nodeArrayPtr, potentialSize);
                 }
                 ret = !potentialNextNodes.empty();
+                delete [] nodesBackup;
                 return ret;
                 break;
             }
@@ -741,14 +752,14 @@ namespace future {
         }
     }
     
-    void HTMLCSSRefAdaptor::updateNextNodes(const std::list<GumboNode *>& potentialNextNodes, future::HTMLCSSRefAdaptor::GumboArrayPtr nodeArrayPtr, int *potentialSize)
+    void HTMLCSSRefAdaptor::updateNextNodes(const std::list<GumboNode *>& potentialNextNodes, future::HTMLCSSRefAdaptor::GumboNodesArrayPtr nodeArrayPtr, int *potentialSize)
     {
         std::list<GumboNode *>::const_iterator it = potentialNextNodes.begin();
         std::list<GumboNode *>::const_iterator end = potentialNextNodes.end();
         int idx = 0;
         int size = (int)potentialNextNodes.size();
         if (size) {
-            GumboNode** potentialNodesArray = new GumboNode*[size];
+            GumboNodesArray potentialNodesArray = new GumboNode*[size];
             while (it != end) {
                 potentialNodesArray[idx++] = *it++;
             }
@@ -761,8 +772,8 @@ namespace future {
     void HTMLCSSRefAdaptor::CleanResource()
     {
         SMemoryBackup.unique();
-        std::list<HTMLCSSRefAdaptor::GumboArray>::iterator it = SMemoryBackup.begin();
-        std::list<HTMLCSSRefAdaptor::GumboArray>::iterator end = SMemoryBackup.end();
+        std::list<HTMLCSSRefAdaptor::GumboNodesArray>::iterator it = SMemoryBackup.begin();
+        std::list<HTMLCSSRefAdaptor::GumboNodesArray>::iterator end = SMemoryBackup.end();
         while (it != end) {
             delete [] *it++;
         }

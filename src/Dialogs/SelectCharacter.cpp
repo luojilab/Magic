@@ -26,6 +26,8 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QApplication>
 #include <QtCore/QSignalMapper>
+#include <QMessageBox>  // QMessageBox::warning(), question()
+#include <QColorDialog> // QColorDialog::getColor()
 
 #include "Dialogs/SelectCharacter.h"
 #include "ResourceObjects/HTMLResource.h"
@@ -331,7 +333,20 @@ void SelectCharacter::SetList()
                              << QString::fromUtf8("\xcf\x92")        << ""           << "&upsih;"    << "Greek Upsilon with hook symbol"
                              << QString::fromUtf8("\xe2\x84\x98")    << ""           << "&weierp;"   << "script capital P"
                              << QString::fromUtf8("\xc2\xa5")        << ""           << "&yen;"      << "yen sign"
+                             << QString::fromUtf8("\xe2\x97\x80")    << ""           << ""           << "black left-pointing triangle"
+                             << QString::fromUtf8("\xe2\x96\xb6")    << ""           << ""           << "black right-pointing triangle"
+                             << QString::fromUtf8("\xe2\x96\xb2")    << ""           << ""           << "black up-pointing triangle"
+                             << QString::fromUtf8("\xe2\x96\xbc")    << ""           << ""           << "black down-pointing triangle"
+                             << QString::fromUtf8("\xe2\x97\x86")    << ""           << ""           << "black diamond"
+                             << QString::fromUtf8("\xe2\x97\x87")    << ""           << ""           << "white diamond"
+                             << QString::fromUtf8("\xe2\x97\x8f")    << ""           << ""           << "black circle"
                              ;
+    
+    // Append user custom characters from setting.
+    for (auto c : m_customChars) {
+        characters3 << c << "" << "" << c;
+    }
+    
     AddGrid(spaces, spaces.count());
     AddGrid(characters, 12);
     AddGrid(characters2, 10);
@@ -391,7 +406,21 @@ QString SelectCharacter::Selection()
 void SelectCharacter::SetSelectedCharacter(const QString &text)
 {
     bool isCtrl = QApplication::keyboardModifiers() & Qt::ControlModifier;
-    emit SelectedCharacter(text);
+    
+    // Choose whether to add character color.
+    QMessageBox::StandardButton useDefaultColor = QMessageBox::question(this, "Magic", u8"是否添加字符颜色？");
+    if (useDefaultColor == QMessageBox::No) {
+        emit SelectedCharacter(text);
+    } else {
+        QColor charColor = QColorDialog::getColor();
+        if (!charColor.isValid()) {
+            QMessageBox::warning(this, "Magic", "Invalid color.");
+            emit SelectedCharacter(text);
+        } else {
+            QString textWithColor = "<span style=\"color:" + charColor.name() + "\">" + text + "</span>";
+            emit SelectedCharacter(textWithColor);
+        }
+    }
 
     if (isCtrl) {
         accept();
@@ -399,6 +428,28 @@ void SelectCharacter::SetSelectedCharacter(const QString &text)
 
     // Return focus to last window to allow typing to continue
     QApplication::setActiveWindow(parentWidget());
+}
+
+void SelectCharacter::addCustomChar()
+{
+    QString c = ui.customCharacter->text().trimmed();
+    if (c.isEmpty()) {
+        return;
+    }
+    if (m_customChars.contains(c)) {
+        QMessageBox::warning(this, "Magic", u8"字符已存在。\nThis character already exists.");
+        return;
+    }
+    if (c.length() > 1) {
+        QMessageBox::warning(this, "Magic", u8"请添加单个字符。\nOnly single character allowed.");
+        return;
+    }
+    m_customChars << c;
+    
+    WriteSettings();
+    ui.customCharacter->setText("");
+    // Refresh dialog.
+    emit newCharAdded();
 }
 
 void SelectCharacter::ReadSettings()
@@ -412,6 +463,9 @@ void SelectCharacter::ReadSettings()
         restoreGeometry(geometry);
     }
 
+    // Read custom characters.
+    m_customChars = settings.value("custom_characters").toStringList();
+    
     settings.endGroup();
     // Load our initial appearance settings
     m_SpecialCharacterAppearance = settings.specialCharacterAppearance();
@@ -423,10 +477,17 @@ void SelectCharacter::WriteSettings()
     settings.beginGroup(SETTINGS_GROUP);
     // The size of the window and it's full screen status
     settings.setValue("geometry", saveGeometry());
+    
+    // Write custom characters.
+    settings.setValue("custom_characters", m_customChars);
+    
     settings.endGroup();
 }
 
 void SelectCharacter::connectSignalsSlots()
 {
     connect(m_buttonMapper, SIGNAL(mapped(const QString &)), this, SLOT(SetSelectedCharacter(const QString &)));
+    connect(ui.addCharButton, SIGNAL(clicked()), this, SLOT(addCustomChar()));
+    connect(this, SIGNAL(newCharAdded()), parent(), SLOT(refreshSelectCharacter()));
+    connect(this, SIGNAL(SelectedCharacter(const QString &)), parent(), SLOT(PasteTextIntoCurrentTarget(const QString &)));
 }

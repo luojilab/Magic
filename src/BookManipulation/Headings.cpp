@@ -40,7 +40,7 @@
 // can be located from a body tag and still
 // be detected as the "name" for that chapter.
 // The value was picked arbitrarily.
-static const int ALLOWED_HEADING_DISTANCE = 20;
+static const int ALLOWED_HEADING_DISTANCE = 1;
 
 const QList<GumboTag> GHEADING_TAGS = QList<GumboTag>() << GUMBO_TAG_H1 << GUMBO_TAG_H2 << GUMBO_TAG_H3 << GUMBO_TAG_H4 << GUMBO_TAG_H5 << GUMBO_TAG_H6;
 

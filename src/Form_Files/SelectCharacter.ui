@@ -14,6 +14,29 @@
    <string>Insert Special Character</string>
   </property>
   <layout class="QVBoxLayout" name="character_box">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>50</number>
+     </property>
+     <property name="leftMargin">
+      <number>20</number>
+     </property>
+     <property name="rightMargin">
+      <number>20</number>
+     </property>
+     <item>
+      <widget class="QLineEdit" name="customCharacter"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="addCharButton">
+       <property name="text">
+        <string>添加字符</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <resources/>

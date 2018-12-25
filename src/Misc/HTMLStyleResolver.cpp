@@ -46,7 +46,7 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
     std::list<std::pair<QSharedPointer<future::Selector>, HTMLTagStylesType> > filterStyles;
     for (auto selector : allSelectors) {
         GumboNode *internalNode = (GumboNode *)node;
-        future::HTMLCSSRefAdaptor::GumboArray nodesArray = &internalNode;
+        future::HTMLCSSRefAdaptor::GumboNodesArray nodesArray = &internalNode;
         int sizeTag = 1;
         if (future::HTMLCSSRefAdaptor::nodeAdaptToSelector(&nodesArray, selector.data(), &sizeTag)) {
             HTMLTagStylesType styleRules = scanCSSRule(selector->getRuleData().c_str());
@@ -55,7 +55,7 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
             }
         }
     }
-    const int STYLE_KEY = 0, STYLE_VALUE = 1;
+	static const int STYLE_KEY = 0; static const int STYLE_VALUE = 1;
     QMap<QString, std::pair<QSharedPointer<future::Selector>, QString> >initialStyle;
     auto tagStyleAttributes = scanCSSRule(getNodeAttribute(node, S_kStyle)).toStdMap();
     std::for_each(tagStyleAttributes.begin(), tagStyleAttributes.end(), [&](const std::pair<QString, QString>& kv) {
@@ -67,8 +67,8 @@ HTMLTagStylesType HTMLStyleResolver::getHTMLTagStyles(const HTMLResource *htmlRe
 HTMLTagStylesType HTMLStyleResolver::filterCSSStyles(const CSSSelectorStyleRuleListType& candidateStyle, const SelectorStylesListType& initialList) {
     HTMLTagStylesType styles;
     SelectorStylesListType lastFilter(initialList);
-    const int SELECTOR = 0, STYLE_RULES_MAP = 1;
-    const int STYLE_KEY = 0, STYLE_VALUE = 1;
+	static const int SELECTOR = 0; static const int STYLE_RULES_MAP = 1;
+	static const int STYLE_KEY = 0; static const int STYLE_VALUE = 1;
     std::for_each(candidateStyle.rbegin(), candidateStyle.rend(), [&](const std::pair<QSharedPointer<future::Selector>, HTMLTagStylesType>& style) {
         auto rules = std::get<STYLE_RULES_MAP>(style).toStdMap();
         std::for_each(rules.begin(), rules.end(), [&](const std::pair<QString, QString>& kv) {
