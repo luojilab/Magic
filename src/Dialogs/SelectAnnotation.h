@@ -63,10 +63,7 @@ public:
 
     QString getText() { return m_annoText; }
     QString getIcon() { return m_iconSrc; }
-
-    // Insert annotation code to html file.
-    static int insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView);
-    
+   
 private slots:
     void selectBgColor() { selectColor(ColorMember::bgColor); }
     void selectFgColor() { selectColor(ColorMember::fgColor); }

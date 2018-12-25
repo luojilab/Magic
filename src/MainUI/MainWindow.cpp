@@ -90,6 +90,7 @@
 #include "Misc/TempFolder.h"
 #include "Misc/TOCHTMLWriter.h"
 #include "Misc/Utility.h"
+#include "Misc/AnnotationUtility.h"
 #include "MiscEditors/IndexHTMLWriter.h"
 #include "ResourceObjects/HTMLResource.h"
 #include "ResourceObjects/NCXResource.h"
@@ -1914,7 +1915,6 @@ void MainWindow::insertAnnotation()
         CodeView();
         return;
     }
-
     CodeViewEditor *codeView = dynamic_cast<CodeViewEditor *>(flowTab->GetSearchableContent());
     if (!codeView) {
         QMessageBox::warning(this, tr("Magic"), tr(u8"代码视图编辑器获取失败。\nGet CodeViewEditor failed."));
@@ -1927,19 +1927,24 @@ void MainWindow::insertAnnotation()
     if (selectAnnotation.exec() != QDialog::Accepted) {
         return;
     }
-
     QString annoText = selectAnnotation.getText();
     QString annoIcon = selectAnnotation.getIcon();
-
     if (annoText.isEmpty()) {
         QMessageBox::warning(this, tr("Magic"), tr(u8"输入文本为空。\nInput text is empty."));
         return;
     }
 
-    if (SelectAnnotation::insertAnnotation(annoText, annoIcon, codeView)) {
+    // insert annotation code
+    if (AnnotationUtility::insertAnnotation(annoText, annoIcon, codeView)) {
         QMessageBox::warning(this, tr("Magic"), tr(u8"插入注释失败。\nInserting annotation fail."));
         return;
     }
+}
+
+// Convert selected annotation text into new style.
+void MainWindow::convertAnnotation()
+{
+    ;
 }
 
 void MainWindow::MarkForIndex()

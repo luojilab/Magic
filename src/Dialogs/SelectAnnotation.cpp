@@ -51,9 +51,6 @@ const QString S_defaultBgColor = "#998181";
 const QString S_defaultFgColor = "#FFFFFF";
 const QSize S_iconSize(72, 72);
 const QString S_defaultIconSrc = "../Images/AnnoIcon0.png";
-const QString S_annoPre = "<img class=\"epub-footnote\" src=\"";
-const QString S_annoInf = "\" alt=\"";
-const QString S_annoSuf = "\" />";
 const QString S_annoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
 const QString S_annoTagsToRemove = "(b|i|u|a|br|strong|em|span|p|sup|sub|div)";
 const QString S_rePre0 = "<";
@@ -94,17 +91,6 @@ SelectAnnotation::SelectAnnotation(QSharedPointer<Book> book,
 SelectAnnotation::~SelectAnnotation()
 {
     delete ui;
-}
-
-// Static function used in MainWindow::insertAnnotation.
-int SelectAnnotation::insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView)
-{
-    QString annotation = S_annoPre + annoIcon + S_annoInf + annoText + S_annoSuf;
-    
-    // Insert annotation text at the cursor in html using QPlainTextEdit::insertPlainText().
-    codeView->insertPlainText(annotation);
-
-    return 0;
 }
 
 // Read SVG resource to QByteArray.
