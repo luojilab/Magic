@@ -40,8 +40,6 @@ SOFTWARE.
 #include "ViewEditors/CodeViewEditor.h"
 #include "Tabs/TabManager.h"
 
-enum ColorMember { bgColor, fgColor };
-
 namespace Ui
 {
 class SelectAnnotation;
@@ -80,6 +78,8 @@ private slots:
     void appendStyle();
 
 private:
+    enum class ColorMember { bgColor, fgColor };
+    
     void initSvg();
     void initUI();
     void initColorStack();

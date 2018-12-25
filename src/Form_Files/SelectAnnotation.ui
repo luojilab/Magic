@@ -98,7 +98,7 @@
           <item>
            <widget class="QPushButton" name="lastColorButton">
             <property name="text">
-             <string>撤消</string>
+             <string>撤销</string>
             </property>
            </widget>
           </item>
