@@ -1944,7 +1944,7 @@ void MainWindow::insertAnnotation()
 // Convert selected annotation text into new style.
 void MainWindow::convertAnnotation()
 {
-    ;
+    QMessageBox::information(this, "", "Convert Annotation Function Developing...");
 }
 
 void MainWindow::MarkForIndex()
@@ -3076,6 +3076,7 @@ void MainWindow::SetStateActionsBookView()
     ui.actionInsertId->setEnabled(true);
     ui.actionInsertHyperlink->setEnabled(true);
     ui.actionInsertAnnotation->setEnabled(true);
+    ui.actionConvertAnnotation->setEnabled(true);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3149,6 +3150,7 @@ void MainWindow::SetStateActionsCodeView()
     ui.actionInsertId->setEnabled(true);
     ui.actionInsertHyperlink->setEnabled(true);
     ui.actionInsertAnnotation->setEnabled(true);
+    ui.actionConvertAnnotation->setEnabled(true);
     ui.actionInsertClosingTag->setEnabled(true);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3239,6 +3241,7 @@ void MainWindow::SetStateActionsRawView()
     ui.actionInsertId->setEnabled(false);
     ui.actionInsertHyperlink->setEnabled(false);
     ui.actionInsertAnnotation->setEnabled(false);
+    ui.actionConvertAnnotation->setEnabled(false);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(true);
     ui.actionRedo->setEnabled(true);
@@ -3312,6 +3315,7 @@ void MainWindow::SetStateActionsStaticView()
     ui.actionInsertId->setEnabled(false);
     ui.actionInsertHyperlink->setEnabled(false);
     ui.actionInsertAnnotation->setEnabled(false);
+    ui.actionConvertAnnotation->setEnabled(false);
     ui.actionInsertClosingTag->setEnabled(false);
     ui.actionUndo->setEnabled(false);
     ui.actionRedo->setEnabled(false);
@@ -4566,6 +4570,7 @@ void MainWindow::ExtendUI()
     sm->registerAction(this, ui.actionInsertId, "MainWindow.InsertId");
     sm->registerAction(this, ui.actionInsertHyperlink, "MainWindow.InsertHyperlink");
     sm->registerAction(this, ui.actionInsertAnnotation, "MainWindow.insertAnnotation");
+    sm->registerAction(this, ui.actionConvertAnnotation, "MainWindow.convertAnnotation");
     sm->registerAction(this, ui.actionMarkForIndex, "MainWindow.MarkForIndex");
     sm->registerAction(this, ui.actionSplitSection, "MainWindow.SplitSection");
     sm->registerAction(this, ui.actionInsertSGFSectionMarker, "MainWindow.InsertSGFSectionMarker");
@@ -5015,6 +5020,7 @@ void MainWindow::ConnectSignalsToSlots()
     connect(ui.actionInsertId,        SIGNAL(triggered()),  this,   SLOT(InsertId()));
     connect(ui.actionInsertHyperlink, SIGNAL(triggered()),  this,   SLOT(InsertHyperlink()));
     connect(ui.actionInsertAnnotation, SIGNAL(triggered()), this, SLOT(insertAnnotation()));
+    connect(ui.actionConvertAnnotation, SIGNAL(triggered()), this, SLOT(convertAnnotation()));
     connect(ui.actionPreferences,     SIGNAL(triggered()), this, SLOT(PreferencesDialog()));
     // Search
     connect(ui.actionFind,             SIGNAL(triggered()), this, SLOT(Find()));

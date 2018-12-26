@@ -50,7 +50,7 @@
      <x>0</x>
      <y>0</y>
      <width>1436</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -150,6 +150,7 @@
     <addaction name="actionInsertId"/>
     <addaction name="actionInsertHyperlink"/>
     <addaction name="actionInsertAnnotation"/>
+    <addaction name="actionConvertAnnotation"/>
     <addaction name="separator"/>
     <addaction name="actionInsertClosingTag"/>
     <addaction name="separator"/>
@@ -467,6 +468,7 @@
    <addaction name="actionInsertId"/>
    <addaction name="actionInsertHyperlink"/>
    <addaction name="actionInsertAnnotation"/>
+   <addaction name="actionConvertAnnotation"/>
   </widget>
   <widget class="QToolBar" name="toolBarBack">
    <property name="windowTitle">
@@ -2567,6 +2569,21 @@
   <action name="actionIPad_landscape">
    <property name="text">
     <string>iPad  (landscape)</string>
+   </property>
+  </action>
+  <action name="actionConvertAnnotation">
+   <property name="icon">
+    <iconset resource="../Resource_Files/main/main.qrc">
+     <normaloff>:/main/convert-annotation_48px.png</normaloff>:/main/convert-annotation_48px.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert Annotation</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Convert Annotation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Convert a doubly linked annotation to clickable icon style annotation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+S</string>
    </property>
   </action>
  </widget>
