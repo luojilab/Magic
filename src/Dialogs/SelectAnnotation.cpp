@@ -32,7 +32,7 @@ SOFTWARE.
 #include "MainUI/BookBrowser.h"         // BookBrowser::Refresh()
 #include "Misc/GumboInterface.h"        // gumbo::get_all_nodes_with_tag()
 #include "gumbo.h"                      // gumbo_get_attribute()
-#include "Misc/CSSSelectorJudge.hpp"      // CSSSelectorJudge::selectorExists()
+#include "Misc/CSSSelectorJudge.hpp"    // CSSSelectorJudge::selectorExists()
 
 #include <utility>                      // pair<ColorMember, QString>
 #include <QSvgRenderer>                 // Render SVG graph
@@ -56,7 +56,7 @@ const QString S_annoTagsToRemove = "(b|i|u|a|br|strong|em|span|p|sup|sub|div)";
 const QString S_rePre0 = "<";
 const QString S_rePre1 = "</";
 const QString S_reSuf0 = ">";
-const QString S_reSuf1 = " (\\w|\\s|\"|=)+>";
+const QString S_reSuf1 = "(\\s+\\w+=\"(\\w|-|#|\\.|\\/)+\")+>";
 const char *S_annoSelector = "img.epub-footnote { }";
 const char *S_annoStyle = "\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align:super;\n    padding: 0 5px;\n}\n";
 
@@ -118,7 +118,7 @@ void SelectAnnotation::initUI()
 
 void SelectAnnotation::inputText()
 {
-    m_annoText = ui->annoTextEdit->toPlainText();
+    m_annoText = ui->annoTextEdit->toPlainText().trimmed();
     
     // Delete inline tags in text.
     m_annoText.remove(QRegularExpression(S_rePre0 + S_annoTagsToRemove + S_reSuf0));
@@ -287,9 +287,7 @@ void SelectAnnotation::appendStyle()
         }
         
         // Append the style to the end of the file
-        if (cssFile.write(S_annoStyle) != 0 && cssFilename != S_annoStylesheetFilename) {
-            QMessageBox::warning(this, "Magic", "写入CSS文件失败。\nWrite CSS file failed.");
-        }
+        cssFile.write(S_annoStyle);
         cssFile.close();
 
     } else {
