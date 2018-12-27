@@ -348,6 +348,12 @@ public:
     bool ReformatHTMLEnabled();
     void SetReformatHTMLEnabled(bool value);
 
+    /**
+     * Control wheter the Convert Annotation submenu is avaliable on the context menu.
+     */
+    bool convertAnnotationEnabled();
+    void setConvertAnnotationEnabled(bool value);
+
     bool PasteClipNumber(int clip_number);
 
     void HighlightWord(const QString &word, int pos);
@@ -541,6 +547,9 @@ private slots:
     void ReformatHTMLToValidAction();
     void ReformatHTMLToValidAllAction();
 
+    void convertFromContent();
+    void convertFromReference();
+
 	void calculateHtmlByteOffset();
 
 private:
@@ -603,6 +612,8 @@ private:
     void AddReformatCSSContextMenu(QMenu *menu);
 
     void AddReformatHTMLContextMenu(QMenu *menu);
+
+    void addConvertAnnotationMenu(QMenu *menu);
 
     void AddGoToLinkOrStyleContextMenu(QMenu *menu);
 
@@ -810,6 +821,11 @@ private:
      * Whether reformat (clean) HTML context menu option is enabled on this view.
      */
     bool m_reformatHTMLEnabled;
+
+    /**
+     *  Whether convert annotation menu is enabled on this view.
+     */
+    bool m_convertAnnotationEnabled;
 
     /**
      * Store the last match when doing a find so we can determine if
