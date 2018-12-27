@@ -1935,10 +1935,7 @@ void MainWindow::insertAnnotation()
     }
 
     // insert annotation code
-    if (AnnotationUtility::insertAnnotation(annoText, annoIcon, codeView)) {
-        QMessageBox::warning(this, tr("Magic"), tr(u8"插入注释失败。\nInserting annotation failed."));
-        return;
-    }
+    AnnotationUtility::insertAnnotation(annoText, annoIcon, codeView->textCursor());
 }
 
 void MainWindow::MarkForIndex()

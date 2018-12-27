@@ -30,6 +30,7 @@
 #define ANNOTATIONUTILITIES_H
 
 #include "ViewEditors/CodeViewEditor.h"
+#include "Tabs/FlowTab.h"
 
 class AnnotationUtility : public QObject
 {
@@ -39,8 +40,17 @@ public:
     explicit AnnotationUtility();
     ~AnnotationUtility();
     
+    enum class ConvertMode { fromContent, fromReference };
+    
     // Insert annotation code to html file.
-    static int insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView);
+    static void insertAnnotation(const QString &anno_text, const QString &anno_icon, QTextCursor cursor);
+    
+    // Convert doubly linked annotation to image annotation.
+    static void convertAnnotation(ConvertMode mode, CodeViewEditor *code_view);
+    
+private:
+    // Check order: the content should be after reference.
+    static int checkOrder(QTextCursor &reference, QTextCursor &content);
 };
 
 #endif /* ANNOTATIONUTILITIES_H */
