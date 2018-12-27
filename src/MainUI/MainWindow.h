@@ -394,9 +394,6 @@ private:typedef enum {
 
 		// Insert an img with text in "alt" to display annotations on devices.
 		void insertAnnotation();
-    
-        // Convert selected annotation text into new style.
-        void convertAnnotation();
 
 		void MarkForIndex();
 
