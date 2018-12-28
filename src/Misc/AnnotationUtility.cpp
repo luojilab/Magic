@@ -33,6 +33,7 @@
 const QString S_anno_prefix = "<img class=\"epub-footnote\" src=\"";
 const QString S_anno_infix = "\" alt=\"";
 const QString S_anno_suffix = "\" />";
+const QString S_default_icon_src = "../Images/AnnoIcon0.png";
 
 // Static function used in MainWindow::insertAnnotation.
 void AnnotationUtility::insertAnnotation(const QString &anno_text, const QString &anno_icon, QTextCursor cursor)
@@ -115,15 +116,17 @@ void AnnotationUtility::convertAnnotation(ConvertMode mode, CodeViewEditor *code
         that_cursor.movePosition(QTextCursor::Right);
     }
     QTextCursor content_cusor, reference_cursor;
-    QString annotation_content;
+    QString content_text, reference_text;
     if (mode == ConvertMode::fromContent) {
         content_cusor = this_cursor;
+        content_text = this_text;
         reference_cursor = that_cursor;
-        annotation_content = this_gumbo.get_local_text_of_node(this_gumbo.get_root_node());
+        //reference_text = that_text;
     } else if (mode == ConvertMode::fromReference) {
         content_cusor = that_cursor;
+        //content_text = that_text;
         reference_cursor = this_cursor;
-        annotation_content = this_doc_gumbo.get_local_text_of_node(that_node_a); // Need modify <<<<<<<
+        reference_text = this_text;
     } else {
         QMessageBox::warning(nullptr, "", "ConvertMode Error.");
     }
@@ -135,8 +138,9 @@ void AnnotationUtility::convertAnnotation(ConvertMode mode, CodeViewEditor *code
     // Remove tags and deal special characters in content text.
     
     // Insert in-text annotation code.
-    QString annotation_code = S_anno_prefix + "../Images/AnnoIcon0.png" + S_anno_infix + annotation_content + S_anno_suffix;
-    reference_cursor.insertText(annotation_code);
+    content_text = getPlainText(content_text);
+    content_text = content_text.remove(reference_text);
+    insertAnnotation(content_text, S_default_icon_src, reference_cursor);
     
     // Remove old reference code.
     size_t old_reference_size = that_size + 4/* the closing tag size */; // Need modify <<<<<<<
@@ -149,6 +153,22 @@ void AnnotationUtility::convertAnnotation(ConvertMode mode, CodeViewEditor *code
     
     this_cursor.endEditBlock();
     that_cursor.endEditBlock();
+}
+
+QString AnnotationUtility::getPlainText(QString &origin_text)
+{
+    if (origin_text.isEmpty()) {
+        QMessageBox::warning(nullptr, "", "Input text empty.");
+    }
+    GumboInterface gumbo{origin_text, "HTML2.0"};
+    QString return_text = gumbo.get_local_text_of_node(gumbo.get_root_node());
+    if (return_text.contains('<')) {
+        QMessageBox::warning(nullptr, "", "注释含有<符号，请手动处理。");
+    }
+    if (return_text.contains('"')) {
+        QMessageBox::warning(nullptr, "", "注释含有\"符号，请手动处理。");
+    }
+    return return_text;
 }
 
 int AnnotationUtility::checkOrder(QTextCursor &reference, QTextCursor &content)

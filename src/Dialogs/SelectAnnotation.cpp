@@ -33,6 +33,7 @@ SOFTWARE.
 #include "Misc/GumboInterface.h"        // gumbo::get_all_nodes_with_tag()
 #include "gumbo.h"                      // gumbo_get_attribute()
 #include "Misc/CSSSelectorJudge.hpp"    // CSSSelectorJudge::selectorExists()
+#include "Misc/AnnotationUtility.h"
 
 #include <utility>                      // pair<ColorMember, QString>
 #include <QSvgRenderer>                 // Render SVG graph
@@ -120,15 +121,8 @@ void SelectAnnotation::inputText()
 {
     m_annoText = ui->annoTextEdit->toPlainText().trimmed();
     
-    // Delete inline tags in text.
-    m_annoText.remove(QRegularExpression(S_rePre0 + S_annoTagsToRemove + S_reSuf0));
-    m_annoText.remove(QRegularExpression(S_rePre1 + S_annoTagsToRemove + S_reSuf0));
-    m_annoText.remove(QRegularExpression(S_rePre0 + S_annoTagsToRemove + S_reSuf1));
-    
-    // Detect tags need manual deal
-    if (m_annoText.contains("<")) {
-        QMessageBox::warning(this, "Magic", "注释含有特殊标签，请手动处理。\nAnnotation contains special tag, need manual deal.");
-    }
+    // Remove tags using AnnotationUtility::getPlainText()
+    m_annoText = AnnotationUtility::getPlainText(m_annoText);
 }
 
 void SelectAnnotation::selectColor(const ColorMember cm)

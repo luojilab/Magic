@@ -48,6 +48,9 @@ public:
     // Convert doubly linked annotation to image annotation.
     static void convertAnnotation(ConvertMode mode, CodeViewEditor *code_view);
     
+    // Remove tags in text and deal special character like ", <.
+    static QString getPlainText(QString &origin_text);
+    
 private:
     // Check order: the content should be after reference.
     static int checkOrder(QTextCursor &reference, QTextCursor &content);
