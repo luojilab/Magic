@@ -1340,8 +1340,8 @@ void CodeViewEditor::addConvertAnnotationMenu(QMenu *menu)
     QMenu *convertAnnotationMenu = new QMenu(tr(u8"注释转换图注"), menu);
     QAction *convertFromContent = new QAction(tr(u8"从注释内容转换"), menu);
     QAction *convertFromReference = new QAction(tr(u8"从文中引用转换"), menu);
-    connect(convertFromContent, SIGNAL(triggered()), this, SLOT(convertFromContent()));
-    connect(convertFromReference, SIGNAL(triggered()), this, SLOT(convertFromReference()));
+    connect(convertFromContent, SIGNAL(triggered()), this, SLOT(convertAnnotationFromContent()));
+    connect(convertFromReference, SIGNAL(triggered()), this, SLOT(convertAnnotationFromReference()));
     convertAnnotationMenu->addAction(convertFromContent);
     convertAnnotationMenu->addAction(convertFromReference);
     
@@ -1356,14 +1356,14 @@ void CodeViewEditor::addConvertAnnotationMenu(QMenu *menu)
     }
 }
 
-void CodeViewEditor::convertFromContent()
+void CodeViewEditor::convertAnnotationFromContent()
 {
-    AnnotationUtility::convertAnnotation(AnnotationUtility::ConvertMode::fromContent, this);
+    AnnotationUtility::convertFromContent(this);
 }
 
-void CodeViewEditor::convertFromReference()
+void CodeViewEditor::convertAnnotationFromReference()
 {
-    AnnotationUtility::convertAnnotation(AnnotationUtility::ConvertMode::fromReference, this);
+    AnnotationUtility::convertFromReference(this);
 }
 
 void CodeViewEditor::AddGoToLinkOrStyleContextMenu(QMenu *menu)

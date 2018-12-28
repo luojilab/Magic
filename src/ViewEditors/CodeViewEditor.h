@@ -547,8 +547,8 @@ private slots:
     void ReformatHTMLToValidAction();
     void ReformatHTMLToValidAllAction();
 
-    void convertFromContent();
-    void convertFromReference();
+    void convertAnnotationFromContent();
+    void convertAnnotationFromReference();
 
 	void calculateHtmlByteOffset();
 
