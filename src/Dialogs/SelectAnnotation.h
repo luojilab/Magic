@@ -48,7 +48,7 @@ class SelectAnnotation;
 // SelectAnnotation functions:
 // 1. Open a dialog to get annotation text.
 // 2. A static function to insert annotation code.
-// 3. get foreground and background colors to generate icon.
+// 3. Get foreground and background colors to generate icon.
 class SelectAnnotation : public QDialog
 {
     Q_OBJECT
