@@ -71,7 +71,13 @@ private:
     } AnnoData;
     
     // Convert doubly linked annotation to image annotation.
-    static void convertAnnotation(AnnoData &content, AnnoData &reference);
+    static int convertAnnotation(AnnoData &content, AnnoData &reference);
+    
+    // Select the nearest <a> tag to the cursor.
+    static int selectNearestTagA(CodeViewEditor *code_view);
+    
+    // Parse the text using Gumbo to get element with tag <a>.
+    static GumboNode *getTagANode(const std::shared_ptr<GumboInterface> gumbo);
     
     // Get the node linked with the selected node.
     static AnnoData getLinked(const AnnoData &selected);
