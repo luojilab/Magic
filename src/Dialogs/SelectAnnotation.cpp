@@ -207,7 +207,15 @@ void SelectAnnotation::addIconFile()
     
     // If the file already exists, delete the old one.
     const QStringList currentFilenames = m_book->GetFolderKeeper()->GetAllFilenames();
-    if (currentFilenames.contains(S_iconSaveName, Qt::CaseSensitive )) {
+    if (currentFilenames.contains(S_iconSaveName, Qt::CaseSensitive)) {
+        if (m_bgColor == m_initialBgColor && m_fgColor == m_initialFgColor) {
+            return;
+        }
+        QMessageBox::StandardButton buttonPressed = QMessageBox::warning(this, "Magic", tr(u8"同名文件\"%1\"已存在，是否替换？").arg(S_iconSaveName), QMessageBox::Ok | QMessageBox::Cancel);
+        if (buttonPressed != QMessageBox::Ok) {
+            restoreInitialColor();
+            return;
+        }
         Resource *oldFile = m_book->GetFolderKeeper()->GetResourceByFilename(S_iconSaveName);
         if (oldFile) {
             oldFile->Delete();
