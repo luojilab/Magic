@@ -32,6 +32,9 @@
 #include "ViewEditors/CodeViewEditor.h"
 #include "Tabs/FlowTab.h"
 
+// A utility class for annotation operations
+// 1. insertAnnotation() to insert annotation text into html.
+// 2. Convert existing doubly linked annotation to image annotation.
 class AnnotationUtility : public QObject
 {
     Q_OBJECT
@@ -53,25 +56,28 @@ public:
     static QString getPlainText(const QString &origin_text);
     
 private:
+    // A struct to store neccesary data for parameter passing
+    typedef struct AnnotationNodeData
+    {
+        AnnotationNodeData() : cursor(QTextCursor()), gumbo(nullptr), a_node(nullptr) {}
+        AnnotationNodeData(const QTextCursor &_cursor,
+                           const std::shared_ptr<GumboInterface> _gumbo,
+                           GumboNode *_a_node)
+        : cursor(_cursor), gumbo(_gumbo), a_node(_a_node) {}
+        
+        QTextCursor cursor;
+        std::shared_ptr<GumboInterface> gumbo;
+        GumboNode *a_node;
+    } AnnoData;
+    
     // Convert doubly linked annotation to image annotation.
-    static void convertAnnotation(QTextCursor &content_cursor,
-                                  std::shared_ptr<GumboInterface> content_gumbo,
-                                  GumboNode *content_a_node,
-                                  QTextCursor &reference_cursor,
-                                  std::shared_ptr<GumboInterface> reference_gumbo,
-                                  GumboNode *reference_a_node);
+    static void convertAnnotation(AnnoData &content, AnnoData &reference);
     
-    // Get annotation reference cursor by href.
-    static std::tuple<QTextCursor, std::shared_ptr<GumboInterface>, GumboNode *> getReferenceByHref(const QString &content_href, QTextCursor &content_cursor);
-    
-    // Get annotation content cursor by href.
-    static QTextCursor getContentByHref(const QString &href);
+    // Get the node linked with the selected node.
+    static AnnoData getLinked(const AnnoData &selected);
     
     // Check doubly link valid.
-    static int checkLink(std::shared_ptr<GumboInterface> content_gumbo,
-                         GumboNode *content_a_node,
-                         std::shared_ptr<GumboInterface> reference_gumbo,
-                         GumboNode *reference_a_node);
+    static int checkLink(const AnnoData &content, const AnnoData &reference);
     
     // Check order: the content should be after reference.
     static int checkOrder(const QTextCursor &content_cursor, const QTextCursor &reference_cursor);
