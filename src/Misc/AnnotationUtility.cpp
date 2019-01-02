@@ -178,7 +178,6 @@ int AnnotationUtility::selectNearestTagA(CodeViewEditor *code_view)
     }
     cursor = code_view->textCursor();
     if (cursor.selectionStart() > initial_cursor.position() || cursor.selectionEnd() < initial_cursor.position()) {
-        std::cout << cursor.selectionStart() << ' ' << cursor.selectionEnd() << ' ' << initial_cursor.position() << std::endl;
         QMessageBox::warning(nullptr, "", u8"光标不位于a标签之间。");
         code_view->setTextCursor(initial_cursor);
         return 3;
@@ -231,16 +230,11 @@ AnnotationUtility::AnnoData AnnotationUtility::getLinked(const AnnoData &selecte
     size_t line = linked_a_node->v.element.start_pos.line;
     size_t column = linked_a_node->v.element.start_pos.column;
     size_t length = linked_a_node->v.element.end_pos.column - column;
+
     // Move the cursor to select <a> tag text.
-    for (int i = 0; i < line; ++i) {
-        linked_cursor.movePosition(QTextCursor::Down);
-    }
-    for (int i = 0; i < column - 1; ++i) {
-        linked_cursor.movePosition(QTextCursor::Right);
-    }
-    for (int i = 0; i < length + 4 /* 4 is the length of closing tag </a> */; ++i) {
-        linked_cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
-    }
+    linked_cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, line);
+    linked_cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, column - 1);
+    linked_cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, length + 4);
     
     return AnnoData{linked_cursor, linked_gumbo, linked_a_node};
 }
@@ -267,12 +261,7 @@ int AnnotationUtility::checkLink(const AnnoData &content, const AnnoData &refere
 
 int AnnotationUtility::checkOrder(const QTextCursor &content_cursor, const QTextCursor &reference_cursor)
 {
-    // TODO: some wrong, need fix
-    // TEST >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//    std::cout << content_cursor.position() << ' ' << reference_cursor.position() << std::endl;
-    // TEST <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     if (content_cursor.position() < reference_cursor.position()) {
-        QMessageBox::warning(nullptr, "", u8"检测到注释内容在引用之前，请检查转换选项是否正确。"); // repeat prompt
         return 1;
     }
     // TODO: the reference and content are not in the same file.
