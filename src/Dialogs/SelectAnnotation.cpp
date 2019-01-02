@@ -115,6 +115,9 @@ void SelectAnnotation::initUI()
 void SelectAnnotation::inputText()
 {
     m_annoText = ui->annoTextEdit->toPlainText().trimmed();
+    if (m_annoText.isEmpty()) {
+        return;
+    }
     
     // Remove tags using AnnotationUtility::getPlainText()
     m_annoText = AnnotationUtility::getPlainText(m_annoText);
