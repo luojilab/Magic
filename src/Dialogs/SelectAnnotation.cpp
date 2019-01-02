@@ -259,7 +259,7 @@ void SelectAnnotation::appendStyle()
         }
         cssFilename = cssFilePath.split('/').back();
         const QStringList currentFilenames = m_book->GetFolderKeeper()->GetAllFilenames();
-        if (currentFilenames.contains(cssFilename, Qt::CaseSensitive )) {
+        if (currentFilenames.contains(cssFilename, Qt::CaseSensitive)) {
             hasCss = true;
             break;
         }

@@ -82,6 +82,8 @@ private:
     // Get the node linked with the selected node.
     static AnnoData getLinked(const AnnoData &selected);
     
+    static std::pair<int, HTMLResource *> getDocument(const QString file_path);
+    
     // Check doubly link valid.
     static int checkLink(const AnnoData &content, const AnnoData &reference);
     

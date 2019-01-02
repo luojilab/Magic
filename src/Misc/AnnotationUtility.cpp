@@ -27,8 +27,8 @@
  */
 
 #include "AnnotationUtility.h"
-#include <QMessageBox>
-#include <iostream>
+#include <QMessageBox>          // QMessageBos::warning()
+#include <iostream>             // std::cerr
 
 const QString S_AnnoPrefix = "<img class=\"epub-footnote\" src=\"";
 const QString S_AnnoInfix = "\" alt=\"";
@@ -69,7 +69,6 @@ void AnnotationUtility::convertFromContent(CodeViewEditor *code_view)
     
     AnnoData reference = getLinked(content);
     if (reference.cursor.isNull() || !reference.gumbo || !reference.a_node) {
-        QMessageBox::warning(nullptr, "", "Invalid annotation data");
         return;
     }
 
@@ -105,7 +104,7 @@ void AnnotationUtility::convertFromReference(CodeViewEditor *code_view)
     
     AnnoData content = getLinked(reference);
     if (content.cursor.isNull() || !content.gumbo || !content.a_node) {
-        QMessageBox::warning(nullptr, "", "Invalid annotation data");
+        return;
     }
     
     if (convertAnnotation(content, reference)) {
@@ -136,8 +135,17 @@ QString AnnotationUtility::getPlainText(const QString &origin_text)
 int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
 {
     // Check the doubly link valid.
-    if (checkLink(content, reference)) {
-        QMessageBox::warning(nullptr, "", u8"双向链接错误。");
+    if (auto err = checkLink(content, reference)) {
+        QString msg;
+        switch (err) {
+            case 1:
+                msg = u8"含有空链接。";
+                break;
+            case 2:
+                msg = u8"双向链接未连通。";
+                break;
+        }
+        QMessageBox::warning(nullptr, "", msg);
         return 1;
     }
     
@@ -157,6 +165,7 @@ int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
     // Remove old code.
     content.cursor.removeSelectedText();
     reference.cursor.removeSelectedText();
+    // TODO: remove text surrounding tag a.
     
     return 0;
 }
@@ -207,25 +216,53 @@ AnnotationUtility::AnnoData AnnotationUtility::getLinked(const AnnoData &selecte
     if (selected_href.isEmpty()) {
         QMessageBox::warning(nullptr, "", u8"双向链接错误（空链接）。");
     }
-
-    // Search the id corresponding to the href in the current file.
-    std::shared_ptr<GumboInterface> linked_gumbo = std::make_shared<GumboInterface>(selected.cursor.document()->toPlainText(), "HTML2.0");
+    
+    // Parse the href to determine the target file.
+    QTextDocument *linked_document = nullptr;
+    QString linked_id;
+    QStringList linked_path = selected_href.split('#', QString::SkipEmptyParts);
+    if (linked_path.length() == 1) { // Linked node in the current file.
+        linked_document = selected.cursor.document();
+        linked_id = linked_path[0];
+    } else if (linked_path.length() == 2) {
+        auto [err, html] = getDocument(linked_path[0]);
+        if (err) {
+            QString msg;
+            switch (err) {
+                case 1:
+                    msg = u8"无法找到主窗口。";
+                    break;
+                case 2:
+                    msg = u8"未找到链接文件。";
+                    break;
+            }
+            QMessageBox::warning(nullptr, "", msg);
+            return AnnoData();
+        }
+        linked_document = &(html->GetTextDocumentForWriting());
+        linked_id = linked_path[1];
+    } else {
+        QMessageBox::warning(nullptr, "", u8"无效链接。");
+        return AnnoData();
+    }
+    
+    // Search the id corresponding to the href.
+    std::shared_ptr<GumboInterface> linked_gumbo = std::make_shared<GumboInterface>(linked_document->toPlainText(), "HTML2.0");
     QList<GumboNode *> nodes_with_id = linked_gumbo->get_all_nodes_with_attribute("id");
     GumboNode *linked_a_node = nullptr;
     for (auto p : nodes_with_id) {
         auto attributes = linked_gumbo->get_attributes_of_node(p);
-        if ('#' + attributes["id"] == selected_href) {
+        if (attributes["id"] == linked_id) {
             linked_a_node = p;
         }
     }
     if (!linked_a_node) {
-        QMessageBox::warning(nullptr, "", u8"（在本文件中）未找到链接节点。\nLinked node not found.");
+        QMessageBox::warning(nullptr, "", u8"未找到链接节点。\nLinked node not found.");
         return AnnoData();
     }
-    // TODO: Search all html files if id not found in the current file.
     
     // Get the reference cursor with <a> tag selected.
-    QTextCursor linked_cursor(selected.cursor.document());
+    QTextCursor linked_cursor(linked_document);
     linked_cursor.beginEditBlock();
     size_t line = linked_a_node->v.element.start_pos.line;
     size_t column = linked_a_node->v.element.start_pos.column;
@@ -239,21 +276,36 @@ AnnotationUtility::AnnoData AnnotationUtility::getLinked(const AnnoData &selecte
     return AnnoData{linked_cursor, linked_gumbo, linked_a_node};
 }
 
+std::pair<int, HTMLResource *> AnnotationUtility::getDocument(const QString file_path)
+{
+    QString file_name = file_path.split('/').back();
+    QWidget *main_window_widget = Utility::GetMainWindow();
+    MainWindow *main_window = dynamic_cast<MainWindow *>(main_window_widget);
+    if (!main_window) {
+        return std::make_pair(1, nullptr);
+    }
+    const QStringList current_filenames = main_window->GetCurrentBook()->GetFolderKeeper()->GetAllFilenames();
+    if (!current_filenames.contains(file_name, Qt::CaseSensitive)) {
+        return std::make_pair(2, nullptr);
+    }
+    Resource *resource = main_window->GetCurrentBook()->GetFolderKeeper()->GetResourceByFilename(file_name);
+    HTMLResource *document = qobject_cast<HTMLResource *>(resource);
+    return std::make_pair(0, document);
+}
+
 int AnnotationUtility::checkLink(const AnnoData &content, const AnnoData &reference)
 {
     auto content_attributes = content.gumbo->get_attributes_of_node(content.a_node);
-    auto content_href = content_attributes["href"];
+    auto content_href = content_attributes["href"].split('#').back();
     auto content_id = content_attributes["id"];
     auto reference_attributes = reference.gumbo->get_attributes_of_node(reference.a_node);
-    auto reference_href = reference_attributes["href"];
+    auto reference_href = reference_attributes["href"].split('#').back();
     auto reference_id = reference_attributes["id"];
 
     if (content_href.isEmpty() || content_id.isEmpty() || reference_href.isEmpty() || reference_id.isEmpty()) {
-        QMessageBox::warning(nullptr, "", u8"含有空链接。"); // repeat prompt
         return 1;
     }
-    if ((content_href != '#' + reference_id) || (reference_href != '#' + content_id)) {
-        QMessageBox::warning(nullptr, "", u8"双向链接存在错误。"); // repeat prompt
+    if ((content_href != reference_id) || (reference_href != content_id)) {
         return 2;
     }
     return 0;
@@ -261,10 +313,22 @@ int AnnotationUtility::checkLink(const AnnoData &content, const AnnoData &refere
 
 int AnnotationUtility::checkOrder(const QTextCursor &content_cursor, const QTextCursor &reference_cursor)
 {
-    if (content_cursor.position() < reference_cursor.position()) {
-        return 1;
+    if (content_cursor.document() == reference_cursor.document()) {
+        if (content_cursor.position() < reference_cursor.position()) {
+            return 1;
+        }
+    } else {
+        QWidget *main_window_widget = Utility::GetMainWindow();
+        MainWindow *main_window = dynamic_cast<MainWindow *>(main_window_widget);
+        if (!main_window) {
+            return 2;
+        }
+        const QStringList filenames_in_order = main_window->GetCurrentBook()->GetOPF()->GetSpineOrderFilenames();
+        if (filenames_in_order.isEmpty()) {
+            return 3;
+        }
+//        std::cerr << content_cursor.document()->baseUrl().toString().toStdString() << '|' << reference_cursor.document()->baseUrl().toString().toStdString() << std::endl;
     }
-    // TODO: the reference and content are not in the same file.
     
     return 0;
 }
