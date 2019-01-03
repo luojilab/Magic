@@ -196,7 +196,10 @@ int AnnotationUtility::selectNearestTagA(CodeViewEditor *code_view)
     cursor.beginEditBlock();
     cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
     code_view->setTextCursor(cursor);
-    if (!code_view->find(QRegExp(S_TagARegex))) {
+    QRegExp tag_a_regex{S_TagARegex};
+    tag_a_regex.setMinimal(true);
+    if (!code_view->find(tag_a_regex)) {
+        std::cerr << '|' << code_view->textCursor().selectedText().toStdString() <<  '|' << std::endl;
         QMessageBox::warning(nullptr, "", u8"未找到完整a../a标签。");
         return 2;
     }
