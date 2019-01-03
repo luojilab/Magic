@@ -88,7 +88,7 @@ private:
     static int checkLink(const AnnoData &content, const AnnoData &reference);
     
     // Check order: the content should be after reference.
-    static int checkOrder(const QTextCursor &content_cursor, const QTextCursor &reference_cursor);
+    static int checkOrder(const AnnoData &content, const AnnoData &reference);
 };
 
 #endif /* ANNOTATIONUTILITIES_H */

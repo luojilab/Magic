@@ -150,8 +150,23 @@ int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
     }
     
     // Check order: the content should be after reference.
-    if (checkOrder(content.cursor, reference.cursor)) {
-        QMessageBox::warning(nullptr, "", u8"检测到注释内容在引用之前，请检查转换选项是否正确。");
+    if (auto err = checkOrder(content, reference)) {
+        QString msg;
+        switch (err) {
+            case 1:
+                msg = u8"检测到注释内容在引用之前，请检查转换选项是否正确。";
+                break;
+            case 2:
+                msg = u8"获取MainWindow错误。";
+                break;
+            case 3:
+                msg = u8"获取xhtml文件顺序发生错误。";
+                break;
+            case 4:
+                msg = u8"检测到注释内容所在文档位于引用所在文档之前，请检查转换选项。";
+                break;
+        }
+        QMessageBox::warning(nullptr, "", msg);
         return 2;
     }
     
@@ -311,13 +326,18 @@ int AnnotationUtility::checkLink(const AnnoData &content, const AnnoData &refere
     return 0;
 }
 
-int AnnotationUtility::checkOrder(const QTextCursor &content_cursor, const QTextCursor &reference_cursor)
+int AnnotationUtility::checkOrder(const AnnoData &content, const AnnoData &reference)
 {
-    if (content_cursor.document() == reference_cursor.document()) {
-        if (content_cursor.position() < reference_cursor.position()) {
+    if (content.cursor.document() == reference.cursor.document()) {
+        if (content.cursor.position() < reference.cursor.position()) {
             return 1;
         }
     } else {
+        // Get filenames of content and reference.
+        QString content_filename = reference.gumbo->get_attributes_of_node(reference.a_node)["href"].split('#').front().split('/').back();
+        QString reference_filename = content.gumbo->get_attributes_of_node(content.a_node)["href"].split('#').front().split('/').back();
+        
+        // Get filenames in the book in order.
         QWidget *main_window_widget = Utility::GetMainWindow();
         MainWindow *main_window = dynamic_cast<MainWindow *>(main_window_widget);
         if (!main_window) {
@@ -327,7 +347,10 @@ int AnnotationUtility::checkOrder(const QTextCursor &content_cursor, const QText
         if (filenames_in_order.isEmpty()) {
             return 3;
         }
-//        std::cerr << content_cursor.document()->baseUrl().toString().toStdString() << '|' << reference_cursor.document()->baseUrl().toString().toStdString() << std::endl;
+        
+        if (filenames_in_order.indexOf(content_filename) < filenames_in_order.indexOf(reference_filename)) {
+            return 4;
+        }
     }
     
     return 0;
