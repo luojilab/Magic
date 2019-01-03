@@ -61,7 +61,7 @@ void AnnotationUtility::convertFromContent(CodeViewEditor *code_view)
     std::shared_ptr<GumboInterface> content_gumbo = std::make_shared<GumboInterface>(block_text, "HTML2.0");
     GumboNode *content_a_node = getTagANode(content_gumbo);
     if (!content_a_node) {
-        QMessageBox::warning(nullptr, "", u8"获取a节点错误。");
+        QMessageBox::warning(nullptr, "", u8"获取&lt;a&gt;节点错误。");
         return;
     }
     
@@ -96,7 +96,7 @@ void AnnotationUtility::convertFromReference(CodeViewEditor *code_view)
     std::shared_ptr<GumboInterface> reference_gumbo = std::make_shared<GumboInterface>(selected_text, "HTML2.0");
     GumboNode *reference_a_node = getTagANode(reference_gumbo);
     if (!reference_a_node) {
-        QMessageBox::warning(nullptr, "", u8"获取a节点错误。");
+        QMessageBox::warning(nullptr, "", u8"获取&lt;a&gt;节点错误。");
         return;
     }
     
@@ -124,7 +124,7 @@ QString AnnotationUtility::getPlainText(const QString &origin_text)
     GumboInterface gumbo{origin_text, "HTML2.0"};
     QString return_text = gumbo.get_local_text_of_node(gumbo.get_root_node());
     if (return_text.contains('<')) {
-        QMessageBox::warning(nullptr, "", "注释含有<符号，请手动处理。");
+        QMessageBox::warning(nullptr, "", "注释含有&lt;符号，请手动处理。");
     }
     if (return_text.contains('"')) {
         QMessageBox::warning(nullptr, "", "注释含有\"符号，请手动处理。");
@@ -189,7 +189,7 @@ int AnnotationUtility::selectNearestTagA(CodeViewEditor *code_view)
 {
     QTextCursor initial_cursor = code_view->textCursor();
     if (!code_view->find("<a", QTextDocument::FindBackward)) {
-        QMessageBox::warning(nullptr, "", u8"未找到a前标签。");
+        QMessageBox::warning(nullptr, "", u8"未找到&lt;a&gt;前标签。");
         return 1;
     }
     QTextCursor cursor = code_view->textCursor();
@@ -199,13 +199,12 @@ int AnnotationUtility::selectNearestTagA(CodeViewEditor *code_view)
     QRegExp tag_a_regex{S_TagARegex};
     tag_a_regex.setMinimal(true);
     if (!code_view->find(tag_a_regex)) {
-        std::cerr << '|' << code_view->textCursor().selectedText().toStdString() <<  '|' << std::endl;
-        QMessageBox::warning(nullptr, "", u8"未找到完整a../a标签。");
+        QMessageBox::warning(nullptr, "", u8"未找到完整&lt;a&gt;..&lt;/a&gt;标签。");
         return 2;
     }
     cursor = code_view->textCursor();
     if (cursor.selectionStart() > initial_cursor.position() || cursor.selectionEnd() < initial_cursor.position()) {
-        QMessageBox::warning(nullptr, "", u8"光标不位于a标签之间。");
+        QMessageBox::warning(nullptr, "", u8"光标不位于&lt;a&gt;标签之间。");
         code_view->setTextCursor(initial_cursor);
         return 3;
     }
@@ -221,7 +220,7 @@ GumboNode *AnnotationUtility::getTagANode(const std::shared_ptr<GumboInterface> 
         return nullptr;
     }
     if (a_nodes.size() > 1) {
-        QMessageBox::warning(nullptr, "", u8"段落含有多个a标签，请手动处理。\nMultiple tag <a> found.");
+        QMessageBox::warning(nullptr, "", u8"段落含有多个&lt;a&gt;标签，请手动处理。\nMultiple tag <a> found.");
         return nullptr;
     }
     return a_nodes[0];
