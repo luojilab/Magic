@@ -111,7 +111,7 @@
     <item>
      <widget class="QPlainTextEdit" name="annoTextEdit">
       <property name="placeholderText">
-       <string>在此输入注释文本（自动删除常见标签）</string>
+       <string>在此输入注释（自动删除标签）</string>
       </property>
      </widget>
     </item>

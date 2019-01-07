@@ -54,7 +54,7 @@ const QSize S_iconSize(72, 72);
 const QString S_defaultIconSrc = "../Images/AnnoIcon0.png";
 const QString S_annoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
 const char *S_annoSelector = "img.epub-footnote { }";
-const char *S_annoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align:super;\n    padding: 0 5px;\n}\n";
+const char *S_annoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
 
 QString SelectAnnotation::S_lastBgColor = S_defaultBgColor;
 QString SelectAnnotation::S_lastFgColor = S_defaultFgColor;
