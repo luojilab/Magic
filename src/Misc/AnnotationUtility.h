@@ -59,13 +59,13 @@ private:
     // A struct to store neccesary data for parameter passing
     typedef struct AnnotationNodeData
     {
-        AnnotationNodeData() : cursor(QTextCursor()), gumbo(nullptr), a_node(nullptr) {}
-        AnnotationNodeData(const QTextCursor &_cursor,
-                           const std::shared_ptr<GumboInterface> _gumbo,
-                           GumboNode *_a_node)
-        : cursor(_cursor), gumbo(_gumbo), a_node(_a_node) {}
+        AnnotationNodeData() = default;
+        AnnotationNodeData(const std::shared_ptr<QTextCursor> &param_cursor,
+                           const std::shared_ptr<GumboInterface> &param_gumbo,
+                           GumboNode *param_a_node)
+        : cursor(param_cursor), gumbo(param_gumbo), a_node(param_a_node) {}
         
-        QTextCursor cursor;
+        std::shared_ptr<QTextCursor> cursor;
         std::shared_ptr<GumboInterface> gumbo;
         GumboNode *a_node;
     } AnnoData;
@@ -74,15 +74,14 @@ private:
     static int convertAnnotation(AnnoData &content, AnnoData &reference);
     
     // Select the nearest <a> tag to the cursor.
-    static int selectNearestTagA(CodeViewEditor *code_view);
-    
-    // Parse the text using Gumbo to get element with tag <a>.
-    static GumboNode *getTagANode(const std::shared_ptr<GumboInterface> gumbo);
+    static std::pair<int, AnnoData> getWrappingTagA(CodeViewEditor *code_view);
     
     // Get the node linked with the selected node.
-    static AnnoData getLinked(const AnnoData &selected);
+    static std::pair<int, AnnoData> getLinkedTagA(const AnnoData &selected);
     
-    static std::pair<int, HTMLResource *> getDocument(const QString file_path);
+    static std::pair<int, HTMLResource *> getDocument(const QString &file_path);
+    
+    static int selectInvisibleWrappingTags(AnnoData *anno);
     
     // Check doubly link valid.
     static int checkLink(const AnnoData &content, const AnnoData &reference);
