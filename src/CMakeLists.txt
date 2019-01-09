@@ -326,6 +326,8 @@ set( MISC_FILES
     Misc/HTMLStyleResolver.cpp
     Misc/CSSSelectorJudge.hpp
     Misc/CSSSelectorJudge.cpp
+    Misc/SplitChecker.hpp
+    Misc/SplitChecker.cpp
     )
 
 set( MISC_EDITORS_FILES    
@@ -991,9 +993,7 @@ elseif (MSVC)
         message( STATUS "Using the 32 bit CRT in the Sigil Windows installer" )
         message( STATUS "Ensure vcredist_x86.exe for VS2015 has been placed in installer/ if you plan on running makeinstaller" )
         add_custom_command( TARGET ${TARGET_FOR_COPY} PRE_BUILD
-            COMMAND cmake -E copy ${CMAKE_SOURCE_DIR}/installer/vcredist2010.exe ${TEMP_PACKAGE_DIR}/vendor/vcredist2010.exe )
-		add_custom_command( TARGET ${TARGET_FOR_COPY} PRE_BUILD
-            COMMAND cmake -E copy ${CMAKE_SOURCE_DIR}/installer/vcredist2015.exe ${TEMP_PACKAGE_DIR}/vendor/vcredist2015.exe )
+            COMMAND cmake -E copy ${CMAKE_SOURCE_DIR}/installer/vcredist_x86.exe ${TEMP_PACKAGE_DIR}/vendor/vcredist2015.exe )
     endif()
 
     # Copy the Changelog

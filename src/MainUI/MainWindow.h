@@ -246,6 +246,8 @@ public:
 	void runPlugin(QAction *action);
 
 	void ResourcesAddedOrDeleted();
+    
+    void SplitCheck();
 
 
 signals:

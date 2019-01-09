@@ -50,7 +50,7 @@
      <x>0</x>
      <y>0</y>
      <width>1436</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -382,6 +382,7 @@
     <addaction name="separator"/>
     <addaction name="actionStandard_html_name"/>
     <addaction name="menu_2"/>
+    <addaction name="actionSplitCheck"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
     <property name="title">
@@ -2567,6 +2568,11 @@
   <action name="actionIPad_landscape">
    <property name="text">
     <string>iPad  (landscape)</string>
+   </property>
+  </action>
+  <action name="actionSplitCheck">
+   <property name="text">
+    <string>拆分检查</string>
    </property>
   </action>
  </widget>

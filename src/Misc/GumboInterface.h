@@ -96,6 +96,10 @@ public:
     QList<GumboNode*> get_nodes_with_attribute(GumboNode* node, const char * att_name);
 
     QList<GumboNode*> get_nodes_with_tags(GumboNode* node, const QList<GumboTag> & tags);
+    
+    void get_all_textNode(GumboNode* root, std::list<GumboNode *>& textNodes);
+    
+    long long  get_html_text_count();
 
 private:
 

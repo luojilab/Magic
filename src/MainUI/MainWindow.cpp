@@ -107,6 +107,7 @@
 #include "CustomDockWidget.h"
 #include "ButtonCollectionView.h"
 #include "HorizonLayoutView.h"
+#include "Misc/SplitChecker.hpp"
 
 static const int TEXT_ELIDE_WIDTH   = 300;
 static const QString SETTINGS_GROUP = "mainwindow";
@@ -5074,6 +5075,7 @@ void MainWindow::ConnectSignalsToSlots()
     ui.actionPreviewForIphoneXQuick->setIcon(QIcon(":/main/ipad-preview_48px.png"));
     connect(ui.actionSplitLeft, SIGNAL(triggered(bool)), this, SLOT(changeSplitStrategy(bool)));
     connect(ui.actionSplitRight, SIGNAL(triggered(bool)), this, SLOT(changeSplitStrategy(bool)));
+    connect(ui.actionSplitCheck, SIGNAL(triggered(bool)), this, SLOT(SplitCheck()));
     // Change case
     connect(ui.actionCasingLowercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
     connect(ui.actionCasingUppercase,  SIGNAL(triggered()), m_casingChangeMapper, SLOT(map()));
@@ -5641,4 +5643,17 @@ void MainWindow::changeSplitStrategy(bool newState) {
             ui.actionSplitLeft->setChecked(false);
         }
     }
+}
+
+void MainWindow::SplitCheck() {
+    SplitChecker chcker;
+    auto result = chcker.Check(m_Book->GetHTMLResources(), 0.1);
+    if (result.errorCode == SplitChecker::SplitError::NoError) {
+        QMessageBox::information(nullptr, "", "可以正确拆分");
+    } else {
+        QString info("拆分错误，错误章节：%1");
+        info = info.arg(result.info.c_str());
+        QMessageBox::information(nullptr, "", info);
+    }
+    return;
 }
