@@ -40,6 +40,30 @@ class AnnotationUtility : public QObject
     Q_OBJECT
     
 public:
+    enum class ErrorCode
+    {
+        NoError,
+        EmptyHref,
+        LinkedFileNotFound,
+        InvalidHref,
+        LinkedNodeNotFound,
+        OpenTagANotFound,
+        TagANotFound,
+        CursorOutOfRange,
+        NoLinkInSelectedBlock,
+        MultipleLinksInSelectedBlock,
+        AttributeIdNotFound,
+        EmptyReferenceText,
+        NullParentNode,
+        DoublyLinkDisconnected,
+        ContentBeforeReference,
+        DocumentOrderNotFound,
+        ContentFileBeforeReferenceFile,
+    };
+    
+    // Used to store error prompt message corresponding to the error code.
+    static const std::map<AnnotationUtility::ErrorCode, QString> S_error_messages;
+    
     explicit AnnotationUtility() = delete;
     ~AnnotationUtility();
     
@@ -74,20 +98,20 @@ private:
     static int convertAnnotation(AnnoData &content, AnnoData &reference);
     
     // Select the nearest <a> tag to the cursor.
-    static std::pair<int, AnnoData> getWrappingTagA(CodeViewEditor *code_view);
+    static std::pair<ErrorCode, AnnoData> getWrappingTagA(CodeViewEditor *code_view);
     
     // Get the node linked with the selected node.
-    static std::pair<int, AnnoData> getLinkedTagA(const AnnoData &selected);
+    static std::pair<ErrorCode, AnnoData> getLinkedTagA(const AnnoData &selected);
     
     static std::pair<int, HTMLResource *> getDocument(const QString &file_path);
     
-    static int selectInvisibleWrappingTags(AnnoData *anno);
+    static ErrorCode selectInvisibleWrappingTags(AnnoData *anno);
     
     // Check doubly link valid.
-    static int checkLink(const AnnoData &content, const AnnoData &reference);
+    static ErrorCode checkLink(const AnnoData &content, const AnnoData &reference);
     
     // Check order: the content should be after reference.
-    static int checkOrder(const AnnoData &content, const AnnoData &reference);
+    static ErrorCode checkOrder(const AnnoData &content, const AnnoData &reference);
 };
 
 #endif /* ANNOTATIONUTILITIES_H */
