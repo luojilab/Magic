@@ -326,6 +326,8 @@ set( MISC_FILES
     Misc/HTMLStyleResolver.cpp
     Misc/CSSSelectorJudge.hpp
     Misc/CSSSelectorJudge.cpp
+    Misc/SplitChecker.hpp
+    Misc/SplitChecker.cpp
     )
 
 set( MISC_EDITORS_FILES    
