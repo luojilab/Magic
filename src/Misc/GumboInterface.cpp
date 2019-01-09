@@ -1351,6 +1351,36 @@ std::string GumboInterface::prettyprint(GumboNode* node, int lvl, const std::str
     return results;
 }
 
+void GumboInterface::get_all_textNode(GumboNode* root, std::list<GumboNode *>& textNodes)
+{
+    if (root->type == GUMBO_NODE_TEXT) {
+        textNodes.push_back(root);
+    } else if (root->type == GUMBO_NODE_ELEMENT) {
+        int childSize = root->v.document.children.length;
+        for (int i = 0; i < childSize; i++) {
+            GumboNode* child = (GumboNode *)root->v.document.children.data[i];
+            get_all_textNode(child, textNodes);
+        }
+    }
+}
+
+long long GumboInterface::get_html_text_count()
+{
+    typedef long long textLen_t;
+    textLen_t length = 0;
+    std::list<GumboNode *>textNodes;
+    parse();
+    GumboNode* root = get_root_node();
+    get_all_textNode(root, textNodes);
+    auto it = textNodes.begin();
+    auto end = textNodes.end();
+    while (it != end) {
+        GumboNode* node = *it++;
+        length += strlen(node->v.text.text);
+    }
+    return length;
+}
+
 
 
 
@@ -1424,6 +1454,7 @@ QString GumboInterface::fix_self_closing_tags(const QString &source)
     }
     return newsource;
 }
+
 #endif
 
 
