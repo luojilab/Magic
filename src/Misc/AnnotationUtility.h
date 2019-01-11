@@ -26,8 +26,8 @@
  --------------------------------------------------------------------------------
  */
 
-#ifndef ANNOTATIONUTILITIES_H
-#define ANNOTATIONUTILITIES_H
+#ifndef ANNOTATION_UTILITIES_H
+#define ANNOTATION_UTILITIES_H
 
 #include "ViewEditors/CodeViewEditor.h"
 #include "Tabs/FlowTab.h"
@@ -114,4 +114,4 @@ private:
     static ErrorCode checkOrder(const AnnoData &content, const AnnoData &reference);
 };
 
-#endif /* ANNOTATIONUTILITIES_H */
+#endif /* ANNOTATION_UTILITIES_H */
