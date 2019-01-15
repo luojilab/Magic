@@ -5658,12 +5658,26 @@ void MainWindow::SplitCheck() {
     return;
 }
 
-void MainWindow::addToolIcon(const QIcon &icon, const QString &text, QObject *receiver, const char *member)
+bool MainWindow::addToolIcon(const QString &icon, const QString &text, QObject *receiver, const char *member)
 {
+    if (icon.isEmpty() && text.isEmpty()) {
+        return false;
+    }
     QToolBar *toolBarNew = new QToolBar(this);
     toolBarNew->setObjectName("toolBarNew");
     toolBarNew->setWindowTitle(text);
     toolBarNew->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->insertToolBar(ui.toolBarTextDirection, toolBarNew);
-    toolBarNew->addAction(icon, text, receiver, member);
+    toolBarNew->addAction(QIcon(icon), text, receiver, member);
+    return true;
+    
+    // Alternative code to add icon without creating new toolbar.
+/* -----------------------------------------------------------------------------
+    QAction *action = new QAction(icon, text, this);
+    connect(action, SIGNAL(triggered()), this, SLOT(insertAnnotation()));
+    QToolButton *button = new QToolButton(this);
+    button->setDefaultAction(action);
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui.toolBarChangeCase->addWidget(button);
+ ----------------------------------------------------------------------------- */
 }

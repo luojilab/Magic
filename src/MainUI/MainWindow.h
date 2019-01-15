@@ -251,7 +251,7 @@ public:
     
     // Add a new tool to the end of toolbar.
     // The type of last parameter, const char *, is used to pass SLOT of Qt.
-    void addToolIcon(const QIcon &icon, const QString &text, QObject *receiver, const char *member);
+    bool addToolIcon(const QString &icon, const QString &text, QObject *receiver, const char *member);
 
 
 signals:
