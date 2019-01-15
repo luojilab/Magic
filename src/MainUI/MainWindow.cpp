@@ -5657,3 +5657,13 @@ void MainWindow::SplitCheck() {
     }
     return;
 }
+
+void MainWindow::addToolIcon(const QIcon &icon, const QString &text, QObject *receiver, const char *member)
+{
+    QToolBar *toolBarNew = new QToolBar(this);
+    toolBarNew->setObjectName("toolBarNew");
+    toolBarNew->setWindowTitle(text);
+    toolBarNew->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->insertToolBar(ui.toolBarTextDirection, toolBarNew);
+    toolBarNew->addAction(icon, text, receiver, member);
+}
