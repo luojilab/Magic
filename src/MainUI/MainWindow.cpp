@@ -5657,3 +5657,74 @@ void MainWindow::SplitCheck() {
     }
     return;
 }
+
+bool MainWindow::addToolBarIcon(const QString &icon, const QString &text, QObject *receiver, const char *member)
+{
+    if (icon.isEmpty() && text.isEmpty()) {
+        return false;
+    }
+    QToolBar *toolBarNew = new QToolBar(this);
+    toolBarNew->setObjectName("toolBarNew");
+    toolBarNew->setWindowTitle(text);
+    toolBarNew->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->insertToolBar(ui.toolBarTextDirection, toolBarNew);
+    toolBarNew->addAction(QIcon(icon), text, receiver, member);
+    return true;
+    
+    // Alternative code to add icon without creating new toolbar.
+/* -----------------------------------------------------------------------------
+    QAction *action = new QAction(icon, text, this);
+    connect(action, SIGNAL(triggered()), this, SLOT(insertAnnotation()));
+    QToolButton *button = new QToolButton(this);
+    button->setDefaultAction(action);
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui.toolBarChangeCase->addWidget(button);
+ ----------------------------------------------------------------------------- */
+}
+
+QList<QAction *> MainWindow::addToolBarMenu(const QList<QString> &icons, const QList<QString> &texts)
+{
+    QList<QAction *> ret;
+    if (icons.size() < 2 || icons.size() != texts.size()) {
+        return ret;
+    }
+    for (int i = 0; i < icons.size(); ++i) {
+        if (icons.at(i).isEmpty() || texts.at(i).isEmpty()) {
+            return ret;
+        }
+    }
+    
+    const int width = 90;
+    const QString styleSheet = "background-color: #CCC;";
+    
+    QMenu *menu = new QMenu(this);
+    menu->setMaximumWidth(width);
+    menu->setStyleSheet(styleSheet);
+    for (int i = 1; i < icons.size(); ++i) {
+        ret.append(menu->addAction(QIcon(icons.at(i)), texts.at(i)));
+        menu->addSeparator();
+    }
+    
+    QToolButton *button = new QToolButton(this);
+    button->setIcon(QIcon(icons.at(0)));
+    button->setText(texts.at(0));
+    button->setMinimumWidth(width);
+    auto font = button->font();
+    font.setPointSize(font.pointSize() * 1.2);
+    button->setFont(font);
+    button->setPopupMode(QToolButton::InstantPopup);
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    button->setMenu(menu);
+    
+    QWidget *spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    
+    QToolBar *toolBarNew = new QToolBar(this);
+    toolBarNew->setObjectName(texts.at(0));
+    toolBarNew->addWidget(spacer);
+    toolBarNew->addWidget(button);
+    
+    this->insertToolBar(ui.toolBarTextDirection, toolBarNew);
+    
+    return ret;
+}

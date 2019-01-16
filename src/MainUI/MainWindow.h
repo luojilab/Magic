@@ -248,6 +248,14 @@ public:
 	void ResourcesAddedOrDeleted();
     
     void SplitCheck();
+    
+    // Add a new tool to the end of toolbar.
+    // The type of last parameter, const char *, is used to pass SLOT of Qt.
+    bool addToolBarIcon(const QString &icon, const QString &text, QObject *receiver, const char *member);
+    
+    // Add a new dropdown menu to the right end of toolbar.
+    // The first item of icons and texts should be the button setting, other items are dropdowns.
+    QList<QAction *> addToolBarMenu(const QList<QString> &icons, const QList<QString> &texts);
 
 
 signals:
