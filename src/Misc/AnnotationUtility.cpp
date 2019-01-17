@@ -27,14 +27,23 @@
  */
 
 #include "AnnotationUtility.h"
-#include <QMessageBox>          // QMessageBos::warning()
-#include <iostream>             // std::cerr
+#include <QMessageBox>                  // QMessageBos::warning()
+#include "MainUI/BookBrowser.h"         // Refresh()
+#include "Misc/CSSSelectorJudge.hpp"    // CSSSelectorJudge::selectorExists()
+#include <iostream>                     // std::cerr
 
 const QString S_AnnoPrefix = "<img class=\"epub-footnote\" src=\"";
 const QString S_AnnoInfix = "\" alt=\"";
 const QString S_AnnoSuffix = "\" />";
 const QString S_DefaultIconSrc = "../Images/AnnoIcon0.png";
 const QString S_TagARegex = "<a(\\s+\\w+=\"(\\w|-|#|\\.|\\/)+\"\\s*)+>.*</a>";
+const QString S_IconFilename = "AnnoIcon0";
+const QString S_IconFilePath = ":icon/AnnoIcon0.png";
+const QString S_AnnoStylesheetFilename = "AnnotationStyles.css";
+const QString S_AnnoStylesheetPath = ":icon/" + S_AnnoStylesheetFilename;
+const QString S_AnnoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
+const char *S_AnnoSelector = "img.epub-footnote { }";
+const char *S_AnnoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
 
 // Static function used in MainWindow::insertAnnotation.
 void AnnotationUtility::insertAnnotation(const QString &anno_text, const QString &anno_icon, QTextCursor cursor)
@@ -90,6 +99,9 @@ void AnnotationUtility::convertFromContent(CodeViewEditor *code_view)
     if (convertAnnotation(content, reference)) {
         return;
     }
+    
+    addIconResource();
+    appendStyle(code_view);
 }
 
 void AnnotationUtility::convertFromReference(CodeViewEditor *code_view)
@@ -121,6 +133,9 @@ void AnnotationUtility::convertFromReference(CodeViewEditor *code_view)
     if (convertAnnotation(content, reference)) {
         return;
     }
+    
+    addIconResource();
+    appendStyle(code_view);
 }
 
 QString AnnotationUtility::getPlainText(const QString &origin_text)
@@ -138,6 +153,81 @@ QString AnnotationUtility::getPlainText(const QString &origin_text)
         QMessageBox::warning(nullptr, "", "注释含有\"符号，请手动处理。");
     }
     return return_text;
+}
+
+bool AnnotationUtility::appendStyle(CodeViewEditor *code_view)
+{
+    // Get html link nodes using Gumbo.
+    GumboInterface gumbo(code_view->toPlainText(), "HTML2.0");
+    const QList<GumboNode *> nodeList = gumbo.get_all_nodes_with_tag(GUMBO_TAG_LINK);
+    if (nodeList.isEmpty()) {
+        return addStylesheet(code_view);
+    }
+    
+    // Get filename of linked stylesheet
+    MainWindow *main_window = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
+    QString css_filename;
+    bool has_css = false;
+    for (auto node : nodeList) {
+        GumboVector attributes = node->v.element.attributes;
+        const QString rel = gumbo_get_attribute(&attributes, "rel")->value;
+        if (rel.isEmpty() || rel != "stylesheet") {
+            continue;
+        }
+        const QString css_file_path = gumbo_get_attribute(&attributes, "href")->value;
+        if (css_file_path.isEmpty()) {
+            continue;
+        }
+        css_filename = css_file_path.split('/').back();
+        const QStringList current_filenames = main_window->GetCurrentBook()->GetFolderKeeper()->GetAllFilenames();
+        if (current_filenames.contains(css_filename, Qt::CaseSensitive)) {
+            has_css = true;
+            break;
+        }
+    }
+    
+    if (!has_css) {
+        return addStylesheet(code_view);
+    }
+    
+    // Get the stylesheet document.
+    CSSResource *css = qobject_cast<CSSResource *>(main_window->GetCurrentBook()->GetFolderKeeper()->GetResourceByFilename(css_filename));
+    if (!css) {
+        QMessageBox::warning(nullptr, "", "文档链接的css文件不存在。\nThe CSS file this HTML linked to does not exsist.");
+    }
+    QTextDocument &css_doc = css->GetTextDocumentForWriting();
+    if (css_doc.isEmpty()) { // The CSS file is not open
+        QFile css_file(css->GetFullPath());
+        css_file.open(QIODevice::ReadWrite);
+        
+        // Check selector existence using CSS parser
+        const QByteArray current_styles = css_file.readAll();
+        if (CSSSelectorJudge::selectorExists(S_AnnoSelector, current_styles)) {
+            return true;
+        }
+        
+        // Append the style to the end of the file
+        css_file.write(S_AnnoStyle);
+        css_file.close();
+        
+    } else {
+        // Check selector existence using CSS parser
+        QString current_styles = css_doc.toPlainText();
+        if (CSSSelectorJudge::selectorExists(S_AnnoSelector, current_styles)) {
+            return true;
+        }
+        
+        // Append the style to the end of the stylesheet.
+        if (current_styles.isEmpty()) {
+            QMessageBox::warning(nullptr, "", "读取CSS失败。Read CSS file failed.");
+            return false;
+        }
+        css_doc.setPlainText(current_styles.append(S_AnnoStyle));
+    }
+    
+    emit css->ResourceUpdatedOnDisk();
+    
+    return true;
 }
 
 int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
@@ -378,6 +468,60 @@ AnnotationUtility::ErrorCode AnnotationUtility::checkOrder(const AnnoData &conte
     return ErrorCode::NoError;
 }
 
+AnnotationUtility::ErrorCode AnnotationUtility::addIconResource()
+{
+    MainWindow *main_window = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
+    const QStringList current_filenames = main_window->GetCurrentBook()->GetFolderKeeper()->GetAllFilenames();
+    if (!current_filenames.contains(S_IconFilename)) {
+        Resource *icon = main_window->GetCurrentBook()->GetFolderKeeper()->AddContentFileToFolder(S_IconFilePath);
+        if (!icon) {
+            return ErrorCode::AddIconFailed;
+        }
+    }
+    main_window->GetBookBrowser()->Refresh();
+    
+    return ErrorCode::NoError;
+}
+
+bool AnnotationUtility::addStylesheet(CodeViewEditor *code_view)
+{
+    MainWindow *main_window = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
+    Resource *anno_stylesheet = main_window->GetCurrentBook()->GetFolderKeeper()->AddContentFileToFolder(S_AnnoStylesheetPath);
+    if (!anno_stylesheet) {
+        QMessageBox::warning(nullptr, "", "添加样式文件失败。\nAdding CSS file failed.");
+        return false;
+    }
+    addStylesheetLink(code_view);
+    
+    // Refresh view to display newly added file.
+    main_window->GetBookBrowser()->Refresh();
+    
+    return true;
+}
+
+bool AnnotationUtility::addStylesheetLink(CodeViewEditor *code_view)
+{
+    // Store the initial cursor position to recover later.
+    const QTextCursor initial_cursor = code_view->textCursor();
+    
+    // Determine whether the stylesheet link is already added.
+    bool link_found = code_view->find(S_AnnoStyleLink, QTextDocument::FindBackward);
+    if (!link_found) {
+        bool head_found = code_view->find("</head>", QTextDocument::FindBackward);
+        if (!head_found) {
+            QMessageBox::warning(nullptr, "", "未找到head标签。\nTag head not found.");
+            return false;
+        }
+        
+        code_view->textCursor().insertText(S_AnnoStyleLink + tr("\n</head>"));
+    }
+    
+    // Recover the cursor position.
+    code_view->setTextCursor(initial_cursor);
+    
+    return true;
+}
+
 const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_error_messages = {
     {ErrorCode::EmptyHref, u8"含有空链接。"},
     {ErrorCode::LinkedFileNotFound, u8"未找到链接文件。"},
@@ -395,4 +539,5 @@ const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_error
     {ErrorCode::ContentBeforeReference, u8"检测到注释内容在引用之前，请检查转换选项是否正确。"},
     {ErrorCode::DocumentOrderNotFound, u8"未找到xhtml文件顺序。"},
     {ErrorCode::ContentFileBeforeReferenceFile, u8"检测到注释内容所在文档位于引用所在文档之前，请检查转换选项。"},
+    {ErrorCode::AddIconFailed, u8"添加图标文件失败。"},
 };

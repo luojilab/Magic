@@ -59,13 +59,13 @@ public:
         ContentBeforeReference,
         DocumentOrderNotFound,
         ContentFileBeforeReferenceFile,
+        AddIconFailed,
     };
     
     // Used to store error prompt message corresponding to the error code.
     static const std::map<AnnotationUtility::ErrorCode, QString> S_error_messages;
     
-    explicit AnnotationUtility() = delete;
-    ~AnnotationUtility();
+    AnnotationUtility() = delete;
     
     // Insert annotation code to html file.
     static void insertAnnotation(const QString &anno_text, const QString &anno_icon, QTextCursor cursor);
@@ -78,6 +78,9 @@ public:
     
     // Remove tags in text and deal special character like ", <.
     static QString getPlainText(const QString &origin_text);
+    
+    // Append the icon style to the end of linked stylesheet file.
+    static bool appendStyle(CodeViewEditor *code_view);
     
 private:
     // A struct to store neccesary data for parameter passing
@@ -112,6 +115,13 @@ private:
     
     // Check order: the content should be after reference.
     static ErrorCode checkOrder(const AnnoData &content, const AnnoData &reference);
+    
+    // Add the default annotation icon if the icon donot exist.
+    static ErrorCode addIconResource();
+    
+    static bool addStylesheet(CodeViewEditor *code_view);
+    
+    static bool addStylesheetLink(CodeViewEditor *code_view);
 };
 
 #endif /* ANNOTATION_UTILITIES_H */

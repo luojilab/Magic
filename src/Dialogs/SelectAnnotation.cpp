@@ -234,6 +234,8 @@ void SelectAnnotation::addIconFile()
 }
 
 // Append the icon style to the end of linked stylesheet file.
+// TODO: This is a duplicate of AnnotationUtility::appendStyle(),
+//       replace the callings with the one in util class.
 void SelectAnnotation::appendStyle()
 {
     // Get html link nodes using Gumbo.
