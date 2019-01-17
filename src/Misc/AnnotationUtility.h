@@ -63,7 +63,7 @@ public:
     };
     
     // Used to store error prompt message corresponding to the error code.
-    static const std::map<AnnotationUtility::ErrorCode, QString> S_error_messages;
+    static const std::map<AnnotationUtility::ErrorCode, QString> S_errorMessages;
     
     AnnotationUtility() = delete;
     
@@ -100,6 +100,9 @@ private:
     // Convert doubly linked annotation to image annotation.
     static int convertAnnotation(AnnoData &content, AnnoData &reference);
     
+    // Select the <a> tag in the block (there should be only one <a>).
+    static std::pair<ErrorCode, AnnoData> getTagAInBlock(CodeViewEditor *code_view);
+    
     // Select the nearest <a> tag to the cursor.
     static std::pair<ErrorCode, AnnoData> getWrappingTagA(CodeViewEditor *code_view);
     
@@ -107,6 +110,8 @@ private:
     static std::pair<ErrorCode, AnnoData> getLinkedTagA(const AnnoData &selected);
     
     static std::pair<int, HTMLResource *> getDocument(const QString &file_path);
+    
+    static ErrorCode selectWrappingBlockTag(AnnoData *anno);
     
     static ErrorCode selectInvisibleWrappingTags(AnnoData *anno);
     

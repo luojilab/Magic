@@ -44,6 +44,7 @@ const QString S_AnnoStylesheetPath = ":icon/" + S_AnnoStylesheetFilename;
 const QString S_AnnoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
 const char *S_AnnoSelector = "img.epub-footnote { }";
 const char *S_AnnoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
+const QList<GumboTag> S_BlockTags = {GUMBO_TAG_ADDRESS, GUMBO_TAG_ARTICLE, GUMBO_TAG_ASIDE, GUMBO_TAG_BLOCKQUOTE, GUMBO_TAG_DETAILS, GUMBO_TAG_DD, GUMBO_TAG_DIV, GUMBO_TAG_DL, GUMBO_TAG_DT, GUMBO_TAG_FIELDSET, GUMBO_TAG_FIGCAPTION, GUMBO_TAG_FIGURE, GUMBO_TAG_FOOTER, GUMBO_TAG_FORM, GUMBO_TAG_H1, GUMBO_TAG_H2, GUMBO_TAG_H3, GUMBO_TAG_H4, GUMBO_TAG_H5, GUMBO_TAG_H6, GUMBO_TAG_HEADER, GUMBO_TAG_HGROUP, GUMBO_TAG_HR, GUMBO_TAG_LI, GUMBO_TAG_MAIN, GUMBO_TAG_NAV, GUMBO_TAG_OL, GUMBO_TAG_P, GUMBO_TAG_PRE, GUMBO_TAG_SECTION, GUMBO_TAG_TABLE, GUMBO_TAG_UL};
 
 // Static function used in MainWindow::insertAnnotation.
 void AnnotationUtility::insertAnnotation(const QString &anno_text, const QString &anno_icon, QTextCursor cursor)
@@ -56,43 +57,58 @@ void AnnotationUtility::insertAnnotation(const QString &anno_text, const QString
 
 void AnnotationUtility::convertFromContent(CodeViewEditor *code_view)
 {
-    // Get block text under the cursor.
-    std::shared_ptr<QTextCursor> content_cursor = std::make_shared<QTextCursor>(code_view->textCursor());
-    content_cursor->beginEditBlock();
-    content_cursor->select(QTextCursor::BlockUnderCursor);
-    QString block_text = content_cursor->selectedText().trimmed();
-    if (block_text.isEmpty()) {
-        QMessageBox::warning(nullptr, "", u8"未选择内容。\nEmpty Selection.");
-        return;
-    }
-    
-    // Parse the text using Gumbo to get element with tag <a>.
-    std::shared_ptr<GumboInterface> content_gumbo = std::make_shared<GumboInterface>(block_text, "HTML2.0");
-    
-    QList<GumboNode *> content_a_nodes = content_gumbo->get_all_nodes_with_tag(GUMBO_TAG_A);
-    if (content_a_nodes.isEmpty()) {
-        QMessageBox::warning(nullptr, "", u8"选定段落不含链接。");
-        return;
-    } else if (content_a_nodes.size() > 1) {
-        QMessageBox::warning(nullptr, "", u8"段落含有多个&lt;a&gt;标签。");
-        return;
-    }
-    GumboNode *content_a_node = content_a_nodes[0];
-    
-    AnnoData content{content_cursor, content_gumbo, content_a_node};
-    
-    AnnoData reference;
+    AnnoData content;
     ErrorCode err = ErrorCode::NoError;
+    std::tie(err, content) = getTagAInBlock(code_view);
+    if (err != ErrorCode::NoError) {
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
+        return;
+    }
+    
+//    // Get block text under the cursor.
+//    std::shared_ptr<QTextCursor> content_cursor = std::make_shared<QTextCursor>(code_view->textCursor());
+//    content_cursor->beginEditBlock();
+//    content_cursor->select(QTextCursor::BlockUnderCursor);
+//    QString block_text = content_cursor->selectedText().trimmed();
+//    if (block_text.isEmpty()) {
+//        QMessageBox::warning(nullptr, "", u8"未选择内容。\nEmpty Selection.");
+//        return;
+//    }
+//
+//    // Parse the text using Gumbo to get element with tag <a>.
+//    std::shared_ptr<GumboInterface> content_gumbo = std::make_shared<GumboInterface>(block_text, "HTML2.0");
+//
+//    QList<GumboNode *> content_a_nodes = content_gumbo->get_all_nodes_with_tag(GUMBO_TAG_A);
+//    if (content_a_nodes.isEmpty()) {
+//        QMessageBox::warning(nullptr, "", u8"选定段落不含链接。");
+//        return;
+//    } else if (content_a_nodes.size() > 1) {
+//        QMessageBox::warning(nullptr, "", u8"段落含有多个&lt;a&gt;标签。");
+//        return;
+//    }
+//    GumboNode *content_a_node = content_a_nodes[0];
+//
+//    AnnoData content{content_cursor, content_gumbo, content_a_node};
+//
+    AnnoData reference;
+    err = ErrorCode::NoError;
     std::tie(err, reference) = getLinkedTagA(content);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_error_messages.at(err));
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
+        return;
+    }
+    
+    err = ErrorCode::NoError;
+    err = selectWrappingBlockTag(&content);
+    if (err != ErrorCode::NoError) {
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         return;
     }
 
     err = ErrorCode::NoError;
     err = selectInvisibleWrappingTags(&reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_error_messages.at(err));
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         return;
     }
 
@@ -110,7 +126,7 @@ void AnnotationUtility::convertFromReference(CodeViewEditor *code_view)
     ErrorCode err = ErrorCode::NoError;
     std::tie(err, reference) = getWrappingTagA(code_view);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_error_messages.at(err));
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         return;
     }
     
@@ -118,15 +134,21 @@ void AnnotationUtility::convertFromReference(CodeViewEditor *code_view)
     err = ErrorCode::NoError;
     std::tie(err, content) = getLinkedTagA(reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_error_messages.at(err));
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         return;
     }
     
-    content.cursor->select(QTextCursor::BlockUnderCursor);
+    err = ErrorCode::NoError;
+    err = selectWrappingBlockTag(&content);
+    if (err != ErrorCode::NoError) {
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
+        return;
+    }
+    
     err = ErrorCode::NoError;
     err = selectInvisibleWrappingTags(&reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_error_messages.at(err));
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         return;
     }
     
@@ -235,7 +257,7 @@ int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
     // Check the doubly link valid.
     auto err = checkLink(content, reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_error_messages.at(err));
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         return 1;
     }
     
@@ -243,7 +265,7 @@ int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
     err = ErrorCode::NoError;
     err = checkOrder(content, reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_error_messages.at(err));
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         return 2;
     }
     
@@ -259,6 +281,66 @@ int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
     reference.cursor->endEditBlock();
     
     return 0;
+}
+
+std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
+AnnotationUtility::getTagAInBlock(CodeViewEditor *code_view)
+{
+    // Get block text under the cursor.
+    QTextCursor temp_cursor = code_view->textCursor();
+    temp_cursor.beginEditBlock();
+    temp_cursor.select(QTextCursor::BlockUnderCursor);
+    QString block_text = temp_cursor.selectedText().trimmed();
+
+    // Parse the text using Gumbo to check the number of <a> tag.
+    GumboInterface temp_gumbo = {block_text, "HTML2.0"};
+    QList<GumboNode *> temp_a_nodes = temp_gumbo.get_all_nodes_with_tag(GUMBO_TAG_A);
+    if (temp_a_nodes.isEmpty()) {
+        return std::make_pair(ErrorCode::TagANotFound, AnnoData());
+    } else if (temp_a_nodes.size() > 1) {
+        return std::make_pair(ErrorCode::MultipleLinksInSelectedBlock, AnnoData());
+    }
+    GumboNode *temp_a_node = temp_a_nodes[0];
+    QHash<QString, QString> temp_a_node_attributes = temp_gumbo.get_attributes_of_node(temp_a_node);
+    QString a_node_id = temp_a_node_attributes["id"];
+    if (a_node_id.isEmpty()) {
+        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::AttributeIdNotFound, AnnoData());
+    }
+    
+    // Select the exact <a> tag for cursor.
+    temp_cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+    code_view->setTextCursor(temp_cursor);
+    
+    if (!code_view->find("<a", QTextDocument::FindBackward)) {
+        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::OpenTagANotFound, AnnoData());
+    }
+    temp_cursor = code_view->textCursor();
+    temp_cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
+    code_view->setTextCursor(temp_cursor);
+    
+    QRegExp tag_a_regex{S_TagARegex};
+    tag_a_regex.setMinimal(true);
+    if (!code_view->find(tag_a_regex)) {
+        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::TagANotFound, AnnoData());
+    }
+    
+    // Parse the document and get the <a> node with the id.
+    std::shared_ptr<GumboInterface> return_gumbo = std::make_shared<GumboInterface>(code_view->document()->toPlainText(), "HTML2.0");
+    QList<GumboNode *> nodes_with_id = return_gumbo->get_all_nodes_with_attribute("id");
+    GumboNode *return_a_node = nullptr;
+    for (auto p : nodes_with_id) {
+        auto attributes = return_gumbo->get_attributes_of_node(p);
+        if (attributes["id"] == a_node_id) {
+            return_a_node = p;
+            break;
+        }
+    }
+    if (!return_a_node) {
+        throw std::logic_error("GumboNode parsed in block text not found in the document.");
+    }
+    
+    std::shared_ptr<QTextCursor> return_cursor = std::make_shared<QTextCursor>(code_view->textCursor());
+    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{return_cursor, return_gumbo, return_a_node});
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
@@ -307,22 +389,22 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *code_view)
     }
     
     // Parse the document and get the <a> node with the id.
-    std::shared_ptr<GumboInterface> gumbo = std::make_shared<GumboInterface>(code_view->document()->toPlainText(), "HTML2.0");
-    QList<GumboNode *> nodes_with_id = gumbo->get_all_nodes_with_attribute("id");
-    GumboNode *a_node = nullptr;
+    std::shared_ptr<GumboInterface> return_gumbo = std::make_shared<GumboInterface>(code_view->document()->toPlainText(), "HTML2.0");
+    QList<GumboNode *> nodes_with_id = return_gumbo->get_all_nodes_with_attribute("id");
+    GumboNode *return_a_node = nullptr;
     for (auto p : nodes_with_id) {
-        auto attributes = gumbo->get_attributes_of_node(p);
+        auto attributes = return_gumbo->get_attributes_of_node(p);
         if (attributes["id"] == a_node_id) {
-            a_node = p;
+            return_a_node = p;
             break;
         }
     }
-    if (!a_node) {
+    if (!return_a_node) {
         throw std::logic_error("GumboNode parsed in block text not found in the document.");
     }
     
-    std::shared_ptr<QTextCursor> cursor = std::make_shared<QTextCursor>(code_view->textCursor());
-    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{cursor, gumbo, a_node});
+    std::shared_ptr<QTextCursor> return_cursor = std::make_shared<QTextCursor>(code_view->textCursor());
+    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{return_cursor, return_gumbo, return_a_node});
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
@@ -396,6 +478,28 @@ std::pair<int, HTMLResource *> AnnotationUtility::getDocument(const QString &fil
     Resource *resource = main_window->GetCurrentBook()->GetFolderKeeper()->GetResourceByFilename(file_name);
     HTMLResource *document = qobject_cast<HTMLResource *>(resource);
     return std::make_pair(0, document);
+}
+
+AnnotationUtility::ErrorCode AnnotationUtility::selectWrappingBlockTag(AnnoData *anno)
+{
+    GumboNode *parent_node = anno->a_node->parent;
+    while (parent_node) {
+        if (S_BlockTags.contains(parent_node->v.element.tag)) {
+            break;
+        }
+        parent_node = parent_node->parent;
+    }
+    if (parent_node == nullptr) {
+        return ErrorCode::LinkedNodeNotFound;
+    }
+    
+    // Move cursor to select the parent tag.
+    auto left_offset = anno->a_node->v.element.start_pos.column - parent_node->v.element.start_pos.column + 1;
+    auto total_length = parent_node->v.element.end_pos.column + parent_node->v.element.original_end_tag.length - parent_node->v.element.start_pos.column;
+    anno->cursor->movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, left_offset);
+    anno->cursor->movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, total_length);
+    
+    return ErrorCode::NoError;
 }
 
 AnnotationUtility::ErrorCode AnnotationUtility::selectInvisibleWrappingTags(AnnoData *anno)
@@ -522,7 +626,7 @@ bool AnnotationUtility::addStylesheetLink(CodeViewEditor *code_view)
     return true;
 }
 
-const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_error_messages = {
+const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_errorMessages = {
     {ErrorCode::EmptyHref, u8"含有空链接。"},
     {ErrorCode::LinkedFileNotFound, u8"未找到链接文件。"},
     {ErrorCode::InvalidHref, u8"无效的href。"},
