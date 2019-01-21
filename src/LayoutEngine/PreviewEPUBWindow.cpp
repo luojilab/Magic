@@ -99,8 +99,10 @@ void PreviewEPUBWindow::reloadEPUB(const std::string& bundlePath, const std::str
 	} else {
         if (m_bookReader != NULL) {
             // Not close preview window
-            closeBase();
+			closeBase();
             LayoutEngine::GetEngine()->closeEpub(m_bookReader, [=](){
+				delete m_viewCore;
+				m_viewCore = 0;
                 bookViewCoreInitial();
                 if (defaultSize != m_defaultSize && !defaultSize.isNull()) {
                     m_defaultSize = defaultSize;
@@ -290,8 +292,8 @@ void PreviewEPUBWindow::closeBase() {
         return;
     }
     delete m_bookContents;
-    delete m_viewCore;
-    m_viewCore = 0;
+    //delete m_viewCore;
+    //m_viewCore = 0;
     m_bookContents = 0;
 }
 
