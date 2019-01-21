@@ -222,8 +222,14 @@ void SelectAnnotation::renderIcon()
 // Add icon to the book resources.
 void SelectAnnotation::addIconFile()
 {
+    TempFolder annoIconFolder;
+    QString savePath = annoIconFolder.GetPath() + '/' + S_iconSaveName;
+    
     // Save image, format based on file extension.
-    m_iconImg.save(S_iconSaveName);
+    if (!m_iconImg.save(savePath)) {
+        QMessageBox::warning(nullptr, "", "Save Icon File Failed.");
+        return;
+    }
     
     // If the file already exists, delete the old one.
     const QStringList currentFilenames = m_book->GetFolderKeeper()->GetAllFilenames();
@@ -237,7 +243,7 @@ void SelectAnnotation::addIconFile()
     }
     
     // Add icon file to the book.
-    Resource *iconImg = m_book->GetFolderKeeper()->AddContentFileToFolder(S_iconSaveName);
+    Resource *iconImg = m_book->GetFolderKeeper()->AddContentFileToFolder(savePath);
     if (!iconImg) {
         QMessageBox::warning(this, tr("Magic"), tr("添加图标文件失败。\nAdding icon file failed."));
         return;
