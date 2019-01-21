@@ -292,8 +292,6 @@ void PreviewEPUBWindow::closeBase() {
         return;
     }
     delete m_bookContents;
-    //delete m_viewCore;
-    //m_viewCore = 0;
     m_bookContents = 0;
 }
 
