@@ -64,32 +64,7 @@ void AnnotationUtility::convertFromContent(CodeViewEditor *code_view)
         QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         return;
     }
-    
-//    // Get block text under the cursor.
-//    std::shared_ptr<QTextCursor> content_cursor = std::make_shared<QTextCursor>(code_view->textCursor());
-//    content_cursor->beginEditBlock();
-//    content_cursor->select(QTextCursor::BlockUnderCursor);
-//    QString block_text = content_cursor->selectedText().trimmed();
-//    if (block_text.isEmpty()) {
-//        QMessageBox::warning(nullptr, "", u8"未选择内容。\nEmpty Selection.");
-//        return;
-//    }
-//
-//    // Parse the text using Gumbo to get element with tag <a>.
-//    std::shared_ptr<GumboInterface> content_gumbo = std::make_shared<GumboInterface>(block_text, "HTML2.0");
-//
-//    QList<GumboNode *> content_a_nodes = content_gumbo->get_all_nodes_with_tag(GUMBO_TAG_A);
-//    if (content_a_nodes.isEmpty()) {
-//        QMessageBox::warning(nullptr, "", u8"选定段落不含链接。");
-//        return;
-//    } else if (content_a_nodes.size() > 1) {
-//        QMessageBox::warning(nullptr, "", u8"段落含有多个&lt;a&gt;标签。");
-//        return;
-//    }
-//    GumboNode *content_a_node = content_a_nodes[0];
-//
-//    AnnoData content{content_cursor, content_gumbo, content_a_node};
-//
+
     AnnoData reference;
     err = ErrorCode::NoError;
     std::tie(err, reference) = getLinkedTagA(content);
