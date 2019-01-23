@@ -152,13 +152,13 @@ QString AnnotationUtility::getPlainText(const QString &originText)
     return returnText;
 }
 
-bool AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow)
+void AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow)
 {
     if (!mainWindow) {
         mainWindow = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
         if (!mainWindow) {
-            QMessageBox::warning(nullptr, "", "Get MainWindow Failed.");
-            return false;
+            QMessageBox::warning(nullptr, "", S_errorMessages.at(ErrorCode::GetMainWindowFailed));
+            return;
         }
     }
     
@@ -166,7 +166,11 @@ bool AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWi
     GumboInterface gumbo(codeView->toPlainText(), "HTML2.0");
     const QList<GumboNode *> nodeList = gumbo.get_all_nodes_with_tag(GUMBO_TAG_LINK);
     if (nodeList.isEmpty()) {
-        return addStylesheet(codeView, mainWindow);
+        auto err = addStylesheet(codeView, mainWindow);
+        if (err != ErrorCode::NoError) {
+            QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
+        }
+        return;
     }
     
     // Get filename of linked stylesheet
@@ -191,7 +195,11 @@ bool AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWi
     }
     
     if (!hasCss) {
-        return addStylesheet(codeView, mainWindow);
+        auto err = addStylesheet(codeView, mainWindow);
+        if (err != ErrorCode::NoError) {
+            QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
+        }
+        return;
     }
     
     // Get the stylesheet document.
@@ -207,7 +215,7 @@ bool AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWi
         // Check selector existence using CSS parser
         const QByteArray currentStyles = cssFile.readAll();
         if (CSSSelectorJudge::selectorExists(S_annoSelector, currentStyles)) {
-            return true;
+            return;
         }
         
         // Append the style to the end of the file
@@ -218,20 +226,18 @@ bool AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWi
         // Check selector existence using CSS parser
         QString currentStyles = cssDoc.toPlainText();
         if (CSSSelectorJudge::selectorExists(S_annoSelector, currentStyles)) {
-            return true;
+            return;
         }
         
         // Append the style to the end of the stylesheet.
         if (currentStyles.isEmpty()) {
             QMessageBox::warning(nullptr, "", "读取CSS失败。Read CSS file failed.");
-            return false;
+            return;
         }
         cssDoc.setPlainText(currentStyles.append(S_annoStyle));
     }
     
     emit css->ResourceUpdatedOnDisk();
-    
-    return true;
 }
 
 int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
@@ -578,26 +584,24 @@ AnnotationUtility::ErrorCode AnnotationUtility::addIconResource()
     return ErrorCode::NoError;
 }
 
-bool AnnotationUtility::addStylesheet(CodeViewEditor *codeView, MainWindow *mainWindow)
+AnnotationUtility::ErrorCode AnnotationUtility::addStylesheet(CodeViewEditor *codeView, MainWindow *mainWindow)
 {
     if (!mainWindow) {
-        QMessageBox::warning(nullptr, "", "Get MainWindow Failed.");
-        return false;
+        return ErrorCode::GetMainWindowFailed;
     }
     Resource *annoStylesheet = mainWindow->GetCurrentBook()->GetFolderKeeper()->AddContentFileToFolder(S_annoStylesheetPath);
     if (!annoStylesheet) {
-        QMessageBox::warning(nullptr, "", "添加样式文件失败。\nAdding CSS file failed.");
-        return false;
+        return ErrorCode::AddStylesheetFailed;
     }
     addStylesheetLink(codeView);
     
     // Refresh view to display newly added file.
     mainWindow->GetBookBrowser()->Refresh();
     
-    return true;
+    return ErrorCode::NoError;
 }
 
-bool AnnotationUtility::addStylesheetLink(CodeViewEditor *codeView)
+AnnotationUtility::ErrorCode AnnotationUtility::addStylesheetLink(CodeViewEditor *codeView)
 {
     // Store the initial cursor position to recover later.
     const QTextCursor initialCursor = codeView->textCursor();
@@ -607,8 +611,7 @@ bool AnnotationUtility::addStylesheetLink(CodeViewEditor *codeView)
     if (!linkFound) {
         bool headFound = codeView->find("</head>", QTextDocument::FindBackward);
         if (!headFound) {
-            QMessageBox::warning(nullptr, "", "未找到head标签。\nTag head not found.");
-            return false;
+            return ErrorCode::TagHeadNotFound;
         }
         
         codeView->textCursor().insertText(S_annoStyleLink + tr("\n</head>"));
@@ -617,7 +620,7 @@ bool AnnotationUtility::addStylesheetLink(CodeViewEditor *codeView)
     // Recover the cursor position.
     codeView->setTextCursor(initialCursor);
     
-    return true;
+    return ErrorCode::NoError;
 }
 
 const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_errorMessages = {
@@ -639,4 +642,6 @@ const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_error
     {ErrorCode::ContentFileBeforeReferenceFile, u8"检测到注释内容所在文档位于引用所在文档之前，请检查转换选项。"},
     {ErrorCode::AddIconFailed, u8"添加图标文件失败。"},
     {ErrorCode::GetMainWindowFailed, u8"获取主窗口失败。"},
+    {ErrorCode::AddStylesheetFailed, u8"添加样式文件失败。\nAdding CSS file failed."},
+    {ErrorCode::TagHeadNotFound, u8"未找到head标签。"},
 };

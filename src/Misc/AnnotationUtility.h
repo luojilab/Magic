@@ -61,6 +61,8 @@ public:
         ContentFileBeforeReferenceFile,
         AddIconFailed,
         GetMainWindowFailed,
+        AddStylesheetFailed,
+        TagHeadNotFound,
     };
     
     // A map used to store error prompt message corresponding to the error code.
@@ -105,7 +107,7 @@ public:
      @param codeView The current CodeViewEditor.
      @return Whether the process succeeded.
      */
-    static bool appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow = nullptr);
+    static void appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow = nullptr);
     
 private:
     // A struct to store neccesary data for parameter passing.
@@ -210,7 +212,7 @@ private:
      @param codeView The current CodeViewEditor.
      @return 0 if succeeded, otherwise failed.
      */
-    static bool addStylesheet(CodeViewEditor *codeView, MainWindow *mainWindow);
+    static ErrorCode addStylesheet(CodeViewEditor *codeView, MainWindow *mainWindow);
     
     /**
      Add the link to the newly added CSS file in the HTML.
@@ -218,7 +220,7 @@ private:
      @param codeView The current CodeViewEditor.
      @return 0 if succeeded, otherwise failed.
      */
-    static bool addStylesheetLink(CodeViewEditor *codeView);
+    static ErrorCode addStylesheetLink(CodeViewEditor *codeView);
 };
 
 #endif /* ANNOTATION_UTILITIES_H */
