@@ -70,55 +70,55 @@ public:
     /**
      Insert annotation code to the cursor position.
 
-     @param anno_text Annotation text.
-     @param anno_icon Annotation icon location path.
+     @param annoText Annotation text.
+     @param annoIcon Annotation icon location path.
      @param cursor The cursor position to be inserted.
      */
-    static void insertAnnotation(const QString &anno_text, const QString &anno_icon, QTextCursor cursor);
+    static void insertAnnotation(const QString &annoText, const QString &annoIcon, QTextCursor cursor);
     
     /**
      Convert doubly linked annotation to image annotation by selecting content.
 
-     @param code_view The current CodeViewEditor.
+     @param codeView The current CodeViewEditor.
      */
-    static void convertFromContent(CodeViewEditor *code_view);
+    static void convertFromContent(CodeViewEditor *codeView);
     
     /**
      Convert doubly linked annotation to image annotation by selecting reference.
 
-     @param code_view The current CodeViewEditor.
+     @param codeView The current CodeViewEditor.
      */
-    static void convertFromReference(CodeViewEditor *code_view);
+    static void convertFromReference(CodeViewEditor *codeView);
     
     /**
      Remove HTML tags in text.
 
-     @param origin_text The text to be processed.
+     @param originText The text to be processed.
      @return The processed text.
      */
-    static QString getPlainText(const QString &origin_text);
+    static QString getPlainText(const QString &originText);
     
     /**
      Append the icon style to the end of linked stylesheet file.
 
-     @param code_view The current CodeViewEditor.
+     @param codeView The current CodeViewEditor.
      @return Whether the process succeeded.
      */
-    static bool appendStyle(CodeViewEditor *code_view);
+    static bool appendStyle(CodeViewEditor *codeView);
     
 private:
     // A struct to store neccesary data for parameter passing.
     typedef struct AnnotationNodeData
     {
         AnnotationNodeData() = default;
-        AnnotationNodeData(const std::shared_ptr<QTextCursor> &param_cursor,
-                           const std::shared_ptr<GumboInterface> &param_gumbo,
-                           GumboNode *param_a_node)
-        : cursor(param_cursor), gumbo(param_gumbo), a_node(param_a_node) {}
+        AnnotationNodeData(const std::shared_ptr<QTextCursor> &paramCursor,
+                           const std::shared_ptr<GumboInterface> &paramGumbo,
+                           GumboNode *paramANode)
+        : cursor(paramCursor), gumbo(paramGumbo), aNode(paramANode) {}
         
         std::shared_ptr<QTextCursor> cursor;
         std::shared_ptr<GumboInterface> gumbo;
-        GumboNode *a_node;
+        GumboNode *aNode;
     } AnnoData;
     
     /**
@@ -133,23 +133,23 @@ private:
     /**
      Select the <a> tag in the block (there should be only one <a>).
 
-     @param code_view The current CodeViewEditor.
+     @param codeView The current CodeViewEditor.
      @return The pair of error code and processed data.
      */
-    static std::pair<ErrorCode, AnnoData> getTagAInBlock(CodeViewEditor *code_view);
+    static std::pair<ErrorCode, AnnoData> getTagAInBlock(CodeViewEditor *codeView);
     
     /**
      Select the <a> tag around the cursor.
 
-     @param code_view The current CodeViewEditor.
+     @param codeView The current CodeViewEditor.
      @return The pair of error code and processed data.
      */
-    static std::pair<ErrorCode, AnnoData> getWrappingTagA(CodeViewEditor *code_view);
+    static std::pair<ErrorCode, AnnoData> getWrappingTagA(CodeViewEditor *codeView);
     
     /**
      Get the node linked with the input node.
 
-     @param code_view The current CodeViewEditor.
+     @param codeView The current CodeViewEditor.
      @return The pair of error code and processed data.
      */
     static std::pair<ErrorCode, AnnoData> getLinkedTagA(const AnnoData &selected);
@@ -157,10 +157,10 @@ private:
     /**
      Get HTML resource according to the input path
 
-     @param file_path the document file path relative to the current file.
+     @param filePath the document file path relative to the current file.
      @return The pair of error (0 if succeeded, otherwise failed) code and a pointer to the HTML resource.
      */
-    static std::pair<int, HTMLResource *> getDocument(const QString &file_path);
+    static std::pair<int, HTMLResource *> getDocument(const QString &filePath);
     
     /**
      With the tag <a> selected, move the cursor to select the least parent block tag.
@@ -206,18 +206,18 @@ private:
     /**
      Add a new CSS file if there is no linked .css when inserting style.
 
-     @param code_view The current CodeViewEditor.
+     @param codeView The current CodeViewEditor.
      @return 0 if succeeded, otherwise failed.
      */
-    static bool addStylesheet(CodeViewEditor *code_view);
+    static bool addStylesheet(CodeViewEditor *codeView);
     
     /**
      Add the link to the newly added CSS file in the HTML.
 
-     @param code_view The current CodeViewEditor.
+     @param codeView The current CodeViewEditor.
      @return 0 if succeeded, otherwise failed.
      */
-    static bool addStylesheetLink(CodeViewEditor *code_view);
+    static bool addStylesheetLink(CodeViewEditor *codeView);
 };
 
 #endif /* ANNOTATION_UTILITIES_H */
