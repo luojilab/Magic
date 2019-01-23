@@ -152,17 +152,24 @@ QString AnnotationUtility::getPlainText(const QString &originText)
     return returnText;
 }
 
-bool AnnotationUtility::appendStyle(CodeViewEditor *codeView)
+bool AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow)
 {
+    if (!mainWindow) {
+        mainWindow = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
+        if (!mainWindow) {
+            QMessageBox::warning(nullptr, "", "Get MainWindow Failed.");
+            return false;
+        }
+    }
+    
     // Get html link nodes using Gumbo.
     GumboInterface gumbo(codeView->toPlainText(), "HTML2.0");
     const QList<GumboNode *> nodeList = gumbo.get_all_nodes_with_tag(GUMBO_TAG_LINK);
     if (nodeList.isEmpty()) {
-        return addStylesheet(codeView);
+        return addStylesheet(codeView, mainWindow);
     }
     
     // Get filename of linked stylesheet
-    MainWindow *mainWindow = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
     QString cssFilename;
     bool hasCss = false;
     for (auto node : nodeList) {
@@ -184,7 +191,7 @@ bool AnnotationUtility::appendStyle(CodeViewEditor *codeView)
     }
     
     if (!hasCss) {
-        return addStylesheet(codeView);
+        return addStylesheet(codeView, mainWindow);
     }
     
     // Get the stylesheet document.
@@ -446,6 +453,9 @@ std::pair<int, HTMLResource *> AnnotationUtility::getDocument(const QString &fil
     QString filename = filePath.split('/').back();
     QWidget *mainWindowWidget = Utility::GetMainWindow();
     MainWindow *mainWindow = dynamic_cast<MainWindow *>(mainWindowWidget);
+    if (!mainWindow) {
+        return std::make_pair(-1, nullptr);
+    }
     const QStringList currentFilenames = mainWindow->GetCurrentBook()->GetFolderKeeper()->GetAllFilenames();
     if (!currentFilenames.contains(filename, Qt::CaseSensitive)) {
         return std::make_pair(1, nullptr);
@@ -534,6 +544,9 @@ AnnotationUtility::ErrorCode AnnotationUtility::checkOrder(const AnnoData &conte
         // Get filenames in the book in order.
         QWidget *mainWindowWidget = Utility::GetMainWindow();
         MainWindow *mainWindow = dynamic_cast<MainWindow *>(mainWindowWidget);
+        if (!mainWindow) {
+            return ErrorCode::GetMainWindowFailed;
+        }
         const QStringList filenamesInOrder = mainWindow->GetCurrentBook()->GetOPF()->GetSpineOrderFilenames();
         if (filenamesInOrder.isEmpty()) {
             return ErrorCode::DocumentOrderNotFound;
@@ -550,6 +563,9 @@ AnnotationUtility::ErrorCode AnnotationUtility::checkOrder(const AnnoData &conte
 AnnotationUtility::ErrorCode AnnotationUtility::addIconResource()
 {
     MainWindow *mainWindow = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
+    if (!mainWindow) {
+        return ErrorCode::GetMainWindowFailed;
+    }
     const QStringList currentFilenames = mainWindow->GetCurrentBook()->GetFolderKeeper()->GetAllFilenames();
     if (!currentFilenames.contains(S_iconFilename)) {
         Resource *icon = mainWindow->GetCurrentBook()->GetFolderKeeper()->AddContentFileToFolder(S_iconFilePath);
@@ -562,9 +578,12 @@ AnnotationUtility::ErrorCode AnnotationUtility::addIconResource()
     return ErrorCode::NoError;
 }
 
-bool AnnotationUtility::addStylesheet(CodeViewEditor *codeView)
+bool AnnotationUtility::addStylesheet(CodeViewEditor *codeView, MainWindow *mainWindow)
 {
-    MainWindow *mainWindow = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
+    if (!mainWindow) {
+        QMessageBox::warning(nullptr, "", "Get MainWindow Failed.");
+        return false;
+    }
     Resource *annoStylesheet = mainWindow->GetCurrentBook()->GetFolderKeeper()->AddContentFileToFolder(S_annoStylesheetPath);
     if (!annoStylesheet) {
         QMessageBox::warning(nullptr, "", "添加样式文件失败。\nAdding CSS file failed.");
@@ -619,4 +638,5 @@ const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_error
     {ErrorCode::DocumentOrderNotFound, u8"未找到xhtml文件顺序。"},
     {ErrorCode::ContentFileBeforeReferenceFile, u8"检测到注释内容所在文档位于引用所在文档之前，请检查转换选项。"},
     {ErrorCode::AddIconFailed, u8"添加图标文件失败。"},
+    {ErrorCode::GetMainWindowFailed, u8"获取主窗口失败。"},
 };

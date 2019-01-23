@@ -60,6 +60,7 @@ public:
         DocumentOrderNotFound,
         ContentFileBeforeReferenceFile,
         AddIconFailed,
+        GetMainWindowFailed,
     };
     
     // A map used to store error prompt message corresponding to the error code.
@@ -104,7 +105,7 @@ public:
      @param codeView The current CodeViewEditor.
      @return Whether the process succeeded.
      */
-    static bool appendStyle(CodeViewEditor *codeView);
+    static bool appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow = nullptr);
     
 private:
     // A struct to store neccesary data for parameter passing.
@@ -209,7 +210,7 @@ private:
      @param codeView The current CodeViewEditor.
      @return 0 if succeeded, otherwise failed.
      */
-    static bool addStylesheet(CodeViewEditor *codeView);
+    static bool addStylesheet(CodeViewEditor *codeView, MainWindow *mainWindow);
     
     /**
      Add the link to the newly added CSS file in the HTML.
