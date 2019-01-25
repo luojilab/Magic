@@ -46,7 +46,25 @@ const char *S_annoSelector = "img.epub-footnote { }";
 const char *S_annoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
 const QList<GumboTag> S_blockTags = {GUMBO_TAG_ADDRESS, GUMBO_TAG_ARTICLE, GUMBO_TAG_ASIDE, GUMBO_TAG_BLOCKQUOTE, GUMBO_TAG_DETAILS, GUMBO_TAG_DD, GUMBO_TAG_DIV, GUMBO_TAG_DL, GUMBO_TAG_DT, GUMBO_TAG_FIELDSET, GUMBO_TAG_FIGCAPTION, GUMBO_TAG_FIGURE, GUMBO_TAG_FOOTER, GUMBO_TAG_FORM, GUMBO_TAG_H1, GUMBO_TAG_H2, GUMBO_TAG_H3, GUMBO_TAG_H4, GUMBO_TAG_H5, GUMBO_TAG_H6, GUMBO_TAG_HEADER, GUMBO_TAG_HGROUP, GUMBO_TAG_HR, GUMBO_TAG_LI, GUMBO_TAG_MAIN, GUMBO_TAG_NAV, GUMBO_TAG_OL, GUMBO_TAG_P, GUMBO_TAG_PRE, GUMBO_TAG_SECTION, GUMBO_TAG_TABLE, GUMBO_TAG_UL};
 
-// Static function used in MainWindow::insertAnnotation.
+void AnnotationUtility::convertAnnotationForContextMenu(CodeViewEditor *codeView, ConvertMode mode)
+{
+    if (!codeView) {
+        return;
+    }
+    ErrorCode err = ErrorCode::NoError;
+    if (mode == ConvertMode::FromContent) {
+        err = convertFromContent(codeView);
+    } else if (mode == ConvertMode::FromReference) {
+        err = convertFromReference(codeView);
+    } else {
+        return;
+    }
+    if (err != ErrorCode::NoError) {
+        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
+        return;
+    }
+}
+
 void AnnotationUtility::insertAnnotation(const QString &annoText, const QString &annoIcon, QTextCursor cursor)
 {
     QString annotationCode = S_annoPrefix + annoIcon + S_annoInfix + annoText + S_annoSuffix;
@@ -55,84 +73,76 @@ void AnnotationUtility::insertAnnotation(const QString &annoText, const QString 
     cursor.insertText(annotationCode);
 }
 
-void AnnotationUtility::convertFromContent(CodeViewEditor *codeView)
+AnnotationUtility::ErrorCode AnnotationUtility::convertFromContent(CodeViewEditor *codeView)
 {
     AnnoData content;
     ErrorCode err = ErrorCode::NoError;
     std::tie(err, content) = getTagAInBlock(codeView);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return;
+        return err;
     }
 
     AnnoData reference;
-    err = ErrorCode::NoError;
     std::tie(err, reference) = getLinkedTagA(content);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return;
+        return err;
     }
     
-    err = ErrorCode::NoError;
     err = selectWrappingBlockTag(&content);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return;
+        return err;
     }
 
-    err = ErrorCode::NoError;
     err = selectInvisibleWrappingTags(&reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return;
+        return err;
     }
 
-    if (convertAnnotation(content, reference)) {
-        return;
+    err = convertAnnotation(content, reference);
+    if (err != ErrorCode::NoError) {
+        return err;
     }
     
     addIconResource();
     appendStyle(codeView);
+    
+    return ErrorCode::NoError;
 }
 
-void AnnotationUtility::convertFromReference(CodeViewEditor *codeView)
+AnnotationUtility::ErrorCode AnnotationUtility::convertFromReference(CodeViewEditor *codeView)
 {
     AnnoData reference;
     ErrorCode err = ErrorCode::NoError;
     std::tie(err, reference) = getWrappingTagA(codeView);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return;
+        return err;
     }
     
     AnnoData content;
-    err = ErrorCode::NoError;
     std::tie(err, content) = getLinkedTagA(reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return;
+        return err;
     }
     
-    err = ErrorCode::NoError;
     err = selectWrappingBlockTag(&content);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return;
+        return err;
     }
     
-    err = ErrorCode::NoError;
     err = selectInvisibleWrappingTags(&reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return;
+        return err;
     }
     
-    if (convertAnnotation(content, reference)) {
-        return;
+    err = convertAnnotation(content, reference);
+    if (err != ErrorCode::NoError) {
+        return err;
     }
     
     addIconResource();
     appendStyle(codeView);
+    
+    return ErrorCode::NoError;
 }
 
 QString AnnotationUtility::getPlainText(const QString &originText)
@@ -240,21 +250,19 @@ void AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWi
     emit css->ResourceUpdatedOnDisk();
 }
 
-int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
+AnnotationUtility::ErrorCode AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
 {
     // Check the doubly link valid.
-    auto err = checkLink(content, reference);
+    ErrorCode err = ErrorCode::NoError;
+    err = checkLink(content, reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return 1;
+        return err;
     }
     
     // Check order: the content should be after reference.
-    err = ErrorCode::NoError;
     err = checkOrder(content, reference);
     if (err != ErrorCode::NoError) {
-        QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
-        return 2;
+        return err;
     }
     
     QString contentText = content.gumbo->get_local_text_of_node(content.aNode->parent);
@@ -262,13 +270,10 @@ int AnnotationUtility::convertAnnotation(AnnoData &content, AnnoData &reference)
     contentText = contentText.remove(referenceText).trimmed();
     insertAnnotation(contentText, S_defaultIconSrc, *reference.cursor);
 
-    // Remove old code.
     content.cursor->removeSelectedText();
     reference.cursor->removeSelectedText();
-    content.cursor->endEditBlock();
-    reference.cursor->endEditBlock();
     
-    return 0;
+    return ErrorCode::NoError;
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
@@ -276,7 +281,6 @@ AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView)
 {
     // Get block text under the cursor.
     QTextCursor tempCursor = codeView->textCursor();
-    tempCursor.beginEditBlock();
     tempCursor.select(QTextCursor::BlockUnderCursor);
     QString blockText = tempCursor.selectedText().trimmed();
 
@@ -336,7 +340,6 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
 {
     const QTextCursor initialCursor = codeView->textCursor();
     QTextCursor tempCursor = codeView->textCursor();
-    tempCursor.beginEditBlock();
     
     // Find opening tag <a>.
     if (!codeView->find("<a", QTextDocument::FindBackward)) {
@@ -441,7 +444,6 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
     
     // Get the reference cursor with <a> tag selected.
     std::shared_ptr<QTextCursor> linkedCursor = std::make_shared<QTextCursor>(linkedDocument);
-    linkedCursor->beginEditBlock();
     size_t line = linkedANode->v.element.start_pos.line;
     size_t column = linkedANode->v.element.start_pos.column;
     size_t length = linkedANode->v.element.end_pos.column - column;

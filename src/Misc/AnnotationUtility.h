@@ -65,10 +65,25 @@ public:
         TagHeadNotFound,
     };
     
+    enum class ConvertMode
+    {
+        FromContent,
+        FromReference,
+    };
+    
     // A map used to store error prompt message corresponding to the error code.
     static const std::map<AnnotationUtility::ErrorCode, QString> S_errorMessages;
     
     AnnotationUtility() = delete;
+    
+    /**
+     Convert annotation API for context menu entry in CodeViewEditor,
+     the to-convert text should be selected with QTextCursor of CodeViewEditor.
+
+     @param codeView The current CodeViewEditor
+     @param mode Convert mode: FromContent/FromReference
+     */
+    static void convertAnnotationForContextMenu(CodeViewEditor *codeView, ConvertMode mode);
     
     /**
      Insert annotation code to the cursor position.
@@ -84,14 +99,14 @@ public:
 
      @param codeView The current CodeViewEditor.
      */
-    static void convertFromContent(CodeViewEditor *codeView);
+    static ErrorCode convertFromContent(CodeViewEditor *codeView);
     
     /**
      Convert doubly linked annotation to image annotation by selecting reference.
 
      @param codeView The current CodeViewEditor.
      */
-    static void convertFromReference(CodeViewEditor *codeView);
+    static ErrorCode convertFromReference(CodeViewEditor *codeView);
     
     /**
      Remove HTML tags in text.
@@ -131,7 +146,7 @@ private:
      @param reference Prepared annotation reference data.
      @return The error code: 0 if succeeded, otherwise failed.
      */
-    static int convertAnnotation(AnnoData &content, AnnoData &reference);
+    static ErrorCode convertAnnotation(AnnoData &content, AnnoData &reference);
     
     /**
      Select the <a> tag in the block (there should be only one <a>).

@@ -1358,12 +1358,12 @@ void CodeViewEditor::addConvertAnnotationMenu(QMenu *menu)
 
 void CodeViewEditor::convertAnnotationFromContent()
 {
-    AnnotationUtility::convertFromContent(this);
+    AnnotationUtility::convertAnnotationForContextMenu(this, AnnotationUtility::ConvertMode::FromContent);
 }
 
 void CodeViewEditor::convertAnnotationFromReference()
 {
-    AnnotationUtility::convertFromReference(this);
+    AnnotationUtility::convertAnnotationForContextMenu(this, AnnotationUtility::ConvertMode::FromReference);
 }
 
 void CodeViewEditor::AddGoToLinkOrStyleContextMenu(QMenu *menu)
