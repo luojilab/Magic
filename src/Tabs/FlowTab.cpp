@@ -165,6 +165,7 @@ void FlowTab::CreateCodeViewIfRequired(bool is_delayed_load)
     QApplication::setOverrideCursor(Qt::WaitCursor);
     m_wCodeView = new CodeViewEditor(CodeViewEditor::Highlight_XHTML, true, this);
     m_wCodeView->SetReformatHTMLEnabled(true);
+    m_wCodeView->setConvertAnnotationEnabled(true);
     m_views->addWidget(m_wCodeView);
 
     if (is_delayed_load) {

@@ -48,45 +48,124 @@ class SelectAnnotation;
 // SelectAnnotation functions:
 // 1. Open a dialog to get annotation text.
 // 2. A static function to insert annotation code.
-// 3. get foreground and background colors to generate icon.
+// 3. Get foreground and background colors to generate icon.
 class SelectAnnotation : public QDialog
 {
     Q_OBJECT
 
 public:
+    /**
+     Instantiate the class and open the dialog.
+
+     @param book The opened book.
+     @param bookBrowser The current BookBrowser.
+     @param tabManager The current TagManager.
+     @param codeView The current CodeViewEditor.
+     @param parent The parent widget.
+     */
     explicit SelectAnnotation(QSharedPointer<Book> book,
                               BookBrowser *bookBrowser,
                               TabManager *tabManager,
                               CodeViewEditor *codeView,
-                              QWidget *parent = 0);
+                              QWidget *parent = nullptr);
+    
     ~SelectAnnotation();
 
-    QString getText() { return m_annoText; }
-    QString getIcon() { return m_iconSrc; }
+    /**
+     Get the annotation content text.
 
-    // Insert annotation code to html file.
-    static int insertAnnotation(const QString &annoText, const QString &annoIcon, CodeViewEditor *codeView);
+     @return The content text.
+     */
+    QString getText() { return m_annoText; }
     
+    /**
+     Get the generated icon resource path.
+
+     @return Relative path to the icon file.
+     */
+    QString getIcon() { return m_iconSrc; }
+   
 private slots:
+    /**
+     The slot corresponding to the buttonBackgroundColor
+     */
     void selectBgColor() { selectColor(ColorMember::bgColor); }
+    
+    /**
+     The slot corresponding to the buttonForegroundColor.
+     */
     void selectFgColor() { selectColor(ColorMember::fgColor); }
+    
+    /**
+     The slot connected with buttonDefaultColor.
+     */
     void restoreDefaultColor();
+    
+    /**
+     The slot connected with buttonLastColor.
+     */
     void restoreLastColor();
+    
+    /**
+     Restore the initial color when the dialog opens.
+     */
     void restoreInitialColor();
+    
+    /**
+     Get the text in the input widget and remove HTML tags.
+     */
     void inputText();
+    
+    /**
+     Add the generated icon file to the book, prompt to replace if already exists.
+     */
     void addIconFile();
+    
+    /**
+     Append the annotation icon style to the CSS file.
+     If the style already exists, then do nothing.
+     Add a new file if there is no linked CSS file.
+     */
     void appendStyle();
 
 private:
     enum class ColorMember { bgColor, fgColor };
     
+    /**
+     Load SVG file and replace the original colors.
+     */
     void initSvg();
+    
+    /**
+     Initialize UI, render icon display.
+     */
     void initUI();
-    void initColorStack();
+    
+    /**
+     Open color selecting dialog, get the selected color.
+
+     @param ColorMember Which member color variable to process (background/foreground).
+     */
     void selectColor(const ColorMember);
+    
+    /**
+     Render icon with selected colors using QSvgRenderer.
+     */
     void renderIcon();
+    
+    /**
+     Add a new stylesheet if there is no linked stylesheet when inserting style.
+     */
     void addStylesheet();
+    
+    /**
+     Add the link to the newly added stylesheet.
+     */
     void addStylesheetLink();
+    
+    /**
+     Connect signals to slots.
+     */
     void connectSignalsSlots();
 
     QString m_annoText;

@@ -394,7 +394,7 @@ private:typedef enum {
 
 		void InsertHyperlink();
 
-		// insert an img with text in "alt" to display annotations on devices
+		// Insert an img with text in "alt" to display annotations on devices.
 		void insertAnnotation();
 
 		void MarkForIndex();

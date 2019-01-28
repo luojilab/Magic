@@ -328,6 +328,8 @@ set( MISC_FILES
     Misc/CSSSelectorJudge.cpp
     Misc/SplitChecker.hpp
     Misc/SplitChecker.cpp
+    Misc/AnnotationUtility.cpp
+    Misc/AnnotationUtility.h
     )
 
 set( MISC_EDITORS_FILES    
