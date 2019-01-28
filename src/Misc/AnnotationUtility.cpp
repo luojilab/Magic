@@ -296,7 +296,7 @@ AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView)
     QHash<QString, QString> tempANodeAttributes = tempGumbo.get_attributes_of_node(tempANode);
     QString aNodeId = tempANodeAttributes["id"];
     if (aNodeId.isEmpty()) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::AttributeIdNotFound, AnnoData());
+        return std::make_pair(ErrorCode::AttributeIdNotFound, AnnoData());
     }
     
     // Select the exact <a> tag for cursor.
@@ -304,7 +304,7 @@ AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView)
     codeView->setTextCursor(tempCursor);
     
     if (!codeView->find("<a", QTextDocument::FindBackward)) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::OpenTagANotFound, AnnoData());
+        return std::make_pair(ErrorCode::OpenTagANotFound, AnnoData());
     }
     tempCursor = codeView->textCursor();
     tempCursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
@@ -313,7 +313,7 @@ AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView)
     QRegExp tagARegex{S_tagARegex};
     tagARegex.setMinimal(true);
     if (!codeView->find(tagARegex)) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::TagANotFound, AnnoData());
+        return std::make_pair(ErrorCode::TagANotFound, AnnoData());
     }
     
     // Parse the document and get the <a> node with the id.
@@ -332,7 +332,7 @@ AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView)
     }
     
     std::shared_ptr<QTextCursor> returnCursor = std::make_shared<QTextCursor>(codeView->textCursor());
-    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
+    return std::make_pair(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
@@ -343,7 +343,7 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
     
     // Find opening tag <a>.
     if (!codeView->find("<a", QTextDocument::FindBackward)) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::OpenTagANotFound, AnnoData());
+        return std::make_pair(ErrorCode::OpenTagANotFound, AnnoData());
     }
     tempCursor = codeView->textCursor();
     tempCursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
@@ -353,13 +353,13 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
     QRegExp tagARegex{S_tagARegex};
     tagARegex.setMinimal(true);
     if (!codeView->find(tagARegex)) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::TagANotFound, AnnoData());
+        return std::make_pair(ErrorCode::TagANotFound, AnnoData());
     }
     
     tempCursor = codeView->textCursor();
     if (tempCursor.selectionStart() > initialCursor.position() || tempCursor.selectionEnd() < initialCursor.position()) {
         codeView->setTextCursor(initialCursor);
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::CursorOutOfRange, AnnoData());
+        return std::make_pair(ErrorCode::CursorOutOfRange, AnnoData());
     }
     
     // Parse the selected text to get node <a>...</a>.
@@ -367,16 +367,16 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
     GumboInterface tempGumbo{tagAText, "HTML2.0"};
     QList<GumboNode *> tempANodes = tempGumbo.get_all_nodes_with_tag(GUMBO_TAG_A);
     if (tempANodes.isEmpty()) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoLinkInSelectedBlock, AnnoData());
+        return std::make_pair(ErrorCode::NoLinkInSelectedBlock, AnnoData());
     }
     if (tempANodes.size() > 1) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::MultipleLinksInSelectedBlock, AnnoData());
+        return std::make_pair(ErrorCode::MultipleLinksInSelectedBlock, AnnoData());
     }
     GumboNode *tempANode = tempANodes[0];
     QHash<QString, QString> tempANodeAttributes = tempGumbo.get_attributes_of_node(tempANode);
     QString aNodeId = tempANodeAttributes["id"];
     if (aNodeId.isEmpty()) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::AttributeIdNotFound, AnnoData());
+        return std::make_pair(ErrorCode::AttributeIdNotFound, AnnoData());
     }
     
     // Parse the document and get the <a> node with the id.
@@ -395,7 +395,7 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
     }
     
     std::shared_ptr<QTextCursor> returnCursor = std::make_shared<QTextCursor>(codeView->textCursor());
-    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
+    return std::make_pair(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
@@ -404,7 +404,7 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
     QHash<QString, QString> selectedAAttributes = selected.gumbo->get_attributes_of_node(selected.aNode);
     QString &selectedHref = selectedAAttributes["href"];
     if (selectedHref.isEmpty()) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::EmptyHref, AnnoData());
+        return std::make_pair(ErrorCode::EmptyHref, AnnoData());
     }
     
     // Parse the href to determine the target file.
@@ -419,12 +419,12 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
         int err;
         std::tie(err, html) = getDocument(linked_path[0]);
         if (err) {
-            return std::make_pair<ErrorCode, AnnoData>(ErrorCode::LinkedFileNotFound, AnnoData());
+            return std::make_pair(ErrorCode::LinkedFileNotFound, AnnoData());
         }
         linkedDocument = &(html->GetTextDocumentForWriting());
         linkedId = linked_path[1];
     } else {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::InvalidHref, AnnoData());
+        return std::make_pair(ErrorCode::InvalidHref, AnnoData());
     }
     
     // Search the id corresponding to the href.
@@ -439,7 +439,7 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
         }
     }
     if (!linkedANode) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::LinkedNodeNotFound, AnnoData());
+        return std::make_pair(ErrorCode::LinkedNodeNotFound, AnnoData());
     }
     
     // Get the reference cursor with <a> tag selected.
@@ -453,7 +453,7 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
     linkedCursor->movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, column - 1);
     linkedCursor->movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, length + 4);
     
-    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{linkedCursor, linkedGumbo, linkedANode});
+    return std::make_pair(ErrorCode::NoError, AnnoData{linkedCursor, linkedGumbo, linkedANode});
 }
 
 std::pair<int, HTMLResource *> AnnotationUtility::getDocument(const QString &filePath)
