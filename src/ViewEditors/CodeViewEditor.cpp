@@ -54,6 +54,7 @@
 #include "ViewEditors/CodeViewEditor.h"
 #include "ViewEditors/LineNumberArea.h"
 #include "sigil_constants.h"
+#include "Misc/AnnotationUtility.h"
 
 static const int TAB_SPACES_WIDTH        = 4;
 static const int LINE_NUMBER_MARGIN      = 5;
@@ -84,6 +85,7 @@ CodeViewEditor::CodeViewEditor(HighlighterType high_type, bool check_spelling, Q
     m_checkSpelling(check_spelling),
     m_reformatCSSEnabled(false),
     m_reformatHTMLEnabled(false),
+    m_convertAnnotationEnabled(false),
     m_lastFindRegex(QString()),
     m_spellingMapper(new QSignalMapper(this)),
     m_addSpellingMapper(new QSignalMapper(this)),
@@ -1097,6 +1099,11 @@ void CodeViewEditor::contextMenuEvent(QContextMenuEvent *event)
     }
 
     AddMarkSelectionMenu(menu);
+
+    if (m_convertAnnotationEnabled) {
+        addConvertAnnotationMenu(menu);
+    }
+
     AddGoToLinkOrStyleContextMenu(menu);
     AddClipContextMenu(menu);
 
@@ -1320,6 +1327,43 @@ void CodeViewEditor::AddReformatHTMLContextMenu(QMenu *menu)
     if (topAction) {
         menu->insertSeparator(topAction);
     }
+}
+
+void CodeViewEditor::addConvertAnnotationMenu(QMenu *menu)
+{
+    QAction *topAction = 0;
+
+    if (!menu->actions().isEmpty()) {
+        topAction = menu->actions().at(0);
+    }
+
+    QMenu *convertAnnotationMenu = new QMenu(tr(u8"注释转换图注"), menu);
+    QAction *convertFromContent = new QAction(tr(u8"从注释内容转换"), menu);
+    QAction *convertFromReference = new QAction(tr(u8"从文中引用转换"), menu);
+    connect(convertFromContent, SIGNAL(triggered()), this, SLOT(convertAnnotationFromContent()));
+    connect(convertFromReference, SIGNAL(triggered()), this, SLOT(convertAnnotationFromReference()));
+    convertAnnotationMenu->addAction(convertFromContent);
+    convertAnnotationMenu->addAction(convertFromReference);
+    
+    if (!topAction) {
+        menu->addMenu(convertAnnotationMenu);
+    } else {
+        menu->insertMenu(topAction, convertAnnotationMenu);
+    }
+
+    if (topAction) {
+        menu->insertSeparator(topAction);
+    }
+}
+
+void CodeViewEditor::convertAnnotationFromContent()
+{
+    AnnotationUtility::convertAnnotationForContextMenu(this, AnnotationUtility::ConvertMode::FromContent);
+}
+
+void CodeViewEditor::convertAnnotationFromReference()
+{
+    AnnotationUtility::convertAnnotationForContextMenu(this, AnnotationUtility::ConvertMode::FromReference);
 }
 
 void CodeViewEditor::AddGoToLinkOrStyleContextMenu(QMenu *menu)
@@ -3515,6 +3559,16 @@ bool CodeViewEditor::ReformatHTMLEnabled()
 void CodeViewEditor::SetReformatHTMLEnabled(bool value)
 {
     m_reformatHTMLEnabled = value;
+}
+
+bool CodeViewEditor::convertAnnotationEnabled()
+{
+    return m_convertAnnotationEnabled;
+}
+
+void CodeViewEditor::setConvertAnnotationEnabled(bool value)
+{
+    m_convertAnnotationEnabled = value;
 }
 
 void CodeViewEditor::SelectAndScrollIntoView(int start_position, int end_position, Searchable::Direction direction, bool wrapped)
