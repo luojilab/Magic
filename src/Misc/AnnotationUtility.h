@@ -84,7 +84,7 @@ public:
      @param contentNodes The GumboNodes to convert, they should all be content nodes (not reference).
      @return A QList of ErrorCode indicating the converting results of corresponding nodes.
      */
-    static QList<ErrorCode> convertAnnotationForNodes(HTMLResource *html, QList<GumboNode *> contentNodes);
+    static QList<ErrorCode> convertAnnotationForContentNodes(HTMLResource *html, QList<GumboNode *> contentNodes);
     
     /**
      Convert annotation API for context menu entry in CodeViewEditor,

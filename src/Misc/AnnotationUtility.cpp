@@ -46,7 +46,7 @@ const char *S_annoSelector = "img.epub-footnote { }";
 const char *S_annoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
 const QList<GumboTag> S_blockTags = {GUMBO_TAG_ADDRESS, GUMBO_TAG_ARTICLE, GUMBO_TAG_ASIDE, GUMBO_TAG_BLOCKQUOTE, GUMBO_TAG_DETAILS, GUMBO_TAG_DD, GUMBO_TAG_DIV, GUMBO_TAG_DL, GUMBO_TAG_DT, GUMBO_TAG_FIELDSET, GUMBO_TAG_FIGCAPTION, GUMBO_TAG_FIGURE, GUMBO_TAG_FOOTER, GUMBO_TAG_FORM, GUMBO_TAG_H1, GUMBO_TAG_H2, GUMBO_TAG_H3, GUMBO_TAG_H4, GUMBO_TAG_H5, GUMBO_TAG_H6, GUMBO_TAG_HEADER, GUMBO_TAG_HGROUP, GUMBO_TAG_HR, GUMBO_TAG_LI, GUMBO_TAG_MAIN, GUMBO_TAG_NAV, GUMBO_TAG_OL, GUMBO_TAG_P, GUMBO_TAG_PRE, GUMBO_TAG_SECTION, GUMBO_TAG_TABLE, GUMBO_TAG_UL};
 
-QList<AnnotationUtility::ErrorCode> AnnotationUtility::convertAnnotationForNodes(HTMLResource *html, QList<GumboNode *> contentNodes)
+QList<AnnotationUtility::ErrorCode> AnnotationUtility::convertAnnotationForContentNodes(HTMLResource *html, QList<GumboNode *> contentNodes)
 {
     QList<ErrorCode> errors;
     if (!html || contentNodes.isEmpty()) {
