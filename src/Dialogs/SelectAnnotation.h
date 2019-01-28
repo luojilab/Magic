@@ -154,16 +154,6 @@ private:
     void renderIcon();
     
     /**
-     Add a new stylesheet if there is no linked stylesheet when inserting style.
-     */
-    void addStylesheet();
-    
-    /**
-     Add the link to the newly added stylesheet.
-     */
-    void addStylesheetLink();
-    
-    /**
      Connect signals to slots.
      */
     void connectSignalsSlots();
