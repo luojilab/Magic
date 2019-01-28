@@ -17,7 +17,7 @@ public:
 	PreviewHTMLWindow(QWidget* parent, const std::string htmlPath, const QSize& standardSize);
 	~PreviewHTMLWindow();
 	void reloadHTML(std::string htmlPath, bool reload, const QSize& standardSize);
-	void updateCurrentPage(const QString& contentTexts);
+	void updateCurrentPage(const QString& contentTexts, bool = false);
 	void updateForOffset(unsigned int);
 	void cleanTempFile();
 

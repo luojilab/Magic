@@ -240,6 +240,8 @@ MainWindow::~MainWindow()
         m_ViewImage->close();
         m_ViewImage = NULL;
     }
+    m_contentChangedTimer->stop();
+    delete m_contentChangedTimer;
 }
 
 
@@ -5434,7 +5436,7 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		return;
 	}
 	ContentTab *tab = m_TabManager->GetCurrentContentTab();
-	QString QfullPath = "";
+	QString qfullPath = "";
 	if (!tab) {
 		QMessageBox::information(this, "", u8"没有打开一个html文件", QMessageBox::Ok);
 		return;
@@ -5444,8 +5446,8 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		QMessageBox::information(this, "", u8"不支持实时预览的资源文件", QMessageBox::Ok);
 		return;
 	}
-	QfullPath = res->GetFullPath();
-	if (QfullPath.isEmpty()) {
+	qfullPath = res->GetFullPath();
+	if (qfullPath.isEmpty()) {
 		QMessageBox::information(this, "", u8"资源文件路径为空，请先保存", QMessageBox::Ok);
 		return;
 	}
@@ -5456,7 +5458,7 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 	float height = (d_size.height()) / ratio;
 	if (!m_previewerToHTML) {
 		// previewer to html
-		m_previewerToHTML = new PreviewHTMLWindow(this, QfullPath.toStdString(), QSize(width, height));
+		m_previewerToHTML = new PreviewHTMLWindow(this, qfullPath.toStdString(), QSize(width, height));
 		m_previewerToHTML->setContextMenuPolicy(Qt::PreventContextMenu);
 		// add to widget
 		addDockWidget(Qt::RightDockWidgetArea, m_previewerToHTML);
@@ -5469,7 +5471,7 @@ void MainWindow::previewForCurrentHTML(PreviewPhoneType type)
 		// style
 		m_previewerToHTML->setStyleSheet("background-color:white;");
 	} else {
-		m_previewerToHTML->reloadHTML(QfullPath.toStdString(), true, QSize(width, height));
+		m_previewerToHTML->reloadHTML(qfullPath.toStdString(), true, QSize(width, height));
 	}
     // set size
     m_previewerToHTML->setMaximumSize(QSize(width, height));
@@ -5515,11 +5517,14 @@ void MainWindow::updateIntimePreviewContent() {
 
 void MainWindow::contentTxetChangedAction() {
 	if (m_contentChanged && m_previewerToHTML && m_previewerToHTML->isVisible()) {
-		HTMLResource* res = dynamic_cast<HTMLResource *>(m_TabManager->GetCurrentContentTab()->GetLoadedResource());
-        if (res == NULL) {
+        Resource *res = m_TabManager->GetCurrentContentTab()->GetLoadedResource();
+        if (res && res->Type() != Resource::HTMLResourceType && res->Type() != Resource::CSSResourceType) {
             return;
         }
-		m_previewerToHTML->updateCurrentPage(res->GetText());
+        if (res->Type() == Resource::CSSResourceType) {
+            m_TabManager->GetCurrentContentTab()->SaveTabContent();
+        }
+        m_previewerToHTML->updateCurrentPage(dynamic_cast<TextResource *>(res)->GetText(), res->Type() == Resource::CSSResourceType);
 		m_contentChanged = false;
 	}
     if (m_contentChanged) {

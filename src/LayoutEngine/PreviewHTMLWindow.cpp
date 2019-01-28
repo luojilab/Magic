@@ -1,4 +1,4 @@
-﻿#include "PreviewHTMLWindow.h"
+#include "PreviewHTMLWindow.h"
 #include <QPainter>
 #include <QMouseEvent>
 #include <QReadWriteLock>
@@ -185,14 +185,16 @@ void PreviewHTMLWindow::reloadHTML(std::string htmlPath, bool reload, const QSiz
     });
 }
 
-void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts)
+void PreviewHTMLWindow::updateCurrentPage(const QString& contentTexts, bool isCSS)
 {
     cleanResource();
     initialCoreView();
-    QFile f(m_innerHtmlPath.c_str());
-    if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        f.write(contentTexts.toUtf8());
-        f.close();
+    if (!isCSS) {
+        QFile f(m_innerHtmlPath.c_str());
+        if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            f.write(contentTexts.toUtf8());
+            f.close();
+        }
     }
     LayoutEngine::GetEngine()->openHtml(m_viewCore, m_innerHtmlPath, "html_id_key", [this](HTMLReader* reader, int ecode) {
         engineOpenHTMLFinish(reader, ecode);
