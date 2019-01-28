@@ -310,12 +310,14 @@ AnnotationUtility::ErrorCode AnnotationUtility::convertAnnotation(AnnoData &cont
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
 AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView, QTextCursor *cursor)
 {
-if (codeView) {
-    // Get block text under the cursor.
-    QTextCursor tempCursor = codeView->textCursor();
-    tempCursor.select(QTextCursor::BlockUnderCursor);
-    QString blockText = tempCursor.selectedText().trimmed();
+    if (codeView) {
+        QTextCursor cursorInCodeView = codeView->textCursor();
+        cursor = &cursorInCodeView;
+    }
 
+    cursor->select(QTextCursor::BlockUnderCursor);
+    QString blockText = cursor->selectedText().trimmed();
+    
     // Parse the text using Gumbo to check the number of <a> tag.
     GumboInterface tempGumbo = {blockText, "HTML2.0"};
     QList<GumboNode *> tempANodes = tempGumbo.get_all_nodes_with_tag(GUMBO_TAG_A);
@@ -330,26 +332,23 @@ if (codeView) {
     if (aNodeId.isEmpty()) {
         return std::make_pair(ErrorCode::AttributeIdNotFound, AnnoData());
     }
-    
-    // Select the exact <a> tag for cursor.
-    tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
-    codeView->setTextCursor(tempCursor);
-    
-    if (!codeView->find("<a", QTextDocument::FindBackward)) {
+
+    cursor->movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+    QTextCursor tempCursor = cursor->document()->find("<a", *cursor, QTextDocument::FindBackward);
+    if (tempCursor.isNull()) {
         return std::make_pair(ErrorCode::OpenTagANotFound, AnnoData());
     }
-    tempCursor = codeView->textCursor();
     tempCursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
-    codeView->setTextCursor(tempCursor);
     
     QRegExp tagARegex{S_tagARegex};
     tagARegex.setMinimal(true);
-    if (!codeView->find(tagARegex)) {
+    tempCursor = cursor->document()->find(tagARegex, tempCursor);
+    if (tempCursor.isNull()) {
         return std::make_pair(ErrorCode::TagANotFound, AnnoData());
     }
-    
+
     // Parse the document and get the <a> node with the id.
-    std::shared_ptr<GumboInterface> returnGumbo = std::make_shared<GumboInterface>(codeView->document()->toPlainText(), "HTML2.0");
+    std::shared_ptr<GumboInterface> returnGumbo = std::make_shared<GumboInterface>(cursor->document()->toPlainText(), "HTML2.0");
     QList<GumboNode *> nodesWithId = returnGumbo->get_all_nodes_with_attribute("id");
     GumboNode *returnANode = nullptr;
     for (auto p : nodesWithId) {
@@ -362,62 +361,9 @@ if (codeView) {
     if (!returnANode) {
         throw std::logic_error("GumboNode parsed in block text not found in the document.");
     }
-    
-    std::shared_ptr<QTextCursor> returnCursor = std::make_shared<QTextCursor>(codeView->textCursor());
+
+    std::shared_ptr<QTextCursor> returnCursor = std::make_shared<QTextCursor>(tempCursor);
     return std::make_pair(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
-}
-    
-    if (!codeView && cursor) {
-        cursor->select(QTextCursor::BlockUnderCursor);
-        QString blockText = cursor->selectedText().trimmed();
-        
-        // Parse the text using Gumbo to check the number of <a> tag.
-        GumboInterface tempGumbo = {blockText, "HTML2.0"};
-        QList<GumboNode *> tempANodes = tempGumbo.get_all_nodes_with_tag(GUMBO_TAG_A);
-        if (tempANodes.isEmpty()) {
-            return std::make_pair(ErrorCode::TagANotFound, AnnoData());
-        } else if (tempANodes.size() > 1) {
-            return std::make_pair(ErrorCode::MultipleLinksInSelectedBlock, AnnoData());
-        }
-        GumboNode *tempANode = tempANodes[0];
-        QHash<QString, QString> tempANodeAttributes = tempGumbo.get_attributes_of_node(tempANode);
-        QString aNodeId = tempANodeAttributes["id"];
-        if (aNodeId.isEmpty()) {
-            return std::make_pair(ErrorCode::AttributeIdNotFound, AnnoData());
-        }
-
-        cursor->movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
-        QTextCursor tempCursor = cursor->document()->find("<a", *cursor, QTextDocument::FindBackward);
-        if (tempCursor.isNull()) {
-            return std::make_pair(ErrorCode::OpenTagANotFound, AnnoData());
-        }
-        tempCursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
-        
-        QRegExp tagARegex{S_tagARegex};
-        tagARegex.setMinimal(true);
-        tempCursor = cursor->document()->find(tagARegex, tempCursor);
-        if (tempCursor.isNull()) {
-            return std::make_pair(ErrorCode::TagANotFound, AnnoData());
-        }
-
-        // Parse the document and get the <a> node with the id.
-        std::shared_ptr<GumboInterface> returnGumbo = std::make_shared<GumboInterface>(cursor->document()->toPlainText(), "HTML2.0");
-        QList<GumboNode *> nodesWithId = returnGumbo->get_all_nodes_with_attribute("id");
-        GumboNode *returnANode = nullptr;
-        for (auto p : nodesWithId) {
-            auto attributes = returnGumbo->get_attributes_of_node(p);
-            if (attributes["id"] == aNodeId) {
-                returnANode = p;
-                break;
-            }
-        }
-        if (!returnANode) {
-            throw std::logic_error("GumboNode parsed in block text not found in the document.");
-        }
-
-        std::shared_ptr<QTextCursor> returnCursor = std::make_shared<QTextCursor>(tempCursor);
-        return std::make_pair(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
-    }
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
