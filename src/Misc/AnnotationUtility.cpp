@@ -32,19 +32,19 @@
 #include "Misc/CSSSelectorJudge.hpp"    // CSSSelectorJudge::selectorExists()
 #include <iostream>                     // std::cerr
 
-const QString S_annoPrefix = "<img class=\"epub-footnote\" src=\"";
-const QString S_annoInfix = "\" alt=\"";
-const QString S_annoSuffix = "\" />";
-const QString S_defaultIconSrc = "../Images/AnnoIcon0.png";
-const QString S_tagARegex = "<a(\\s+\\w+=\"(\\w|-|#|\\.|\\/)+\"\\s*)+>.*</a>";
-const QString S_iconFilename = "AnnoIcon0";
-const QString S_iconFilePath = ":icon/AnnoIcon0.png";
-const QString S_annoStylesheetFilename = "AnnotationStyles.css";
-const QString S_annoStylesheetPath = ":icon/" + S_annoStylesheetFilename;
-const QString S_annoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
-const char *S_annoSelector = "img.epub-footnote { }";
-const char *S_annoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
-const QList<GumboTag> S_blockTags = {GUMBO_TAG_ADDRESS, GUMBO_TAG_ARTICLE, GUMBO_TAG_ASIDE, GUMBO_TAG_BLOCKQUOTE, GUMBO_TAG_DETAILS, GUMBO_TAG_DD, GUMBO_TAG_DIV, GUMBO_TAG_DL, GUMBO_TAG_DT, GUMBO_TAG_FIELDSET, GUMBO_TAG_FIGCAPTION, GUMBO_TAG_FIGURE, GUMBO_TAG_FOOTER, GUMBO_TAG_FORM, GUMBO_TAG_H1, GUMBO_TAG_H2, GUMBO_TAG_H3, GUMBO_TAG_H4, GUMBO_TAG_H5, GUMBO_TAG_H6, GUMBO_TAG_HEADER, GUMBO_TAG_HGROUP, GUMBO_TAG_HR, GUMBO_TAG_LI, GUMBO_TAG_MAIN, GUMBO_TAG_NAV, GUMBO_TAG_OL, GUMBO_TAG_P, GUMBO_TAG_PRE, GUMBO_TAG_SECTION, GUMBO_TAG_TABLE, GUMBO_TAG_UL};
+static const QString S_annoPrefix = "<img class=\"epub-footnote\" src=\"";
+static const QString S_annoInfix = "\" alt=\"";
+static const QString S_annoSuffix = "\" />";
+static const QString S_defaultIconSrc = "../Images/AnnoIcon0.png";
+static const QString S_tagARegex = "<a(\\s+\\w+=\"(\\w|-|#|\\.|\\/)+\"\\s*)+>.*</a>";
+static const QString S_iconFilename = "AnnoIcon0";
+static const QString S_iconFilePath = ":icon/AnnoIcon0.png";
+static const QString S_annoStylesheetFilename = "AnnotationStyles.css";
+static const QString S_annoStylesheetPath = ":icon/" + S_annoStylesheetFilename;
+static const QString S_annoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
+static const char *S_annoSelector = "img.epub-footnote { }";
+static const char *S_annoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
+static const QList<GumboTag> S_blockTags = {GUMBO_TAG_ADDRESS, GUMBO_TAG_ARTICLE, GUMBO_TAG_ASIDE, GUMBO_TAG_BLOCKQUOTE, GUMBO_TAG_DETAILS, GUMBO_TAG_DD, GUMBO_TAG_DIV, GUMBO_TAG_DL, GUMBO_TAG_DT, GUMBO_TAG_FIELDSET, GUMBO_TAG_FIGCAPTION, GUMBO_TAG_FIGURE, GUMBO_TAG_FOOTER, GUMBO_TAG_FORM, GUMBO_TAG_H1, GUMBO_TAG_H2, GUMBO_TAG_H3, GUMBO_TAG_H4, GUMBO_TAG_H5, GUMBO_TAG_H6, GUMBO_TAG_HEADER, GUMBO_TAG_HGROUP, GUMBO_TAG_HR, GUMBO_TAG_LI, GUMBO_TAG_MAIN, GUMBO_TAG_NAV, GUMBO_TAG_OL, GUMBO_TAG_P, GUMBO_TAG_PRE, GUMBO_TAG_SECTION, GUMBO_TAG_TABLE, GUMBO_TAG_UL};
 
 QList<AnnotationUtility::ErrorCode> AnnotationUtility::convertAnnotationForContentNodes(HTMLResource *html, QList<GumboNode *> contentNodes)
 {
@@ -446,10 +446,8 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
         linkedDocument = selected.cursor->document();
         linkedId = linked_path[0];
     } else if (linked_path.length() == 2) { // Linked node in other file.
-        HTMLResource *html;
-        int err;
-        std::tie(err, html) = getDocument(linked_path[0]);
-        if (err) {
+        HTMLResource *html = getDocument(linked_path[0]);
+        if (!html) {
             return std::make_pair(ErrorCode::LinkedFileNotFound, AnnoData());
         }
         linkedDocument = &(html->GetTextDocumentForWriting());
@@ -487,21 +485,21 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
     return std::make_pair(ErrorCode::NoError, AnnoData{linkedCursor, linkedGumbo, linkedANode});
 }
 
-std::pair<int, HTMLResource *> AnnotationUtility::getDocument(const QString &filePath)
+HTMLResource *AnnotationUtility::getDocument(const QString &filePath)
 {
     QString filename = filePath.split('/').back();
     QWidget *mainWindowWidget = Utility::GetMainWindow();
     MainWindow *mainWindow = dynamic_cast<MainWindow *>(mainWindowWidget);
     if (!mainWindow) {
-        return std::make_pair(-1, nullptr);
+        return nullptr;
     }
     const QStringList currentFilenames = mainWindow->GetCurrentBook()->GetFolderKeeper()->GetAllFilenames();
     if (!currentFilenames.contains(filename, Qt::CaseSensitive)) {
-        return std::make_pair(1, nullptr);
+        return nullptr;
     }
     Resource *resource = mainWindow->GetCurrentBook()->GetFolderKeeper()->GetResourceByFilename(filename);
     HTMLResource *document = qobject_cast<HTMLResource *>(resource);
-    return std::make_pair(0, document);
+    return document;
 }
 
 AnnotationUtility::ErrorCode AnnotationUtility::selectWrappingBlockTag(AnnoData *anno)

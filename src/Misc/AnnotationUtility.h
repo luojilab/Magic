@@ -190,9 +190,9 @@ private:
      Get HTML resource according to the input path
 
      @param filePath the document file path relative to the current file.
-     @return The pair of error (0 if succeeded, otherwise failed) code and a pointer to the HTML resource.
+     @return Pointer to the HTML resource, nullptr if failed.
      */
-    static std::pair<int, HTMLResource *> getDocument(const QString &filePath);
+    static HTMLResource *getDocument(const QString &filePath);
     
     /**
      With the tag <a> selected, move the cursor to select the least parent block tag.
