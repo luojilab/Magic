@@ -105,21 +105,6 @@ public:
     static void insertAnnotation(const QString &annoText, const QString &annoIcon, QTextCursor cursor);
     
     /**
-     Convert doubly linked annotation to image annotation by selecting content.
-
-     @param codeView The current CodeViewEditor.
-     @param cursor If the document is not in current ViewEditor, then pass the cursor.
-     */
-    static ErrorCode convertFromContent(CodeViewEditor *codeView, QTextCursor *cursor);
-    
-    /**
-     Convert doubly linked annotation to image annotation by selecting reference.
-
-     @param codeView The current CodeViewEditor.
-     */
-    static ErrorCode convertFromReference(CodeViewEditor *codeView);
-    
-    /**
      Remove HTML tags in text.
 
      @param originText The text to be processed.
@@ -151,6 +136,21 @@ private:
         std::shared_ptr<GumboInterface> gumbo;
         GumboNode *aNode;
     } AnnoData;
+    
+    /**
+     Convert doubly linked annotation to image annotation by selecting content.
+     
+     @param codeView The current CodeViewEditor.
+     @param cursor If the document is not in current ViewEditor, then pass the cursor.
+     */
+    static ErrorCode convertFromContent(CodeViewEditor *codeView, QTextCursor *cursor);
+    
+    /**
+     Convert doubly linked annotation to image annotation by selecting reference.
+     
+     @param codeView The current CodeViewEditor.
+     */
+    static ErrorCode convertFromReference(CodeViewEditor *codeView);
     
     /**
      Convert annotation to image annotation.
