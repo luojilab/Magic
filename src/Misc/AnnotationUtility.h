@@ -63,6 +63,7 @@ public:
         GetMainWindowFailed,
         AddStylesheetFailed,
         TagHeadNotFound,
+        NullCodeViewOrCursor,
     };
     
     enum class ConvertMode
@@ -75,6 +76,15 @@ public:
     static const std::map<AnnotationUtility::ErrorCode, QString> S_errorMessages;
     
     AnnotationUtility() = delete;
+    
+    /**
+     API for converting annotations in an HTML document.
+
+     @param html The HTML resource to convert.
+     @param contentNodes The GumboNodes to convert, they should all be content nodes (not reference).
+     @return A QList of ErrorCode indicating the converting results of corresponding nodes.
+     */
+    static QList<ErrorCode> convertAnnotationForContentNodes(HTMLResource *html, QList<GumboNode *> contentNodes);
     
     /**
      Convert annotation API for context menu entry in CodeViewEditor,
@@ -95,20 +105,6 @@ public:
     static void insertAnnotation(const QString &annoText, const QString &annoIcon, QTextCursor cursor);
     
     /**
-     Convert doubly linked annotation to image annotation by selecting content.
-
-     @param codeView The current CodeViewEditor.
-     */
-    static ErrorCode convertFromContent(CodeViewEditor *codeView);
-    
-    /**
-     Convert doubly linked annotation to image annotation by selecting reference.
-
-     @param codeView The current CodeViewEditor.
-     */
-    static ErrorCode convertFromReference(CodeViewEditor *codeView);
-    
-    /**
      Remove HTML tags in text.
 
      @param originText The text to be processed.
@@ -120,9 +116,11 @@ public:
      Append the icon style to the end of linked stylesheet file.
 
      @param codeView The current CodeViewEditor.
+     @param mainWindow A pointer to MainWindow to search for resources.
+     @param paramCursor Alternative to codeView if needed.
      @return Whether the process succeeded.
      */
-    static void appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow = nullptr);
+    static void appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow = nullptr, QTextCursor *paramCursor = nullptr);
     
 private:
     // A struct to store neccesary data for parameter passing.
@@ -140,6 +138,21 @@ private:
     } AnnoData;
     
     /**
+     Convert doubly linked annotation to image annotation by selecting content.
+     
+     @param codeView The current CodeViewEditor.
+     @param cursor If the document is not in current ViewEditor, then pass the cursor.
+     */
+    static ErrorCode convertFromContent(CodeViewEditor *codeView, QTextCursor *cursor);
+    
+    /**
+     Convert doubly linked annotation to image annotation by selecting reference.
+     
+     @param codeView The current CodeViewEditor.
+     */
+    static ErrorCode convertFromReference(CodeViewEditor *codeView);
+    
+    /**
      Convert annotation to image annotation.
 
      @param content Prepared annotation content data.
@@ -152,9 +165,10 @@ private:
      Select the <a> tag in the block (there should be only one <a>).
 
      @param codeView The current CodeViewEditor.
+     @param cursor Alternative to codeView
      @return The pair of error code and processed data.
      */
-    static std::pair<ErrorCode, AnnoData> getTagAInBlock(CodeViewEditor *codeView);
+    static std::pair<ErrorCode, AnnoData> getTagAInBlock(CodeViewEditor *codeView, QTextCursor *cursor);
     
     /**
      Select the <a> tag around the cursor.
@@ -176,9 +190,9 @@ private:
      Get HTML resource according to the input path
 
      @param filePath the document file path relative to the current file.
-     @return The pair of error (0 if succeeded, otherwise failed) code and a pointer to the HTML resource.
+     @return Pointer to the HTML resource, nullptr if failed.
      */
-    static std::pair<int, HTMLResource *> getDocument(const QString &filePath);
+    static HTMLResource *getDocument(const QString &filePath);
     
     /**
      With the tag <a> selected, move the cursor to select the least parent block tag.
@@ -224,18 +238,19 @@ private:
     /**
      Add a new CSS file if there is no linked .css when inserting style.
 
-     @param codeView The current CodeViewEditor.
-     @return 0 if succeeded, otherwise failed.
+     @param cursor A text cursor in the target document.
+     @param mainWindow A pointer to the MainWindow.
+     @return Error code.
      */
-    static ErrorCode addStylesheet(CodeViewEditor *codeView, MainWindow *mainWindow);
+    static ErrorCode addStylesheet(QTextCursor cursor, MainWindow *mainWindow);
     
     /**
      Add the link to the newly added CSS file in the HTML.
 
-     @param codeView The current CodeViewEditor.
-     @return 0 if succeeded, otherwise failed.
+     @param cursor A text cursor in the target document.
+     @return Error code.
      */
-    static ErrorCode addStylesheetLink(CodeViewEditor *codeView);
+    static ErrorCode addStylesheetLink(QTextCursor cursor);
 };
 
 #endif /* ANNOTATION_UTILITIES_H */

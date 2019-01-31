@@ -32,19 +32,39 @@
 #include "Misc/CSSSelectorJudge.hpp"    // CSSSelectorJudge::selectorExists()
 #include <iostream>                     // std::cerr
 
-const QString S_annoPrefix = "<img class=\"epub-footnote\" src=\"";
-const QString S_annoInfix = "\" alt=\"";
-const QString S_annoSuffix = "\" />";
-const QString S_defaultIconSrc = "../Images/AnnoIcon0.png";
-const QString S_tagARegex = "<a(\\s+\\w+=\"(\\w|-|#|\\.|\\/)+\"\\s*)+>.*</a>";
-const QString S_iconFilename = "AnnoIcon0";
-const QString S_iconFilePath = ":icon/AnnoIcon0.png";
-const QString S_annoStylesheetFilename = "AnnotationStyles.css";
-const QString S_annoStylesheetPath = ":icon/" + S_annoStylesheetFilename;
-const QString S_annoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
-const char *S_annoSelector = "img.epub-footnote { }";
-const char *S_annoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
-const QList<GumboTag> S_blockTags = {GUMBO_TAG_ADDRESS, GUMBO_TAG_ARTICLE, GUMBO_TAG_ASIDE, GUMBO_TAG_BLOCKQUOTE, GUMBO_TAG_DETAILS, GUMBO_TAG_DD, GUMBO_TAG_DIV, GUMBO_TAG_DL, GUMBO_TAG_DT, GUMBO_TAG_FIELDSET, GUMBO_TAG_FIGCAPTION, GUMBO_TAG_FIGURE, GUMBO_TAG_FOOTER, GUMBO_TAG_FORM, GUMBO_TAG_H1, GUMBO_TAG_H2, GUMBO_TAG_H3, GUMBO_TAG_H4, GUMBO_TAG_H5, GUMBO_TAG_H6, GUMBO_TAG_HEADER, GUMBO_TAG_HGROUP, GUMBO_TAG_HR, GUMBO_TAG_LI, GUMBO_TAG_MAIN, GUMBO_TAG_NAV, GUMBO_TAG_OL, GUMBO_TAG_P, GUMBO_TAG_PRE, GUMBO_TAG_SECTION, GUMBO_TAG_TABLE, GUMBO_TAG_UL};
+static const QString S_annoPrefix = "<img class=\"epub-footnote\" src=\"";
+static const QString S_annoInfix = "\" alt=\"";
+static const QString S_annoSuffix = "\" />";
+static const QString S_defaultIconSrc = "../Images/AnnoIcon0.png";
+static const QString S_tagARegex = "<a(\\s+\\w+=\"(\\w|-|#|\\.|\\/)+\"\\s*)+>.*</a>";
+static const QString S_iconFilename = "AnnoIcon0";
+static const QString S_iconFilePath = ":icon/AnnoIcon0.png";
+static const QString S_annoStylesheetFilename = "AnnotationStyles.css";
+static const QString S_annoStylesheetPath = ":icon/" + S_annoStylesheetFilename;
+static const QString S_annoStyleLink = "<link rel=\"stylesheet\" href=\"../Styles/AnnotationStyles.css\" />";
+static const char *S_annoSelector = "img.epub-footnote { }";
+static const char *S_annoStyle = "\n\nimg.epub-footnote {\n    width: .8em;\n    height: .8em;\n    vertical-align: super;\n    padding: 0 5px;\n}\n";
+static const QList<GumboTag> S_blockTags = {GUMBO_TAG_ADDRESS, GUMBO_TAG_ARTICLE, GUMBO_TAG_ASIDE, GUMBO_TAG_BLOCKQUOTE, GUMBO_TAG_DETAILS, GUMBO_TAG_DD, GUMBO_TAG_DIV, GUMBO_TAG_DL, GUMBO_TAG_DT, GUMBO_TAG_FIELDSET, GUMBO_TAG_FIGCAPTION, GUMBO_TAG_FIGURE, GUMBO_TAG_FOOTER, GUMBO_TAG_FORM, GUMBO_TAG_H1, GUMBO_TAG_H2, GUMBO_TAG_H3, GUMBO_TAG_H4, GUMBO_TAG_H5, GUMBO_TAG_H6, GUMBO_TAG_HEADER, GUMBO_TAG_HGROUP, GUMBO_TAG_HR, GUMBO_TAG_LI, GUMBO_TAG_MAIN, GUMBO_TAG_NAV, GUMBO_TAG_OL, GUMBO_TAG_P, GUMBO_TAG_PRE, GUMBO_TAG_SECTION, GUMBO_TAG_TABLE, GUMBO_TAG_UL};
+
+QList<AnnotationUtility::ErrorCode> AnnotationUtility::convertAnnotationForContentNodes(HTMLResource *html, QList<GumboNode *> contentNodes)
+{
+    QList<ErrorCode> errors;
+    if (!html || contentNodes.isEmpty()) {
+        return errors;
+    }
+    
+    for (const auto &node : contentNodes) {
+        size_t line = node->v.element.start_pos.line;
+        size_t column = node->v.element.start_pos.column;
+
+        QTextCursor cursor(&(html->GetTextDocumentForWriting()));
+        cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, line);
+        cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, column - 1);
+        
+        errors.append(convertFromContent(nullptr, &cursor));
+    }
+    return errors;
+}
 
 void AnnotationUtility::convertAnnotationForContextMenu(CodeViewEditor *codeView, ConvertMode mode)
 {
@@ -53,7 +73,7 @@ void AnnotationUtility::convertAnnotationForContextMenu(CodeViewEditor *codeView
     }
     ErrorCode err = ErrorCode::NoError;
     if (mode == ConvertMode::FromContent) {
-        err = convertFromContent(codeView);
+        err = convertFromContent(codeView, nullptr);
     } else if (mode == ConvertMode::FromReference) {
         err = convertFromReference(codeView);
     } else {
@@ -73,11 +93,15 @@ void AnnotationUtility::insertAnnotation(const QString &annoText, const QString 
     cursor.insertText(annotationCode);
 }
 
-AnnotationUtility::ErrorCode AnnotationUtility::convertFromContent(CodeViewEditor *codeView)
+AnnotationUtility::ErrorCode AnnotationUtility::convertFromContent(CodeViewEditor *codeView, QTextCursor *cursor)
 {
+    if (!codeView && !cursor) {
+        return ErrorCode::NullCodeViewOrCursor;
+    }
+
     AnnoData content;
     ErrorCode err = ErrorCode::NoError;
-    std::tie(err, content) = getTagAInBlock(codeView);
+    std::tie(err, content) = getTagAInBlock(codeView, cursor);
     if (err != ErrorCode::NoError) {
         return err;
     }
@@ -104,7 +128,7 @@ AnnotationUtility::ErrorCode AnnotationUtility::convertFromContent(CodeViewEdito
     }
     
     addIconResource();
-    appendStyle(codeView);
+    appendStyle(codeView, nullptr, cursor);
     
     return ErrorCode::NoError;
 }
@@ -162,7 +186,7 @@ QString AnnotationUtility::getPlainText(const QString &originText)
     return returnText;
 }
 
-void AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow)
+void AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWindow, QTextCursor *paramCursor)
 {
     if (!mainWindow) {
         mainWindow = dynamic_cast<MainWindow *>(Utility::GetMainWindow());
@@ -172,11 +196,18 @@ void AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWi
         }
     }
     
+    QTextCursor cursor;
+    if (codeView) {
+        cursor = codeView->textCursor();
+    } else {
+        cursor = *paramCursor;
+    }
+    
     // Get html link nodes using Gumbo.
-    GumboInterface gumbo(codeView->toPlainText(), "HTML2.0");
+    GumboInterface gumbo(cursor.document()->toPlainText(), "HTML2.0");
     const QList<GumboNode *> nodeList = gumbo.get_all_nodes_with_tag(GUMBO_TAG_LINK);
     if (nodeList.isEmpty()) {
-        auto err = addStylesheet(codeView, mainWindow);
+        auto err = addStylesheet(cursor, mainWindow);
         if (err != ErrorCode::NoError) {
             QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         }
@@ -205,7 +236,7 @@ void AnnotationUtility::appendStyle(CodeViewEditor *codeView, MainWindow *mainWi
     }
     
     if (!hasCss) {
-        auto err = addStylesheet(codeView, mainWindow);
+        auto err = addStylesheet(cursor, mainWindow);
         if (err != ErrorCode::NoError) {
             QMessageBox::warning(nullptr, "", S_errorMessages.at(err));
         }
@@ -277,13 +308,16 @@ AnnotationUtility::ErrorCode AnnotationUtility::convertAnnotation(AnnoData &cont
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
-AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView)
+AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView, QTextCursor *cursor)
 {
-    // Get block text under the cursor.
-    QTextCursor tempCursor = codeView->textCursor();
-    tempCursor.select(QTextCursor::BlockUnderCursor);
-    QString blockText = tempCursor.selectedText().trimmed();
+    if (codeView) {
+        QTextCursor cursorInCodeView = codeView->textCursor();
+        cursor = &cursorInCodeView;
+    }
 
+    cursor->select(QTextCursor::BlockUnderCursor);
+    QString blockText = cursor->selectedText().trimmed();
+    
     // Parse the text using Gumbo to check the number of <a> tag.
     GumboInterface tempGumbo = {blockText, "HTML2.0"};
     QList<GumboNode *> tempANodes = tempGumbo.get_all_nodes_with_tag(GUMBO_TAG_A);
@@ -296,28 +330,25 @@ AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView)
     QHash<QString, QString> tempANodeAttributes = tempGumbo.get_attributes_of_node(tempANode);
     QString aNodeId = tempANodeAttributes["id"];
     if (aNodeId.isEmpty()) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::AttributeIdNotFound, AnnoData());
+        return std::make_pair(ErrorCode::AttributeIdNotFound, AnnoData());
     }
-    
-    // Select the exact <a> tag for cursor.
-    tempCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
-    codeView->setTextCursor(tempCursor);
-    
-    if (!codeView->find("<a", QTextDocument::FindBackward)) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::OpenTagANotFound, AnnoData());
+
+    cursor->movePosition(QTextCursor::Right, QTextCursor::MoveAnchor);
+    QTextCursor tempCursor = cursor->document()->find("<a", *cursor, QTextDocument::FindBackward);
+    if (tempCursor.isNull()) {
+        return std::make_pair(ErrorCode::OpenTagANotFound, AnnoData());
     }
-    tempCursor = codeView->textCursor();
     tempCursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
-    codeView->setTextCursor(tempCursor);
     
     QRegExp tagARegex{S_tagARegex};
     tagARegex.setMinimal(true);
-    if (!codeView->find(tagARegex)) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::TagANotFound, AnnoData());
+    tempCursor = cursor->document()->find(tagARegex, tempCursor);
+    if (tempCursor.isNull()) {
+        return std::make_pair(ErrorCode::TagANotFound, AnnoData());
     }
-    
+
     // Parse the document and get the <a> node with the id.
-    std::shared_ptr<GumboInterface> returnGumbo = std::make_shared<GumboInterface>(codeView->document()->toPlainText(), "HTML2.0");
+    std::shared_ptr<GumboInterface> returnGumbo = std::make_shared<GumboInterface>(cursor->document()->toPlainText(), "HTML2.0");
     QList<GumboNode *> nodesWithId = returnGumbo->get_all_nodes_with_attribute("id");
     GumboNode *returnANode = nullptr;
     for (auto p : nodesWithId) {
@@ -330,9 +361,9 @@ AnnotationUtility::getTagAInBlock(CodeViewEditor *codeView)
     if (!returnANode) {
         throw std::logic_error("GumboNode parsed in block text not found in the document.");
     }
-    
-    std::shared_ptr<QTextCursor> returnCursor = std::make_shared<QTextCursor>(codeView->textCursor());
-    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
+
+    std::shared_ptr<QTextCursor> returnCursor = std::make_shared<QTextCursor>(tempCursor);
+    return std::make_pair(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
@@ -343,7 +374,7 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
     
     // Find opening tag <a>.
     if (!codeView->find("<a", QTextDocument::FindBackward)) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::OpenTagANotFound, AnnoData());
+        return std::make_pair(ErrorCode::OpenTagANotFound, AnnoData());
     }
     tempCursor = codeView->textCursor();
     tempCursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor);
@@ -353,13 +384,13 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
     QRegExp tagARegex{S_tagARegex};
     tagARegex.setMinimal(true);
     if (!codeView->find(tagARegex)) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::TagANotFound, AnnoData());
+        return std::make_pair(ErrorCode::TagANotFound, AnnoData());
     }
     
     tempCursor = codeView->textCursor();
     if (tempCursor.selectionStart() > initialCursor.position() || tempCursor.selectionEnd() < initialCursor.position()) {
         codeView->setTextCursor(initialCursor);
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::CursorOutOfRange, AnnoData());
+        return std::make_pair(ErrorCode::CursorOutOfRange, AnnoData());
     }
     
     // Parse the selected text to get node <a>...</a>.
@@ -367,16 +398,16 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
     GumboInterface tempGumbo{tagAText, "HTML2.0"};
     QList<GumboNode *> tempANodes = tempGumbo.get_all_nodes_with_tag(GUMBO_TAG_A);
     if (tempANodes.isEmpty()) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoLinkInSelectedBlock, AnnoData());
+        return std::make_pair(ErrorCode::NoLinkInSelectedBlock, AnnoData());
     }
     if (tempANodes.size() > 1) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::MultipleLinksInSelectedBlock, AnnoData());
+        return std::make_pair(ErrorCode::MultipleLinksInSelectedBlock, AnnoData());
     }
     GumboNode *tempANode = tempANodes[0];
     QHash<QString, QString> tempANodeAttributes = tempGumbo.get_attributes_of_node(tempANode);
     QString aNodeId = tempANodeAttributes["id"];
     if (aNodeId.isEmpty()) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::AttributeIdNotFound, AnnoData());
+        return std::make_pair(ErrorCode::AttributeIdNotFound, AnnoData());
     }
     
     // Parse the document and get the <a> node with the id.
@@ -395,7 +426,7 @@ AnnotationUtility::getWrappingTagA(CodeViewEditor *codeView)
     }
     
     std::shared_ptr<QTextCursor> returnCursor = std::make_shared<QTextCursor>(codeView->textCursor());
-    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
+    return std::make_pair(ErrorCode::NoError, AnnoData{returnCursor, returnGumbo, returnANode});
 }
 
 std::pair<AnnotationUtility::ErrorCode, AnnotationUtility::AnnoData>
@@ -404,7 +435,7 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
     QHash<QString, QString> selectedAAttributes = selected.gumbo->get_attributes_of_node(selected.aNode);
     QString &selectedHref = selectedAAttributes["href"];
     if (selectedHref.isEmpty()) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::EmptyHref, AnnoData());
+        return std::make_pair(ErrorCode::EmptyHref, AnnoData());
     }
     
     // Parse the href to determine the target file.
@@ -415,16 +446,14 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
         linkedDocument = selected.cursor->document();
         linkedId = linked_path[0];
     } else if (linked_path.length() == 2) { // Linked node in other file.
-        HTMLResource *html;
-        int err;
-        std::tie(err, html) = getDocument(linked_path[0]);
-        if (err) {
-            return std::make_pair<ErrorCode, AnnoData>(ErrorCode::LinkedFileNotFound, AnnoData());
+        HTMLResource *html = getDocument(linked_path[0]);
+        if (!html) {
+            return std::make_pair(ErrorCode::LinkedFileNotFound, AnnoData());
         }
         linkedDocument = &(html->GetTextDocumentForWriting());
         linkedId = linked_path[1];
     } else {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::InvalidHref, AnnoData());
+        return std::make_pair(ErrorCode::InvalidHref, AnnoData());
     }
     
     // Search the id corresponding to the href.
@@ -439,7 +468,7 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
         }
     }
     if (!linkedANode) {
-        return std::make_pair<ErrorCode, AnnoData>(ErrorCode::LinkedNodeNotFound, AnnoData());
+        return std::make_pair(ErrorCode::LinkedNodeNotFound, AnnoData());
     }
     
     // Get the reference cursor with <a> tag selected.
@@ -453,24 +482,24 @@ AnnotationUtility::getLinkedTagA(const AnnoData &selected)
     linkedCursor->movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, column - 1);
     linkedCursor->movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, length + 4);
     
-    return std::make_pair<ErrorCode, AnnoData>(ErrorCode::NoError, AnnoData{linkedCursor, linkedGumbo, linkedANode});
+    return std::make_pair(ErrorCode::NoError, AnnoData{linkedCursor, linkedGumbo, linkedANode});
 }
 
-std::pair<int, HTMLResource *> AnnotationUtility::getDocument(const QString &filePath)
+HTMLResource *AnnotationUtility::getDocument(const QString &filePath)
 {
     QString filename = filePath.split('/').back();
     QWidget *mainWindowWidget = Utility::GetMainWindow();
     MainWindow *mainWindow = dynamic_cast<MainWindow *>(mainWindowWidget);
     if (!mainWindow) {
-        return std::make_pair(-1, nullptr);
+        return nullptr;
     }
     const QStringList currentFilenames = mainWindow->GetCurrentBook()->GetFolderKeeper()->GetAllFilenames();
     if (!currentFilenames.contains(filename, Qt::CaseSensitive)) {
-        return std::make_pair(1, nullptr);
+        return nullptr;
     }
     Resource *resource = mainWindow->GetCurrentBook()->GetFolderKeeper()->GetResourceByFilename(filename);
     HTMLResource *document = qobject_cast<HTMLResource *>(resource);
-    return std::make_pair(0, document);
+    return document;
 }
 
 AnnotationUtility::ErrorCode AnnotationUtility::selectWrappingBlockTag(AnnoData *anno)
@@ -586,7 +615,7 @@ AnnotationUtility::ErrorCode AnnotationUtility::addIconResource()
     return ErrorCode::NoError;
 }
 
-AnnotationUtility::ErrorCode AnnotationUtility::addStylesheet(CodeViewEditor *codeView, MainWindow *mainWindow)
+AnnotationUtility::ErrorCode AnnotationUtility::addStylesheet(QTextCursor cursor, MainWindow *mainWindow)
 {
     if (!mainWindow) {
         return ErrorCode::GetMainWindowFailed;
@@ -595,37 +624,29 @@ AnnotationUtility::ErrorCode AnnotationUtility::addStylesheet(CodeViewEditor *co
     if (!annoStylesheet) {
         return ErrorCode::AddStylesheetFailed;
     }
-    addStylesheetLink(codeView);
-    
-    // Refresh view to display newly added file.
+    addStylesheetLink(cursor);
+
     mainWindow->GetBookBrowser()->Refresh();
     
     return ErrorCode::NoError;
 }
 
-AnnotationUtility::ErrorCode AnnotationUtility::addStylesheetLink(CodeViewEditor *codeView)
+AnnotationUtility::ErrorCode AnnotationUtility::addStylesheetLink(QTextCursor cursor)
 {
-    // Store the initial cursor position to recover later.
-    const QTextCursor initialCursor = codeView->textCursor();
-    
-    // Determine whether the stylesheet link is already added.
-    bool linkFound = codeView->find(S_annoStyleLink, QTextDocument::FindBackward);
-    if (!linkFound) {
-        bool headFound = codeView->find("</head>", QTextDocument::FindBackward);
-        if (!headFound) {
+    QTextCursor resultCursor = cursor.document()->find(S_annoStyleLink, cursor, QTextDocument::FindBackward);
+    if (resultCursor.isNull()) {
+        resultCursor = cursor.document()->find("</head>", cursor, QTextDocument::FindBackward);
+        if (resultCursor.isNull()) {
             return ErrorCode::TagHeadNotFound;
         }
         
-        codeView->textCursor().insertText(S_annoStyleLink + tr("\n</head>"));
+        resultCursor.insertText(S_annoStyleLink + tr("\n</head>"));
     }
-    
-    // Recover the cursor position.
-    codeView->setTextCursor(initialCursor);
-    
     return ErrorCode::NoError;
 }
 
 const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_errorMessages = {
+    {ErrorCode::NoError, "No Error."},
     {ErrorCode::EmptyHref, u8"含有空链接。"},
     {ErrorCode::LinkedFileNotFound, u8"未找到链接文件。"},
     {ErrorCode::InvalidHref, u8"无效的href。"},
@@ -646,4 +667,5 @@ const std::map<AnnotationUtility::ErrorCode, QString> AnnotationUtility::S_error
     {ErrorCode::GetMainWindowFailed, u8"获取主窗口失败。"},
     {ErrorCode::AddStylesheetFailed, u8"添加样式文件失败。\nAdding CSS file failed."},
     {ErrorCode::TagHeadNotFound, u8"未找到head标签。"},
+    {ErrorCode::NullCodeViewOrCursor, u8"Null CodeView or Cursor."},
 };
